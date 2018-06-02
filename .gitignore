@@ -67,3 +67,7 @@ fastlane/readme.md
 # OS-specific files
 .DS_Store
 .DS_Store?
+
+# Javalint
+checkstyle.jar
+google_checks.xml
