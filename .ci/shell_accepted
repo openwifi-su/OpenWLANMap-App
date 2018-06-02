@@ -1,0 +1,9 @@
+./.git/hooks/pre-rebase.sample
+./.git/hooks/pre-commit.sample
+./.git/hooks/pre-receive.sample
+./.git/hooks/applypatch-msg.sample
+./.git/hooks/prepare-commit-msg.sample
+./.git/hooks/pre-push.sample
+./.git/hooks/pre-applypatch.sample
+./.git/hooks/update.sample
+./gradlew
