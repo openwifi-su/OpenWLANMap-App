@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1DE9B6</color>
+    <color name="colorPrimaryDark">#009688</color>
+    <color name="colorAccent">#009688</color>
+
+    <!--signal level 0: very good -->
+    <color name="signal_level_0">#00E676</color>
+    <!--signal level 1: good -->
+    <color name="signal_level_1">#69F0AE</color>
+    <!--signal level 2: okay -->
+    <color name="signal_level_2">#B9F6CA</color>
+    <!--signal level 3: quite bad -->
+    <color name="signal_level_3">#FFEA00</color>
+    <!--signal level 4: bad -->
+    <color name="signal_level_4">#FF3D00</color>
+
+
+    <!--timestamp color-->
+    <color name="timestamp">#B4BAC0</color>
+</resources>

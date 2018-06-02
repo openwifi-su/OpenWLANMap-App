@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arr_languages">
+        <item>@string/english</item>
+        <item>@string/german</item>
+        <item>@string/vietnamese</item>
+        <item>@string/spanish</item>
+    </string-array>
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="spanish">Spanish</string>
+
+    <string-array name="arr_start_modes">
+        <item>@string/always_in_background</item>
+        <item>@string/after_start_in_background</item>
+    </string-array>
+    <string name="always_in_background">Always run in background after starting phone</string>
+    <string name="after_start_in_background">Run in background after starting the application</string>
+
+    <string-array name="arr_upload_modes">
+        <item>@string/manual</item>
+        <item>@string/if_internet</item>
+        <item>@string/if_wifi</item>
+    </string-array>
+    <string name="manual">Manual</string>
+    <string name="if_internet">Automatic if internet connection is available</string>
+    <string name="if_wifi">Automatic if wireless connection is available</string>
+
+    <string-array name="arr_battery">
+        <item>@string/never</item>
+        <item>@string/five</item>
+        <item>@string/ten</item>
+        <item>@string/fifteen</item>
+    </string-array>
+    <string name="five">5 percent</string>
+    <string name="ten">10 percent</string>
+    <string name="fifteen">15 percent</string>
+    <string name="never">Never</string>
+
+    <string-array name="arr_time_kill_app">
+        <item>@string/never</item>
+        <item>@string/five_m</item>
+        <item>@string/ten_m</item>
+        <item>@string/fifteen_m</item>
+        <item>@string/thirty_m</item>
+    </string-array>
+    <string name="five_m">5 minutes</string>
+    <string name="ten_m">10 minutes</string>
+    <string name="fifteen_m">15 minutes</string>
+    <string name="thirty_m">30 minutes</string>
+
+    <string-array name="arr_time_stop_scan">
+        <item>@string/never</item>
+        <item>@string/one_m</item>
+        <item>@string/two_m</item>
+        <item>@string/five_m</item>
+        <item>@string/ten_m</item>
+    </string-array>
+    <string name="one_m">1 minute</string>
+    <string name="two_m">2 minutes</string>
+
+    <string-array name="arr_brightness">
+        <item>@string/never</item>
+        <item>@string/always</item>
+        <item>@string/reduce_at_5</item>
+        <item>@string/reduce_at_10</item>
+        <item>@string/reduce_at_20</item>
+    </string-array>
+    <string name="always">Always</string>
+    <string name="reduce_at_5">Automatic reduce when battery is smaller than 5 percent</string>
+    <string name="reduce_at_10">Automatic reduce when battery is smaller than 10 percent</string>
+    <string name="reduce_at_20">Automatic reduce when battery is smaller than 20 percent</string>
+
+</resources>

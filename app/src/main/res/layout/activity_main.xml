@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="su.openwifi.openwlanmap.MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        style="@style/Header"
+        android:paddingTop="10dp"
+        android:text="Summary"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        style="@style/Box">
+        <LinearLayout style="@style/HeaderCategory">
+            <TextView
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:text="GPS: "
+                />
+            <TextView
+                android:id="@+id/gps"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="Waiting for signal..."
+                />
+        </LinearLayout>
+        <LinearLayout style="@style/HeaderCategory">
+            <TextView
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:text="Scan service: "
+                />
+            <TextView
+                android:id="@+id/scan_status"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="Scanning ..."
+                />
+        </LinearLayout>
+        <LinearLayout style="@style/HeaderCategory">
+            <TextView
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:text="APs Total: "
+                />
+            <TextView
+                android:id="@+id/ap_total"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="100"
+                />
+        </LinearLayout>
+        <LinearLayout style="@style/HeaderCategory">
+            <TextView
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:text="Newest scan:"
+                />
+            <TextView
+                android:id="@+id/newest_scan"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="10"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        style="@style/Header"
+        android:paddingTop="10dp"
+        android:text="Access Point List"/>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Box"
+        android:divider="#000000"
+        android:dividerHeight="2dp"
+        android:orientation="vertical">
+    </ListView>
+
+</LinearLayout>
