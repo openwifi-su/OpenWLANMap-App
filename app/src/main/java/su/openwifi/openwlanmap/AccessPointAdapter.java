@@ -1,7 +1,9 @@
 package su.openwifi.openwlanmap;
 
-import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -10,16 +12,22 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static android.view.View.GONE;
 
 /**
  * Created by tali on 18.05.18.
  */
 
 public class AccessPointAdapter extends ArrayAdapter<AccessPoint> {
-    public AccessPointAdapter(@NonNull Activity activity,ArrayList<AccessPoint> list) {
-        super(activity, 0, list);
+    private Context context;
+
+    public AccessPointAdapter(@NonNull Context context, List<AccessPoint> list) {
+        super(context, 0, list);
+        this.context = context;
     }
 
     private int getColor(int strength) {
@@ -51,16 +59,40 @@ public class AccessPointAdapter extends ArrayAdapter<AccessPoint> {
         TextView ssid = view.findViewById(R.id.ssid);
         TextView freq = view.findViewById(R.id.frequency);
         TextView timestamp = view.findViewById(R.id.timestamp);
+        TextView lat = view.findViewById(R.id.lat);
+        TextView lon = view.findViewById(R.id.lon);
+        ssid.setVisibility(GONE);
+        freq.setVisibility(GONE);
+        timestamp.setVisibility(GONE);
+        lat.setVisibility(GONE);
+        lon.setVisibility(GONE);
 
         rssi.setText(String.valueOf(ap.getRssid()));
         GradientDrawable circle = (GradientDrawable) rssi.getBackground();
         circle.setColor(getColor(ap.getRssid()));
         bssid.setText(ap.getBssid());
-        ssid.setText(ap.getSsid());
-        freq.setText(String.valueOf(ap.getFrequency())+"GHz");
-        timestamp.setText(Utils.SIMPLE_DATE_FORMAT.format(
-                new Date(ap.getTimestamp())
-        ));
+
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> listSet = defaultSharedPreferences.getStringSet("pref_show_list", null);
+        for (String item : listSet) {
+            if (item.equalsIgnoreCase(getContext().getString(R.string.l_ssid))) {
+                ssid.setText(ap.getSsid());
+                ssid.setVisibility(View.VISIBLE);
+            } else if (item.equalsIgnoreCase(getContext().getString(R.string.l_freq))) {
+                freq.setText(String.valueOf(ap.getFrequency()) + "GHz");
+                freq.setVisibility(View.VISIBLE);
+            } else if (item.equalsIgnoreCase(getContext().getString(R.string.l_locate))) {
+                lat.setText(String.valueOf(ap.getLat()));
+                lon.setText(String.valueOf(ap.getLon()));
+                lat.setVisibility(View.VISIBLE);
+                lon.setVisibility(View.VISIBLE);
+            } else if (item.equalsIgnoreCase(getContext().getString(R.string.l_timestamp))) {
+                timestamp.setText(Utils.SIMPLE_DATE_FORMAT.format(
+                        new Date(ap.getTimestamp())
+                ));
+                timestamp.setVisibility(View.VISIBLE);
+            }
+        }
         return view;
     }
 }
