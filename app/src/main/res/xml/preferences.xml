@@ -1,103 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-    <PreferenceCategory
-        android:title="@string/setting_user">
-        <SwitchPreference
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/setting_user">
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_privacy"
-            android:title="@string/setting_privacy"
-            android:defaultValue="true">
-        </SwitchPreference>
+            android:title="@string/setting_privacy"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
+            android:defaultValue="not set yet"
             android:key="pref_team"
-            android:title="@string/names"
-            android:defaultValue="not set yet">
-        </su.openwifi.openwlanmap.custom.CustomEditTextPreference>
+            android:title="@string/names"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/setting_general">
+    <PreferenceCategory android:title="@string/setting_project">
+        <su.openwifi.openwlanmap.custom.CustomMultiListPreference
+            android:defaultValue="@array/arr_default_project"
+            android:entries="@array/arr_project"
+            android:entryValues="@array/arr_project"
+            android:key="pref_support_project"
+            android:title="@string/setting_support_project"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setting_general">
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_language"
-            android:title="@string/setting_language"
-            android:entries="@array/arr_languages"
-            android:entryValues="@array/arr_languages"
-            android:defaultValue="@string/english">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
-        <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_start_mode"
-            android:title="@string/setting_start_mode"
+            android:defaultValue="@string/always_in_background"
             android:entries="@array/arr_start_modes"
             android:entryValues="@array/arr_start_modes"
-            android:defaultValue="@string/always_in_background">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
-        <su.openwifi.openwlanmap.custom.CustomEditTextPreferenceScanMode
-            android:key="pref_scan_period"
-            android:title="@string/setting_scan_period"
-            android:inputType="number"
-            android:defaultValue="5">
-        </su.openwifi.openwlanmap.custom.CustomEditTextPreferenceScanMode>
+            android:key="pref_start_mode"
+            android:title="@string/setting_start_mode"></su.openwifi.openwlanmap.custom.CustomListPreference>
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_upload_mode"
-            android:title="@string/setting_upload_mode"
+            android:defaultValue="@string/if_wifi"
             android:entries="@array/arr_upload_modes"
             android:entryValues="@array/arr_upload_modes"
-            android:defaultValue="@string/if_wifi">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
+            android:key="pref_upload_mode"
+            android:title="@string/setting_upload_mode"></su.openwifi.openwlanmap.custom.CustomListPreference>
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_autoconnect_freifunk"
             android:layout="@layout/custom_pref_layout"
-            android:title="@string/setting_autoconnect_freifunk"
-            android:defaultValue="true">
-        </CheckBoxPreference>
+            android:title="@string/setting_autoconnect_freifunk"></CheckBoxPreference>
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_autoconnect_openwifi"
             android:layout="@layout/custom_pref_layout"
-            android:title="@string/setting_autoconnect"
-            android:defaultValue="false">
-        </CheckBoxPreference>
-        <su.openwifi.openwlanmap.custom.CustomEditTextPreferenceRSSI
+            android:title="@string/setting_autoconnect"></CheckBoxPreference>
+        <su.openwifi.openwlanmap.custom.CustomListPreference
+            android:defaultValue="@string/r120"
+            android:entries="@array/arr_rssi"
+            android:entryValues="@array/arr_rssi"
+            android:inputType="numberSigned"
             android:key="pref_min_rssi"
-            android:title="@string/setting_min_rssi"
-            android:defaultValue="-120"
-            android:inputType="numberSigned">
-        </su.openwifi.openwlanmap.custom.CustomEditTextPreferenceRSSI>
+            android:title="@string/setting_min_rssi"></su.openwifi.openwlanmap.custom.CustomListPreference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_show_counter"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/setting_show_counter"></CheckBoxPreference>
+        <su.openwifi.openwlanmap.custom.CustomMultiListPreference
+            android:defaultValue="@array/arr_summary_default"
+            android:entries="@array/arr_summary"
+            android:entryValues="@array/arr_summary"
+            android:key="pref_show_summary"
+            android:title="@string/setting_summary"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
+        <su.openwifi.openwlanmap.custom.CustomMultiListPreference
+            android:defaultValue="@array/arr_list_default"
+            android:entries="@array/arr_list"
+            android:entryValues="@array/arr_list"
+            android:key="pref_show_list"
+            android:title="@string/setting_list"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/setting_resource">
+    <PreferenceCategory android:title="@string/setting_resource">
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_battery"
-            android:title="@string/setting_battery"
+            android:defaultValue="@string/five"
             android:entries="@array/arr_battery"
             android:entryValues="@array/arr_battery"
-            android:defaultValue="@string/five">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
+            android:key="pref_battery"
+            android:title="@string/setting_battery"></su.openwifi.openwlanmap.custom.CustomListPreference>
 
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_kill_ap_no_gps"
-            android:title="@string/kill_ap_no_gps"
-            android:layout="@layout/custom_pref_layout"
+            android:defaultValue="@string/thirty_m"
             android:entries="@array/arr_time_kill_app"
             android:entryValues="@array/arr_time_kill_app"
-            android:defaultValue="@string/thirty_m">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
+            android:key="pref_kill_ap_no_gps"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/kill_ap_no_gps"></su.openwifi.openwlanmap.custom.CustomListPreference>
 
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_stop_scan_no_gps"
-            android:title="@string/stop_scan_no_gps"
-            android:layout="@layout/custom_pref_layout"
+            android:defaultValue="@string/five_m"
             android:entries="@array/arr_time_stop_scan"
             android:entryValues="@array/arr_time_stop_scan"
-            android:defaultValue="@string/five_m">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
+            android:key="pref_stop_scan_no_gps"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/stop_scan_no_gps"></su.openwifi.openwlanmap.custom.CustomListPreference>
 
         <su.openwifi.openwlanmap.custom.CustomListPreference
-            android:key="pref_brightness"
-            android:title="@string/setting_brightness"
+            android:defaultValue="@string/never"
             android:entries="@array/arr_brightness"
             android:entryValues="@array/arr_brightness"
-            android:defaultValue="@string/never">
-        </su.openwifi.openwlanmap.custom.CustomListPreference>
+            android:key="pref_brightness"
+            android:title="@string/setting_brightness"></su.openwifi.openwlanmap.custom.CustomListPreference>
     </PreferenceCategory>
+
 
 </PreferenceScreen>
