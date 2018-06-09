@@ -9,11 +9,17 @@ import android.util.AttributeSet;
  */
 
 public class CustomListPreference extends ListPreference {
-        public CustomListPreference(Context context) { super(context); }
-        public CustomListPreference(Context context, AttributeSet attrs) { super(context, attrs); }
-        @Override
-        public void setValue(String value) {
-            super.setValue(value);
-            setSummary(getEntry());
-        }
+    public CustomListPreference(Context context) {
+        super(context);
+    }
+
+    public CustomListPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    public void setValue(String value) {
+        super.setValue(value);
+        setSummary(getEntry());
+    }
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -34,7 +33,7 @@
             android:scaleType="fitStart"
             android:visibility="gone"
             tools:ignore="ContentDescription"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
     </FrameLayout>
 
     <LinearLayout
@@ -51,14 +50,14 @@
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
             android:maxLines="2"
-            android:textAppearance="?textAppearanceListItem"/>
+            android:textAppearance="?textAppearanceListItem" />
 
         <TextView
             android:id="@android:id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="10"
-            android:textColor="?android:textColorSecondary"/>
+            android:textColor="?android:textColorSecondary" />
 
     </LinearLayout>
 
@@ -73,6 +72,6 @@
         android:gravity="end|center_vertical"
         android:orientation="vertical"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"/>
+        android:paddingRight="16dp" />
 
 </LinearLayout>
