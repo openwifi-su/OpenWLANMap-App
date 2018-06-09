@@ -9,16 +9,16 @@ import android.util.AttributeSet;
  */
 
 public class CustomEditTextPreference extends EditTextPreference {
-    public CustomEditTextPreference(Context context) {
-        super(context);
-    }
+  public CustomEditTextPreference(Context context) {
+    super(context);
+  }
 
-    public CustomEditTextPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public CustomEditTextPreference(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    @Override
-    public CharSequence getSummary() {
-        return getText();
-    }
+  @Override
+  public CharSequence getSummary() {
+    return getText();
+  }
 }

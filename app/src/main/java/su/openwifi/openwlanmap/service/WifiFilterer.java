@@ -7,70 +7,108 @@ import android.net.wifi.ScanResult;
  */
 
 public class WifiFilterer {
-    private WifiFilterer() {
-    }
+  public static final String[] mobilHotspot = {
+      "iphone",              // mobile AP
+      "ipad",            // mobile AP
+      "android",         // mobile AP
+      "motorola",       // mobile AP
+      "deinbus.de",     // WLAN network on board of German bus
+      "db ic bus",      // WLAN network on board of German bus
+      "fernbus",        // WLAN network on board of German bus
+      "flixbus",         // WLAN network on board of German bus
+      "flixmedia",       // WLAN network on board of German bus
+      "postbus",        // WLAN network on board of bus line
+      "megabus",        // WLAN network on board of bus line
+      "ecolines",       // WLAN network on board of German bus
+      "eurolines",      // WLAN network on board of German bus
+      "contiki-wifi",  // WLAN network on board of bus
+      "muenchenlinie",   // WLAN network on board of bus
+      "guest@ms ",      // WLAN network on Hurtigruten ships
+      "admin@ms ",      // WLAN network on Hurtigruten ships
+      "mobile hotspot",  // e.g. BlackBerry devices
+      "mobilewifi",     // e.g. some Vodafone devices
+      "portable hotspot", // e.g. HTC devices
+      "nokia lumia",    // portable hotspot
+      "telekom_ice",    // WLAN network on DB trains
+      "nsb_interakti",   // WLAN network in NSB trains)
+      "mobyclick"         // hotspot in bus in Hamburg
+  };
 
-    public boolean isOpenWifi(ScanResult ap) {
-        return ((!ap.capabilities.contains("WEP")) &&
-                (!ap.capabilities.contains("WPA")) &&
-                (!ap.capabilities.contains("TKIP")) &&
-                (!ap.capabilities.contains("CCMP")) &&
-                (!ap.capabilities.contains("PSK")));
-    }
+  private WifiFilterer() {
+  }
 
-    public boolean isFreeHotspot(ScanResult ap) {
-        if (isOpenWifi(ap)) {
-            String ssid = ap.SSID.toLowerCase();
-            if (ssid.contains("free-hotspot.com")
-                    || ssid.contains("the cloud")) {
-                return true;
-            }
-        }
-        return false;
-    }
+  /**
+   * This methods checks if the ScanResult wifi is an open wifi.
+   * @param ap : ScanResult object
+   * @return true if it is open wifi, otherwise false
+   */
+  public boolean isOpenWifi(ScanResult ap) {
+    return ((!ap.capabilities.contains("WEP"))
+        && (!ap.capabilities.contains("WPA"))
+        && (!ap.capabilities.contains("TKIP"))
+        && (!ap.capabilities.contains("CCMP"))
+        && (!ap.capabilities.contains("PSK")));
+  }
 
-    public boolean isFreifunk(ScanResult ap) {
-        return ap.SSID.toLowerCase().contains("freifunk");
+  /**
+   * This methods checks if the ScanResult wifi is free hotspot.
+   * @param ap : ScanResult object
+   * @return true if it is free hotspot, otherwise false
+   */
+  public boolean isFreeHotspot(ScanResult ap) {
+    if (isOpenWifi(ap)) {
+      String ssid = ap.SSID.toLowerCase();
+      if (ssid.contains("free-hotspot.com")
+          || ssid.contains("the cloud")) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    public boolean isNoMapMarked(ScanResult ap) {
-        return ap.SSID.endsWith("_nomap");
-    }
+  /**
+   * This methods checks if the ScanResult wifi is from freifunk.
+   * @param ap : ScanResult object
+   * @return true if it is from freifunk, otherwise false
+   */
+  public boolean isFreifunk(ScanResult ap) {
+    return ap.SSID.toLowerCase().contains("freifunk");
+  }
 
-    public boolean isMobilHotspot(ScanResult ap) {
-        if (ap.SSID.startsWith("Audi") || ap.SSID.startsWith("Volkswagen")) {
-            return true;
-        }
-        String lowerSSID = ap.SSID.toLowerCase();
-        return (lowerSSID.contains("iphone") ||                 // mobile AP
-                (lowerSSID.contains("ipad")) ||            // mobile AP
-                (lowerSSID.contains("android")) ||         // mobile AP
-                (lowerSSID.contains("motorola")) ||        // mobile AP
-                (lowerSSID.contains("deinbus.de")) ||      // WLAN network on board of German bus
-                (lowerSSID.contains("db ic bus")) ||       // WLAN network on board of German bus
-                (lowerSSID.contains("fernbus")) ||         // WLAN network on board of German bus
-                (lowerSSID.contains("flixbus")) ||         // WLAN network on board of German bus
-                (lowerSSID.contains("flixmedia")) ||       // WLAN network on board of German bus
-                (lowerSSID.contains("postbus")) ||         // WLAN network on board of bus line
-                (lowerSSID.contains("megabus")) ||         // WLAN network on board of bus line
-                (lowerSSID.contains("ecolines")) ||        // WLAN network on board of German bus
-                (lowerSSID.contains("eurolines")) ||       // WLAN network on board of German bus
-                (lowerSSID.contains("contiki-wifi")) ||    // WLAN network on board of bus
-                (lowerSSID.contains("muenchenlinie")) ||   // WLAN network on board of bus
-                (lowerSSID.contains("guest@ms ")) ||       // WLAN network on Hurtigruten ships
-                (lowerSSID.contains("admin@ms ")) ||       // WLAN network on Hurtigruten ships
-                (lowerSSID.contains("mobile hotspot")) ||  // e.g. BlackBerry devices
-                (lowerSSID.contains("mobilewifi")) ||      // e.g. some Vodafone devices
-                (lowerSSID.contains("portable hotspot")) ||// e.g. HTC devices
-                (lowerSSID.contains("nokia lumia")) ||     // portable hotspot
-                (lowerSSID.contains("telekom_ice")) ||     // WLAN network on DB trains
-                (lowerSSID.contains("nsb_interakti")) ||   // WLAN network in NSB trains)
-                (lowerSSID.contains("mobyclick"))          // hotspot in bus in Hamburg
-        );
-    }
+  /**
+   * This methods checks if the ScanResult wifi is marked with _nomap.
+   * @param ap : ScanResult object
+   * @return true if it is marked, otherwise false
+   */
+  public boolean isNoMapMarked(ScanResult ap) {
+    return ap.SSID.endsWith("_nomap");
+  }
 
-    private boolean isNonInfrastructureNetwork(ScanResult result){
-        return false;
+  /**
+   * This methods checks if the ScanResult wifi is a mobil hotspot.
+   * @param ap : ScanResult object
+   * @return true if it is a mobil hotspot, otherwise false
+   */
+  public boolean isMobilHotspot(ScanResult ap) {
+    if (ap.SSID.startsWith("Audi") || ap.SSID.startsWith("Volkswagen")) {
+      return true;
     }
+    String lowerSsid = ap.SSID.toLowerCase();
+    for (String hotspot: mobilHotspot) {
+      if (lowerSsid.contains(hotspot)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * This methods checks if the ScanResult wifi is a non-infrastructure wifi access point.
+   * @param result : ScanResult object
+   * @return true if it is non-infrastructure access point, otherwise false
+   */
+  private boolean isNonInfrastructureNetwork(ScanResult result) {
+    return false;
+  }
 
 }

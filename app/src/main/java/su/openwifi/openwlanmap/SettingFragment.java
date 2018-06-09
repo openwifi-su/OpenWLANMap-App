@@ -9,10 +9,10 @@ import android.support.annotation.Nullable;
  */
 
 public class SettingFragment extends PreferenceFragment {
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //Load preference from xml
-        addPreferencesFromResource(R.xml.preferences);
-    }
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //Load preference from xml
+    addPreferencesFromResource(R.xml.preferences);
+  }
 }

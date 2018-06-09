@@ -5,8 +5,8 @@ package su.openwifi.openwlanmap.service;
  */
 
 public class WifiStorer implements Runnable {
-    @Override
-    public void run() {
-        //Do storing data in local disk
-    }
+  @Override
+  public void run() {
+    //Do storing data in local disk
+  }
 }

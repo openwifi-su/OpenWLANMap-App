@@ -8,9 +8,9 @@ import java.util.Set;
  */
 
 class RequestData {
-    public Set<String> bssids;
+  public Set<String> bssids;
 
-    public RequestData() {
-        bssids = new HashSet<>();
-    }
+  public RequestData() {
+    bssids = new HashSet<>();
+  }
 }
