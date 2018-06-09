@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="su.openwifi.openwlanmap">
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -10,25 +15,43 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
-        android:configChanges="orientation|screenSize"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
             android:theme="@style/MainTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".SettingActivity"
+            android:label="Settings"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".MapActivity" android:parentActivityName=".MainActivity"/>
-        <activity android:name=".AccessPointActivity" android:parentActivityName=".MainActivity"/>
-        <activity android:name=".RankingActivity" android:parentActivityName=".MainActivity" />
-        <activity android:name=".OpenWifiMapActivity" android:parentActivityName=".MainActivity" />
-        <activity android:name=".NewsActivity" android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".MapActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".AccessPointActivity"
+            android:label="Access Point Details"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".RankingActivity"
+            android:label="Ranking"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".OpenWifiMapActivity"
+            android:label="Map"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".NewsActivity"
+            android:label="News"
+            android:parentActivityName=".MainActivity" />
+
+        <service
+            android:name=".service.ScanService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
