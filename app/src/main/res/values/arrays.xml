@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="arr_languages">
-        <item>@string/english</item>
-        <item>@string/german</item>
-        <item>@string/vietnamese</item>
-        <item>@string/spanish</item>
-    </string-array>
-    <string name="english">English</string>
-    <string name="german">German</string>
-    <string name="vietnamese">Vietnamese</string>
-    <string name="spanish">Spanish</string>
-
     <string-array name="arr_start_modes">
         <item>@string/always_in_background</item>
         <item>@string/after_start_in_background</item>
     </string-array>
-    <string name="always_in_background">Always run in background after starting phone</string>
+    <string name="always_in_background">Run in background after booting device</string>
     <string name="after_start_in_background">Run in background after starting the application</string>
 
     <string-array name="arr_upload_modes">
@@ -40,25 +29,27 @@
 
     <string-array name="arr_time_kill_app">
         <item>@string/never</item>
-        <item>@string/five_m</item>
+        <item>@string/hour</item>
         <item>@string/ten_m</item>
         <item>@string/fifteen_m</item>
         <item>@string/thirty_m</item>
     </string-array>
-    <string name="five_m">5 minutes</string>
     <string name="ten_m">10 minutes</string>
     <string name="fifteen_m">15 minutes</string>
     <string name="thirty_m">30 minutes</string>
+    <string name="hour">an hour</string>
 
     <string-array name="arr_time_stop_scan">
         <item>@string/never</item>
-        <item>@string/one_m</item>
         <item>@string/two_m</item>
         <item>@string/five_m</item>
         <item>@string/ten_m</item>
+        <item>@string/twenty_m</item>
     </string-array>
     <string name="one_m">1 minute</string>
     <string name="two_m">2 minutes</string>
+    <string name="twenty_m">20 minutes</string>
+    <string name="five_m">5 minutes</string>
 
     <string-array name="arr_brightness">
         <item>@string/never</item>
@@ -71,5 +62,66 @@
     <string name="reduce_at_5">Automatic reduce when battery is smaller than 5 percent</string>
     <string name="reduce_at_10">Automatic reduce when battery is smaller than 10 percent</string>
     <string name="reduce_at_20">Automatic reduce when battery is smaller than 20 percent</string>
+
+    <string-array name="arr_rssi">
+        <item>@string/r70</item>
+        <item>@string/r80</item>
+        <item>@string/r90</item>
+        <item>@string/r100</item>
+        <item>@string/r110</item>
+        <item>@string/r120</item>
+        <item>@string/r_never</item>
+    </string-array>
+    <string name="r70">-70dB</string>
+    <string name="r80">-80dB</string>
+    <string name="r90">-90dB</string>
+    <string name="r100">-100dB</string>
+    <string name="r110">-110dB</string>
+    <string name="r120">-120dB</string>
+    <string name="r_never">no limit</string>
+
+    <string-array name="arr_project">
+        <item>@string/openwifi_su</item>
+        <item>@string/mozilla</item>
+        <item>@string/virtualworlds</item>
+        <item>@string/openwlanmap</item>
+    </string-array>
+    <string name="openwifi_su">openwifi.su</string>
+    <string name="mozilla">Mozilla Location Services</string>
+    <string name="virtualworlds">virtualworlds.de</string>
+    <string name="openwlanmap">openwlanmap.org</string>
+    <string-array name="arr_default_project">
+        <item>@string/openwifi_su</item>
+    </string-array>
+    <string-array name="arr_summary">
+        <item>@string/rank_sum</item>
+        <item>@string/gps_sum</item>
+        <item>@string/speed_sum</item>
+    </string-array>
+
+    <string name="rank_sum">Ranking</string>
+    <string name="gps_sum">GPS</string>
+    <string name="speed_sum">Speed</string>
+    <string-array name="arr_summary_default">
+        <item>@string/rank_sum</item>
+        <item>@string/gps_sum</item>
+        <item>@string/speed_sum</item>
+    </string-array>
+
+    <string name="l_ssid">SSID</string>
+    <string name="l_freq">Frequency</string>
+    <string name="l_locate">Latitude+Longitude</string>
+    <string name="l_timestamp">First seen time</string>
+    <string-array name="arr_list">
+        <item>@string/l_ssid</item>
+        <item>@string/l_freq</item>
+        <item>@string/l_locate</item>
+        <item>@string/l_timestamp</item>
+    </string-array>
+    <string-array name="arr_list_default">
+        <item>@string/l_ssid</item>
+        <item>@string/l_freq</item>
+        <item>@string/l_timestamp</item>
+    </string-array>
 
 </resources>

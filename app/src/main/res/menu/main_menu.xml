@@ -5,22 +5,22 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/scan_service"
-        android:title="Start/Stop scan service"/>
+        android:title="Start/Stop scan service" />
     <item
         android:id="@+id/gps_map"
-        android:title="Show GPS in map"/>
+        android:title="Show GPS in map" />
     <item
         android:id="@+id/sort_signal"
-        android:title="Sort by RSSI"/>
+        android:title="Sort by RSSI" />
     <item
         android:id="@+id/sort_timestamp"
-        android:title="Sort by timestamp"/>
+        android:title="Sort by timestamp" />
     <item
         android:id="@+id/sort_frequency"
-        android:title="Sort by frequency"/>
+        android:title="Sort by frequency" />
     <item
         android:id="@+id/upload"
         android:title="Upload"
         app:showAsAction="always"
-        android:icon="@drawable/ic_file_upload_black_24dp"/>
+        android:icon="@drawable/ic_file_upload_black_24dp" />
 </menu>

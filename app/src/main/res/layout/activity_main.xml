@@ -17,83 +17,116 @@
     <TextView
         style="@style/Header"
         android:paddingTop="10dp"
-        android:text="Summary"/>
+        android:text="Summary" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         style="@style/Box">
-        <LinearLayout style="@style/HeaderCategory">
+
+        <LinearLayout style="@style/HeaderCategory" android:id="@+id/rank_field">
+
             <TextView
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_weight="2"
-                android:text="GPS: "
-                />
+                android:text="@string/h_rank" />
+
+            <TextView
+                android:id="@+id/rank"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="@string/c_rank" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/HeaderCategory" android:id="@+id/gps_field">
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:text="@string/h_gps" />
+
             <TextView
                 android:id="@+id/gps"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="5"
-                android:text="Waiting for signal..."
-                />
+                android:text="@string/c_gps" />
         </LinearLayout>
+        <LinearLayout style="@style/HeaderCategory" android:id="@+id/speed_field">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textStyle="bold"
+                android:text="@string/speed"/>
+
+            <TextView
+                android:id="@+id/speed"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:text="?" />
+        </LinearLayout>
+
         <LinearLayout style="@style/HeaderCategory">
+
             <TextView
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_weight="2"
-                android:text="Scan service: "
-                />
+                android:text="@string/h_scan" />
+
             <TextView
                 android:id="@+id/scan_status"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="5"
-                android:text="Scanning ..."
-                />
+                android:text="@string/c_scan" />
         </LinearLayout>
+
         <LinearLayout style="@style/HeaderCategory">
+
             <TextView
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_weight="2"
-                android:text="APs Total: "
-                />
+                android:text="@string/h_api_total" />
+
             <TextView
                 android:id="@+id/ap_total"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="100"
-                />
-        </LinearLayout>
-        <LinearLayout style="@style/HeaderCategory">
+                android:layout_weight="3"
+                android:text="0" />
+
             <TextView
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_weight="2"
-                android:text="Newest scan:"
-                />
+                android:text="@string/h_newest_scan" />
+
             <TextView
                 android:id="@+id/newest_scan"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="10"
-                />
+                android:layout_weight="3"
+                android:text="0" />
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         style="@style/Header"
         android:paddingTop="10dp"
-        android:text="Access Point List"/>
+        android:text="Access Point List" />
 
     <ListView
         android:id="@+id/list"
@@ -102,7 +135,14 @@
         style="@style/Box"
         android:divider="#000000"
         android:dividerHeight="2dp"
-        android:orientation="vertical">
-    </ListView>
+        android:orientation="vertical"></ListView>
+
+    <TextView
+        android:id="@+id/no_api"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Box"
+        android:gravity="center_horizontal"
+        android:text="@string/no_ap" />
 
 </LinearLayout>
