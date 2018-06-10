@@ -24,21 +24,21 @@ import su.openwifi.openwlanmap.QueryUtils;
  */
 
 public class WifiLocator implements Runnable {
-  public static final int WLOC_OK = 0;
   /**
    * Result code for position request, given position information are OK.
    */
-  public static final int WLOC_REQUEST_ERROR = 1;
+  public static final int WLOC_OK = 0;
   /**
    * Result code for position request,
    * a connection error occured, no position information are available.
    */
-  public static final int WLOC_LOCATION_ERROR = 2;
-  private static final String LOG_TAG = WifiLocator.class.getSimpleName();
+  public static final int WLOC_REQUEST_ERROR = 1;
   /**
    * Result code for position request,
    * the position could not be evaluated, no position information are available.
    */
+  public static final int WLOC_LOCATION_ERROR = 2;
+  private static final String LOG_TAG = WifiLocator.class.getSimpleName();
   private static final long WAIT_FOR_SIGNAL = 7500;
   private static final long GPS_PERIOD = 100;
 
@@ -230,6 +230,7 @@ public class WifiLocator implements Runnable {
 
         } else {
           Log.i(LOG_TAG, "No ap seen");
+          wlocReturnPosition(WLOC_LOCATION_ERROR, 0.0, 0.0, (float) 0.0, (short) 0);
         }
       }
     }

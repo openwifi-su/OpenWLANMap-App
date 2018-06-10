@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity
             doRegister();
             startService(intent);
             Toast.makeText(this, getString(R.string.gps_pop_up_ok), Toast.LENGTH_SHORT).show();
-            new Thread() {
+            /*new Thread() {
               @Override
               public void run() {
                 try {
@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity
                 }
               }
             }.start();
+            */
           } else {
             Toast.makeText(this, getString(R.string.gps_pop_up), Toast.LENGTH_SHORT).show();
             new Thread() {
@@ -494,6 +495,7 @@ public class MainActivity extends AppCompatActivity
           addPreference(PREF_TOTAL_AP, total + apInDb);
           break;
         case R_UPDATE_ERROR:
+          Log.e(LOG_TAG, "Could not validate position");
           gps.setText(getString(R.string.c_gps));
           newestScan.setText("0");
           break;
