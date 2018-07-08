@@ -27,6 +27,7 @@ public class QueryUtils {
 
   /**
    * This methods fetchs the location data in case of no gps signal from the old api.
+   *
    * @param bssids : a list of surrounding wifi access points
    * @return a LocationObject contains latitude, longitude and result's quality
    */
@@ -69,6 +70,7 @@ public class QueryUtils {
 
   /**
    * This methods fetchs the location data in case of no gps signal from the new api.
+   *
    * @param bssids : a list of surrounding wifi access points
    * @return a LocationObject contains latitude, longitude
    */
@@ -187,6 +189,7 @@ public class QueryUtils {
 
     /**
      * Constructor of LocationObject.
+     *
      * @param lat : latitude
      * @param lon : longitude
      */

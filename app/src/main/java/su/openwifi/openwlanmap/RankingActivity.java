@@ -56,9 +56,10 @@ public class RankingActivity extends AppCompatActivity {
 
     /**
      * Constructor of Rank object.
-     * @param name : name of person/team
+     *
+     * @param name  : name of person/team
      * @param point : number of gained points
-     * @param pos : position in the ranking list
+     * @param pos   : position in the ranking list
      */
     public Rank(String name, int point, int pos) {
       this.name = name;

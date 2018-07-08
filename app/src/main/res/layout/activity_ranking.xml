@@ -11,15 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="20dp">
+        android:paddingBottom="20dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Your/Your's position: "
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="Your/Your's position: " />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/user_ranking"
@@ -33,10 +33,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="20sp"
+        android:paddingBottom="20dp"
         android:text="@string/ranking"
-        android:paddingBottom="20dp" />
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/list_ranking"

@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-import java.util.logging.Logger;
 
 /**
  * This class describes the activity, which shows the details of an access point.

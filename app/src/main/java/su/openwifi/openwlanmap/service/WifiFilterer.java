@@ -3,7 +3,7 @@ package su.openwifi.openwlanmap.service;
 import android.net.wifi.ScanResult;
 
 /**
- * Created by tali on 04.06.18.
+ * This class contains all the filter for access point.
  */
 
 public class WifiFilterer {
@@ -38,26 +38,28 @@ public class WifiFilterer {
   }
 
   /**
-   * This methods checks if the ScanResult wifi is an open wifi.
-   * @param ap : ScanResult object
+   * This methods checks if the scan result is an open wifi.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is open wifi, otherwise false
    */
-  public boolean isOpenWifi(ScanResult ap) {
-    return ((!ap.capabilities.contains("WEP"))
-        && (!ap.capabilities.contains("WPA"))
-        && (!ap.capabilities.contains("TKIP"))
-        && (!ap.capabilities.contains("CCMP"))
-        && (!ap.capabilities.contains("PSK")));
+  public static boolean isOpenWifi(ScanResult scanResult) {
+    return ((!scanResult.capabilities.contains("WEP"))
+        && (!scanResult.capabilities.contains("WPA"))
+        && (!scanResult.capabilities.contains("TKIP"))
+        && (!scanResult.capabilities.contains("CCMP"))
+        && (!scanResult.capabilities.contains("PSK")));
   }
 
   /**
-   * This methods checks if the ScanResult wifi is free hotspot.
-   * @param ap : ScanResult object
+   * This methods checks if the scan result is free hotspot.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is free hotspot, otherwise false
    */
-  public boolean isFreeHotspot(ScanResult ap) {
-    if (isOpenWifi(ap)) {
-      String ssid = ap.SSID.toLowerCase();
+  public static boolean isFreeHotspot(ScanResult scanResult) {
+    if (isOpenWifi(scanResult)) {
+      String ssid = scanResult.SSID.toLowerCase();
       if (ssid.contains("free-hotspot.com")
           || ssid.contains("the cloud")) {
         return true;
@@ -67,34 +69,37 @@ public class WifiFilterer {
   }
 
   /**
-   * This methods checks if the ScanResult wifi is from freifunk.
-   * @param ap : ScanResult object
+   * This methods checks if the scan result is from freifunk.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is from freifunk, otherwise false
    */
-  public boolean isFreifunk(ScanResult ap) {
-    return ap.SSID.toLowerCase().contains("freifunk");
+  public static boolean isFreifunk(ScanResult scanResult) {
+    return scanResult.SSID.toLowerCase().contains("freifunk");
   }
 
   /**
-   * This methods checks if the ScanResult wifi is marked with _nomap.
-   * @param ap : ScanResult object
+   * This methods checks if the scan result is marked with _nomap.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is marked, otherwise false
    */
-  public boolean isNoMapMarked(ScanResult ap) {
-    return ap.SSID.endsWith("_nomap");
+  public static boolean isNoMapMarked(ScanResult scanResult) {
+    return scanResult.SSID.endsWith("_nomap");
   }
 
   /**
-   * This methods checks if the ScanResult wifi is a mobil hotspot.
-   * @param ap : ScanResult object
+   * This methods checks if the scan result is a mobil hotspot.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is a mobil hotspot, otherwise false
    */
-  public boolean isMobilHotspot(ScanResult ap) {
-    if (ap.SSID.startsWith("Audi") || ap.SSID.startsWith("Volkswagen")) {
+  public static boolean isMobilHotspot(ScanResult scanResult) {
+    if (scanResult.SSID.startsWith("Audi") || scanResult.SSID.startsWith("Volkswagen")) {
       return true;
     }
-    String lowerSsid = ap.SSID.toLowerCase();
-    for (String hotspot: mobilHotspot) {
+    String lowerSsid = scanResult.SSID.toLowerCase();
+    for (String hotspot : mobilHotspot) {
       if (lowerSsid.contains(hotspot)) {
         return true;
       }
@@ -103,12 +108,23 @@ public class WifiFilterer {
   }
 
   /**
-   * This methods checks if the ScanResult wifi is a non-infrastructure wifi access point.
-   * @param result : ScanResult object
+   * This methods checks if the scan result is a non-infrastructure wifi access point.
+   *
+   * @param scanResult : ScanResult object
    * @return true if it is non-infrastructure access point, otherwise false
    */
-  private boolean isNonInfrastructureNetwork(ScanResult result) {
+  public static boolean isNonInfrastructureNetwork(ScanResult scanResult) {
     return false;
+  }
+
+  /**
+   * This methods checks if the access point should be updated or deleted from backend.
+   * @param scanResult : ScanResult object.
+   * @return true if it should be updated, otherwise false
+   */
+  public static boolean isToUpdate(ScanResult scanResult) {
+    return !(isNoMapMarked(scanResult) || isMobilHotspot(scanResult)
+        || isNonInfrastructureNetwork(scanResult));
   }
 
 }

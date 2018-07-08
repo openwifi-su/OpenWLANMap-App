@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import su.openwifi.openwlanmap.service.Config;
 import su.openwifi.openwlanmap.service.ScanService;
 
 public class MainActivity extends AppCompatActivity
@@ -325,6 +326,7 @@ public class MainActivity extends AppCompatActivity
         addPreference(PREF_TOTAL_AP, 0);
         totalAp.setText("0");
         apInDb = 0;
+        Config.setUploadStatus(true);
         break;
       default:
         break;

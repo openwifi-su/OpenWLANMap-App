@@ -9,14 +9,14 @@
         android:id="@+id/rssi"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        android:layout_gravity="center_vertical"
         android:background="@drawable/circle"
-        android:gravity="center"
-        android:layout_gravity="center_vertical" />
+        android:gravity="center" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="2"
         android:layout_height="wrap_content"
+        android:layout_weight="2"
         android:orientation="vertical"
         android:paddingLeft="10dp">
 
@@ -36,10 +36,12 @@
             android:id="@+id/frequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/lat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/lon"
             android:layout_width="wrap_content"
@@ -51,9 +53,9 @@
         android:id="@+id/timestamp"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:textColor="@color/timestamp"
         android:gravity="center"
-        android:layout_gravity="center_vertical" />
+        android:textColor="@color/timestamp" />
 
 </LinearLayout>

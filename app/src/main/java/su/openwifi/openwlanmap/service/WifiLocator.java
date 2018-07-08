@@ -60,6 +60,7 @@ public class WifiLocator implements Runnable {
 
   /**
    * Constructor of WifiLocator object.
+   *
    * @param context : context for WifiScanListener and LocationListener object
    */
   @SuppressLint("MissingPermission")
@@ -148,6 +149,7 @@ public class WifiLocator implements Runnable {
 
   /**
    * This method checks if the given latitude and longitude is valid or not.
+   *
    * @param lat : latitude
    * @param lng : longitude
    * @return true if latitude and longitude is valid, otherwise false

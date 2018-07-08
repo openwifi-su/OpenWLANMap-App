@@ -27,4 +27,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //material design
     implementation 'com.android.support:design:27.1.1'
+    //room dep
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
 }

@@ -7,10 +7,10 @@
     <!--background color-->
     <solid android:color="#ffffff" />
     <padding
+        android:bottom="0dp"
         android:left="7dp"
-        android:top="7dp"
         android:right="7dp"
-        android:bottom="0dp" />
+        android:top="7dp" />
     <!--make corner rounded-->
     <corners android:radius="4dp" />
 </shape>

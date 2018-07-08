@@ -29,6 +29,7 @@ public class Utils {
 
   /**
    * This methods checks the location permission.
+   *
    * @param activity : the activity where the onPermissionResult should be implemented
    */
   public static void checkLocationPermission(Activity activity) {
@@ -43,6 +44,7 @@ public class Utils {
 
   /**
    * This methods checks if the gps signal is available, if not pop up a message.
+   *
    * @param context : context of the application
    */
   public static void checkGpsSignal(Context context) {

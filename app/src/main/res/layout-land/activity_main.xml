@@ -8,9 +8,9 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary">
 
     </android.support.v7.widget.Toolbar>
 
@@ -19,150 +19,161 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical">
-
-    <TextView
-        style="@style/Header"
-        android:paddingTop="10dp"
-        android:text="Summary" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/Box">
-
-        <LinearLayout style="@style/HeaderCategory" android:id="@+id/rank_field">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:text="@string/h_rank" />
+                style="@style/Header"
+                android:paddingTop="10dp"
+                android:text="Summary" />
 
-            <TextView
-                android:id="@+id/rank"
+            <LinearLayout
+                style="@style/Box"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="@string/c_rank" />
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/rank_field"
+                    style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/h_rank"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/rank"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="@string/c_rank" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/gps_field"
+                    style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/h_gps"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/gps"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="@string/c_gps" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/speed_field"
+                    style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/speed"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/speed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="?" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/h_scan"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/scan_status"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="@string/c_scan" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/h_api_total"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/ap_total"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/HeaderCategory">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/h_newest_scan"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/newest_scan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="0" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout style="@style/HeaderCategory" android:id="@+id/gps_field">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:orientation="vertical">
 
             <TextView
+                style="@style/Header"
+                android:paddingTop="10dp"
+                android:text="Access Point List" />
+
+            <ListView
+                android:id="@+id/list"
+                style="@style/Box"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:text="@string/h_gps" />
+                android:divider="#000000"
+                android:dividerHeight="2dp"
+                android:orientation="vertical"></ListView>
 
             <TextView
-                android:id="@+id/gps"
+                android:id="@+id/no_api"
+                style="@style/Box"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="@string/c_gps" />
-        </LinearLayout>
-        <LinearLayout style="@style/HeaderCategory" android:id="@+id/speed_field">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:textStyle="bold"
-                android:text="@string/speed"/>
-
-            <TextView
-                android:id="@+id/speed"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="?" />
+                android:gravity="center_horizontal"
+                android:text="@string/no_ap" />
         </LinearLayout>
 
-        <LinearLayout style="@style/HeaderCategory">
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:text="@string/h_scan" />
-
-            <TextView
-                android:id="@+id/scan_status"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="@string/c_scan" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/HeaderCategory">
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:text="@string/h_api_total" />
-
-            <TextView
-                android:id="@+id/ap_total"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="0" />
-        </LinearLayout>
-        <LinearLayout style="@style/HeaderCategory">
-            <TextView
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:text="@string/h_newest_scan" />
-
-            <TextView
-                android:id="@+id/newest_scan"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="5"
-                android:text="0" />
-        </LinearLayout>
     </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:orientation="vertical">
-    <TextView
-        style="@style/Header"
-        android:paddingTop="10dp"
-        android:text="Access Point List" />
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Box"
-        android:divider="#000000"
-        android:dividerHeight="2dp"
-        android:orientation="vertical"></ListView>
-
-    <TextView
-        android:id="@+id/no_api"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Box"
-        android:gravity="center_horizontal"
-        android:text="@string/no_ap" />
-    </LinearLayout>
-
-</LinearLayout>
 </LinearLayout>

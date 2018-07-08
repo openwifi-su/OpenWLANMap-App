@@ -7,18 +7,18 @@
     <TextView
         android:id="@+id/name"
         android:layout_width="0dp"
-        android:layout_weight="5"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_weight="5" />
 
     <TextView
         android:id="@+id/point"
         android:layout_width="0dp"
-        android:layout_weight="2"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_weight="2" />
 
     <TextView
         android:id="@+id/position"
         android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 </LinearLayout>

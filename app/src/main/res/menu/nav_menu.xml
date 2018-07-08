@@ -2,26 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/settings"
-        android:title="@string/settings"
-        android:icon="@drawable/ic_settings_black_24dp" />
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/settings" />
     <item
         android:id="@+id/ranking"
-        android:title="@string/ranking"
-        android:icon="@drawable/ic_trending_up_black_24dp" />
+        android:icon="@drawable/ic_trending_up_black_24dp"
+        android:title="@string/ranking" />
     <item
         android:id="@+id/map"
-        android:title="@string/map"
-        android:icon="@drawable/ic_map_black_24dp" />
+        android:icon="@drawable/ic_map_black_24dp"
+        android:title="@string/map" />
     <item
         android:id="@+id/news"
-        android:title="@string/news"
-        android:icon="@drawable/ic_new_releases_black_24dp" />
+        android:icon="@drawable/ic_new_releases_black_24dp"
+        android:title="@string/news" />
     <item
         android:id="@+id/contribute"
-        android:title="@string/contribute"
-        android:icon="@drawable/ic_bug_report_black_24dp" />
+        android:icon="@drawable/ic_bug_report_black_24dp"
+        android:title="@string/contribute" />
     <item
         android:id="@+id/share"
-        android:title="@string/share"
-        android:icon="@drawable/ic_share_black_24dp" />
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="@string/share" />
 </menu>
