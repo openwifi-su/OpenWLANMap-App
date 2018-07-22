@@ -6,9 +6,13 @@
             android:key="pref_privacy"
             android:title="@string/setting_privacy"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
-            android:defaultValue="not set yet"
+            android:defaultValue="@string/not_set"
             android:key="pref_team"
             android:title="@string/names"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
+        <su.openwifi.openwlanmap.custom.CustomEditTextPreference
+            android:defaultValue="@string/not_set"
+            android:key="pref_team_tag"
+            android:title="@string/team_tag"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setting_project">
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference

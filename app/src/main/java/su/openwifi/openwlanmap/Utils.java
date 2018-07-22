@@ -18,8 +18,6 @@ public class Utils {
       = new SimpleDateFormat("dd.MM.yyyy 'at' hh:mm:ss");
   public static final String OPEN_WIFI_MAP_URL = "http://owm.vreeken.net/map/";
   public static final String MAILING_LIST = "caothivananh98@gmail.com";
-  public static final String URL_GET_LOCATION = "http://www.openwlanmap.org/getpos.php";
-  public static final String URL_GET_LOCATION_NEW = "http://openwifi.su/api/v1/bssids/";
   //request code
   public static final int REQUEST_GPS = 100;
   public static final int REQUEST_WRITE = 102;
