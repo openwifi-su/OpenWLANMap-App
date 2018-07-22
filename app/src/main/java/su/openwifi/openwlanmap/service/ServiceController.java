@@ -202,12 +202,12 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
 
     @Override
-    protected void wlocReturnPosition(int ret, double lat, double lon, float radius, short ccode) {
+    protected void wlocReturnPosition(WLOC_REPONSE_CODE ret, double lat, double lon, float radius, short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       intent = new Intent();
-      if (ret == WLOC_OK && qualityCheck(lat, lon)) {
+      if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon)) {
         AccessPoint ap;
-        List<ScanResult> resultList = simpleWifiLocator.getLocationInfo().wifiScanResult;
+        List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
           int channel = 0;
           try {
