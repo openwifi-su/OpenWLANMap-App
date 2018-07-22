@@ -43,6 +43,9 @@ public abstract class AccessPointDao {
   public abstract void update(String bssid, String ssid, int rssid, double frequency, int channel,
                               String capabilities, double lat, double lon, boolean toUpdate);
 
+  @Query("SELECT COUNT(*) FROM " + TABLE_NAME)
+  public abstract long countEntries();
+
   @Query("DELETE FROM " + TABLE_NAME)
   public abstract void deleteAll();
 

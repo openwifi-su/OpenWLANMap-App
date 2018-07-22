@@ -13,11 +13,19 @@ import su.openwifi.openwlanmap.database.MyDatabase;
 public class WifiStorer extends Thread {
   private static String TAG = WifiStorer.class.getName();
   private DataQueue buffer;
+  private TotalApWrapper totalAps;
   private Context context;
 
-  public WifiStorer(Context context, DataQueue buffer) {
+  /**
+   * WifiStorer Constructor.
+   * @param context : app context
+   * @param buffer  : buffer of access point
+   * @param totalAps  : total ap in database
+   */
+  public WifiStorer(Context context, DataQueue buffer, TotalApWrapper totalAps) {
     this.context = context;
     this.buffer = buffer;
+    this.totalAps = totalAps;
   }
 
   @Override
@@ -30,7 +38,11 @@ public class WifiStorer extends Thread {
             .getAccessPointDao()
             .insertOrUpdateIfExisted(list);
         Log.i(TAG, "Finish inserting ......");
-        readWholeDatabase();
+        long i = MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .countEntries();
+        totalAps.setTotalAps(i);
+        Log.i(TAG, "db entries count=" + i);
       }
       try {
         Thread.sleep(100);
@@ -38,23 +50,5 @@ public class WifiStorer extends Thread {
         Thread.currentThread().interrupt();
       }
     }
-  }
-
-  private void readWholeDatabase() {
-    Log.i(TAG, "READING DATABASE..................................................");
-    List<AccessPoint> allDataEntries = MyDatabase.getInstance(context)
-        .getAccessPointDao()
-        .getAllDataEntries();
-
-    Log.i(TAG, "db = " + allDataEntries.size() + "-------------------------------");
-
-    /* print out all entries
-        for(AccessPoint entry: allDataEntries){
-            Log.i("ENTRY=",entry.toString());
-        }
-    */
-
-    Log.i(TAG, "Ending READING DATABASE............................................");
-
   }
 }

@@ -2,10 +2,10 @@ package su.openwifi.openwlanmap.service;
 
 import java.util.Observable;
 
-public class TotalAPWrapper extends Observable {
+public class TotalApWrapper extends Observable {
   private long totalAps;
 
-  public TotalAPWrapper() {
+  public TotalApWrapper() {
   }
 
   /**
