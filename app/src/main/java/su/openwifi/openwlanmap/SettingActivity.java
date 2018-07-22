@@ -1,6 +1,11 @@
 package su.openwifi.openwlanmap;
 
+import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +36,19 @@ public class SettingActivity extends AppCompatActivity {
         break;
       case R.id.setting_import:
         Toast.makeText(this, "Settings is imported sucessfully", Toast.LENGTH_LONG).show();
+        break;
+      case R.id.setting_ownbssid:
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.ownbssid) +"\n"
+        + PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_OWN_BSSID,getString(R.string.error_ownbssid)));
+        builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int id) {
+            dialog.dismiss();
+          }
+        });
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
         break;
       case android.R.id.home:
         finish();

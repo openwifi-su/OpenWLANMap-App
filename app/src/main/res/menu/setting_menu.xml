@@ -11,4 +11,7 @@
     <item
         android:id="@+id/setting_reset"
         android:title="@string/setting_reset" />
+    <item
+        android:id="@+id/setting_ownbssid"
+        android:title="@string/setting_show_bssid"/>
 </menu>
