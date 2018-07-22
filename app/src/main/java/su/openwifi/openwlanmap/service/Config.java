@@ -5,14 +5,16 @@ package su.openwifi.openwlanmap.service;
  * scanning service.
  */
 public class Config {
-  //TODO how to let storer thread update data/ or stop it and start new thread for it
-  private static boolean isUploading = false;
+  public enum MODE {
+    SCAN_MODE, UPLOAD_MODE
+  }
+  private static MODE mode = MODE.SCAN_MODE;
 
-  public static synchronized boolean getUploadStatus() {
-    return isUploading;
+  public static synchronized MODE getMode() {
+    return mode;
   }
 
-  public static synchronized void setUploadStatus(boolean uploadStatus) {
-    isUploading = uploadStatus;
+  public static synchronized void setMode(MODE modeToSet) {
+    mode = modeToSet;
   }
 }
