@@ -134,6 +134,7 @@
     <TextView
         style="@style/Header"
         android:paddingTop="10dp"
+        android:id="@+id/ap_list_h"
         android:text="Access Point List" />
 
     <ListView
@@ -152,5 +153,12 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="@string/no_ap" />
+    <ProgressBar
+        android:id="@+id/loading"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
