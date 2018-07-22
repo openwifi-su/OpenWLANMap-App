@@ -101,6 +101,7 @@ public class WifiLocator implements Runnable {
   public void doUnregister() {
     try {
       context.unregisterReceiver(wifiScanReceiver);
+      locationManager.removeUpdates(gpsLocationListener);
     } catch (IllegalArgumentException ex) {
       // just in case wifiReceiver is not registered yet
     }
