@@ -7,7 +7,7 @@ package su.openwifi.openwlanmap.database;
 public class DatabaseConstant {
   //database
   public static final String TABLE_NAME = "access_point_table";
-  public static final String UPLOAD_MAX = "3";
+  public static final String UPLOAD_MAX = "5000";
   //col
   public static final String COLUMN_ID = "id";
   public static final String COLUMN_SSID = "ssid";

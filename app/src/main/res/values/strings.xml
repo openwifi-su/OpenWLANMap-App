@@ -25,7 +25,7 @@
     <string name="setting_user">ACCOUNT SETTINGS</string>
     <string name="setting_privacy">Stay anonym</string>
     <string name="setting_autoconnect_freifunk">Autoconnect to freifunk and upload data</string>
-    <string name="names">Your/Your team\'s identifier</string>
+    <string name="names">Your team\'s identifier</string>
     <string name="gps_pop_up">This app requires GPS to work! Please allow permission</string>
     <string name="enable_gps">Please enable GPS!</string>
     <string name="gps_pop_up_ok">You allowed GPS permission</string>
@@ -39,7 +39,7 @@
     <string name="frequency">Frequency</string>
     <string name="channel">channel</string>
     <string name="capabilities">capabilities</string>
-    <string name="no_ap">0ops! No AP seen</string>
+    <string name="no_ap">0ops! No AP in list</string>
     <string name="speed">Speed:</string>
     <string name="setting_show_counter">Show big number of scanned AP in background</string>
     <string name="setting_project">PROJECT SETTINGS</string>
@@ -61,4 +61,20 @@
     <string name="setting_list">Show in access point list</string>
     <string name="scanning">Scanning...</string>
     <string name="stopped">Stopped</string>
+    <string name="closeDialog">CLOSE</string>
+    <string name="uploading">Uploading...</string>
+    <string name="uploadOK">Uploaded successfully!</string>
+    <string name="upCount">Uploaded count =</string>
+    <string name="upRank">Uploaded rank =</string>
+    <string name="upNewAp">New aps =</string>
+    <string name="upUpdAp">Updated aps =</string>
+    <string name="upDelAp">Deleted aps =</string>
+    <string name="upNewPoint">Point gained =</string>
+    <string name="point">points</string>
+    <string name="upload_under_limit">Upload can only be processed with at least 250 access points.</string>
+    <string name="setting_show_bssid">Show own identifier</string>
+    <string name="ownbssid">This number identifies a team. In case you have other members in team. Please follow them this. They have to set it up in settings!</string>
+    <string name="error_ownbssid">Could not get your identifier!</string>
+    <string name="team_tag">Tag</string>
+    <string name="not_set">none</string>
 </resources>

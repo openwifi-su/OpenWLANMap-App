@@ -26,7 +26,11 @@ public class WifiUploader {
     this.totalAps = totalAps;
   }
 
-  public boolean upload(){
+  /**
+   * This method upload all data in database to backend.
+   * @return true if successful otherwise false
+   */
+  public boolean upload() {
     //TODO read from preference
     String testOwnBssid = "8911CDEE5A14";
     String testTeam = "Team42";
@@ -34,28 +38,28 @@ public class WifiUploader {
         .getAccessPointDao()
         .countEntries();
     int counter = 0;
-    while(count>0){
-      Log.i(LOG_TAG, "READING DATABASE......................db="+count);
+    while (count > 0) {
+      Log.i(LOG_TAG, "READING DATABASE......................db=" + count);
       List<AccessPoint> uploadEntries = MyDatabase.getInstance(context)
           .getAccessPointDao()
           .getAllDataEntriesToUpload();
-      Log.i(LOG_TAG, "Uploading now = "+uploadEntries.size());
-      if(checkConnection()){
+      Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
+      if (checkConnection()) {
         //Upload
         ranking = QueryUtils.uploadData(uploadEntries, testOwnBssid, testTeam);
-        if(ranking !=null){
+        if (ranking != null) {
           //Delete
-          Log.e(LOG_TAG,"Getting back from upload response");
+          Log.e(LOG_TAG, "Getting back from upload response");
           MyDatabase.getInstance(context)
               .getAccessPointDao()
               .delete(uploadEntries);
-        }else{
+        } else {
           error = "Uploading failed!";
           return false;
         }
-      }else{
-        counter ++;
-        if(counter > MAX_TRIAL){
+      } else {
+        counter++;
+        if (counter > MAX_TRIAL) {
           totalAps.setTotalAps(count);
           error = "Connection might be broken!";
           return false;
@@ -70,10 +74,11 @@ public class WifiUploader {
     return true;
   }
 
-  private boolean checkConnection(){
-    ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+  private boolean checkConnection() {
+    ConnectivityManager manager = (ConnectivityManager)
+        context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo info = manager.getActiveNetworkInfo();
-    return (info!=null && info.isConnected());
+    return (info != null && info.isConnected());
   }
 
   public QueryUtils.RankingObject getRanking() {

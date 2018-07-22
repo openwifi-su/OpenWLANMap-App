@@ -74,11 +74,11 @@ public class ServiceController extends Service implements Runnable, Observer {
             }
           }
           Log.i(LOG_TAG, "Now uploading......");
-          if(totalAps.getTotalAps() < MIN_UPLOAD_ALLOWED) {
+          if (totalAps.getTotalAps() < MIN_UPLOAD_ALLOWED) {
             intent = new Intent();
             intent.setAction(R_UPLOAD_UNDER_LIMIT);
             sendBroadcast(intent);
-          }else{
+          } else {
             boolean uploaded = uploader.upload();
             if (uploaded) {
               //update ranking
@@ -107,6 +107,8 @@ public class ServiceController extends Service implements Runnable, Observer {
             Log.i(LOG_TAG, "Do next request...");
             Thread.currentThread().interrupt();
           }
+          break;
+        default:
           break;
       }
     }

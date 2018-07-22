@@ -39,8 +39,9 @@ public class SettingActivity extends AppCompatActivity {
         break;
       case R.id.setting_ownbssid:
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.ownbssid) +"\n"
-        + PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_OWN_BSSID,getString(R.string.error_ownbssid)));
+        builder.setMessage(getString(R.string.ownbssid) + "\n"
+            + PreferenceManager.getDefaultSharedPreferences(this)
+            .getString(PREF_OWN_BSSID, getString(R.string.error_ownbssid)));
         builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
             dialog.dismiss();

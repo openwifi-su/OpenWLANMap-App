@@ -65,6 +65,7 @@ public abstract class AccessPointDao {
    * This transaction update/insert a list of access point.
    * Update: if exist and the rssid is bigger.
    * Insert: if not exist in the database.
+   *
    * @param list : an collection of wifi access points
    */
   @Transaction

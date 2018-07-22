@@ -115,7 +115,10 @@ public class QueryUtils {
    * @param teamTag : team tag as user defines
    * @return a RankingObject
    */
-  public static RankingObject uploadData(List<AccessPoint> uploadEntries, String mac, String teamTag) {
+  public static RankingObject uploadData(
+      List<AccessPoint> uploadEntries,
+      String mac,
+      String teamTag) {
     URL url = create(URL_UPLOAD);
     InputStream ins = makeHttpRequest(url, "POST", prepareUploading(uploadEntries, mac, teamTag));
     RankingObject rankingObject = streamToRankingObject(ins);
