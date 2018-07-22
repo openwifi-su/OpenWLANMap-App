@@ -32,9 +32,9 @@ import su.openwifi.openwlanmap.QueryUtils;
  * Created by tali on 01.06.18.
  */
 
-public class ScanService extends Service implements Runnable, Observer {
+public class ServiceController extends Service implements Runnable, Observer {
   private static final long SCAN_PERIOD = 2000;
-  private static final String LOG_TAG = ScanService.class.getSimpleName();
+  private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 50;
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private boolean running = true;

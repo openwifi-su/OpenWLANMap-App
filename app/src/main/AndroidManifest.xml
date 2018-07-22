@@ -49,7 +49,7 @@
             android:parentActivityName=".MainActivity" />
 
         <service
-            android:name=".service.ScanService"
+            android:name=".service.ServiceController"
             android:exported="false" />
 
     </application>
