@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
   private static final String SORT_BY_FREQ = "sort_by_freq";
   private static final String S_SCANN_STATUS = "scan_status";
   private static final String PREF_TOTAL_AP = "p_total_ap";
-  private static final String PREF_RANKING = "p_ranking";
+  public static final String PREF_RANKING = "p_ranking";
   public static final String PREF_OWN_BSSID = "own_bssid";
   private TextView gps;
   private TextView scanningStatus;

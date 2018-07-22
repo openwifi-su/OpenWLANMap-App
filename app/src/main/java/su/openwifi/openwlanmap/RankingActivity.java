@@ -1,7 +1,12 @@
 package su.openwifi.openwlanmap;
 
+import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
+import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +32,8 @@ public class RankingActivity extends AppCompatActivity {
     TextView userRank = findViewById(R.id.user_ranking);
 
     //test data
-    userRank.setText("15");
+    userRank.setText(PreferenceManager.getDefaultSharedPreferences(this)
+        .getString(PREF_RANKING, ""));
     List<Rank> list = new ArrayList<>();
     list.add(new Rank("test team 1", 111000, 1));
     list.add(new Rank("test team 2", 11100, 2));
