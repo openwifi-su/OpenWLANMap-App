@@ -27,21 +27,24 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.service.Config;
-import su.openwifi.openwlanmap.service.ScanService;
+import su.openwifi.openwlanmap.service.ServiceController;
 
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,8 +54,13 @@ public class MainActivity extends AppCompatActivity
   public static final String R_LIST_AP = "location_info_object";
   public static final String R_UPDATE_UI = "update_ui";
   public static final String R_UPDATE_ERROR = "update_error";
-  public static final String R_UPDATE_LAST = "update_last";
   public static final String R_TOTAL_LIST = "total_list";
+  public static final String R_UPLOAD_ERROR = "upload_error_msg";
+  public static final String R_UPLOAD_MSG = "upload_msg";
+  public static final String R_UPDATE_DB = "database_status";
+  public static final String R_UPDATE_RANKING = "update_ranking";
+  public static final String R_RANK = "rank_position";
+  public static final String R_UPLOAD_UNDER_LIMIT = "update_under_limit";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
   private static final String PREF_SORT_METHOD = "sort_method";
   private static final String SORT_BY_TIME = "sort_by_time";
@@ -60,22 +68,27 @@ public class MainActivity extends AppCompatActivity
   private static final String SORT_BY_FREQ = "sort_by_freq";
   private static final String S_SCANN_STATUS = "scan_status";
   private static final String PREF_TOTAL_AP = "p_total_ap";
-  TextView gps;
-  TextView scanningStatus;
-  TextView totalAp;
-  TextView newestScan;
-  TextView speed;
-  TextView rank;
-  LinearLayout gpsField;
-  LinearLayout speedField;
-  LinearLayout rankField;
+  private static final String PREF_RANKING = "p_ranking";
+  public static final String PREF_OWN_BSSID = "own_bssid";
+  private TextView gps;
+  private TextView scanningStatus;
+  private TextView totalAp;
+  private TextView newestScan;
+  private TextView speed;
+  private TextView rank;
+  private LinearLayout gpsField;
+  private LinearLayout speedField;
+  private LinearLayout rankField;
+  private ListView listView;
+  private TextView listHeader;
+  private ProgressBar loading;
   private AccessPointAdapter adapter;
   private DrawerLayout drawerLayout;
   private List<AccessPoint> listAp;
   private SharedPreferences sharedPreferences;
   private boolean scanning = false;
   private Intent intent;
-  private long apInDb;
+  private String rankingInfo;
   private BroadcastReceiver serviceBroadcastReceiver = new ServiceBroadcastReceiver();
 
   @Override
@@ -105,8 +118,19 @@ public class MainActivity extends AppCompatActivity
     if (!sharedPreferences.contains(PREF_TOTAL_AP)) {
       addPreference(PREF_TOTAL_AP, 0);
     } else {
-      apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0);
+      long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0);
       totalAp.setText(String.valueOf(apInDb));
+    }
+
+    if (!sharedPreferences.contains(PREF_RANKING)) {
+      addPreference(PREF_RANKING, "unknown");
+    } else {
+      rankingInfo = sharedPreferences.getString(PREF_RANKING, "unknown");
+      rank.setText(rankingInfo);
+    }
+
+    if (!sharedPreferences.contains(PREF_OWN_BSSID)) {
+      addPreference(PREF_OWN_BSSID, generateOwnBssid());
     }
 
     //set up drawer nav and toolbar
@@ -127,8 +151,11 @@ public class MainActivity extends AppCompatActivity
 
 
     //list of demo ap
-    ListView listView = findViewById(R.id.list);
-    listView.setEmptyView(findViewById(R.id.no_api));
+    listHeader = findViewById(R.id.ap_list_h);
+    loading = findViewById(R.id.loading);
+    TextView emptyView = findViewById(R.id.no_api);
+    listView = findViewById(R.id.list);
+    listView.setEmptyView(emptyView);
     listAp = new ArrayList<>();
 
     adapter = new AccessPointAdapter(this, listAp);
@@ -143,7 +170,7 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
-    intent = new Intent(this, ScanService.class);
+    intent = new Intent(this, ServiceController.class);
     if (ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -159,7 +186,19 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged();
       }
     }
+  }
 
+  private String generateOwnBssid() {
+    String ownBssid;
+    do {
+      SecureRandom sr = new SecureRandom();
+      byte[] output = new byte[6];
+      sr.nextBytes(output);
+      ownBssid = String.format("%2X%2X%2X%2X%2X%2X",
+          output[0], output[1], output[2], output[3], output[4], output[5]);
+      ownBssid = ownBssid.replace(" ", "");
+    } while (ownBssid.length() < 12);
+    return ownBssid;
   }
 
   @Override
@@ -186,8 +225,14 @@ public class MainActivity extends AppCompatActivity
     IntentFilter intentFilter = new IntentFilter();
     intentFilter.addAction(R_UPDATE_UI);
     intentFilter.addAction(R_UPDATE_ERROR);
-    //Only for demo to show save aps
-    intentFilter.addAction(R_UPDATE_LAST);
+    //Upload under limit
+    intentFilter.addAction(R_UPLOAD_UNDER_LIMIT);
+    //Upload status
+    intentFilter.addAction(R_UPLOAD_ERROR);
+    //Database status
+    intentFilter.addAction(R_UPDATE_DB);
+    //Ranking
+    intentFilter.addAction(R_UPDATE_RANKING);
     registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
@@ -214,9 +259,9 @@ public class MainActivity extends AppCompatActivity
     }
   }
 
-  private void addPreference(String key, String sortMethod) {
+  private void addPreference(String key, String info) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putString(key, sortMethod);
+    editor.putString(key, info);
     editor.commit();
   }
 
@@ -296,7 +341,6 @@ public class MainActivity extends AppCompatActivity
           toast = getString(R.string.scanning);
           startService(intent);
           scanning = true;
-          apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0);
         }
         scanningStatus.setText(toast);
         break;
@@ -320,18 +364,22 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged();
         break;
       case R.id.upload:
-        Toast.makeText(this,
-            "Demo uploading. Reset APs total in DB to 0",
-            Toast.LENGTH_SHORT).show();
-        addPreference(PREF_TOTAL_AP, 0);
-        totalAp.setText("0");
-        apInDb = 0;
-        Config.setUploadStatus(true);
+        showToastInCenter(getString(R.string.uploading));
+        listView.setVisibility(View.GONE);
+        listHeader.setVisibility(View.GONE);
+        loading.setVisibility(View.VISIBLE);
+        Config.setMode(Config.MODE.UPLOAD_MODE);
         break;
       default:
         break;
     }
     return true;
+  }
+
+  private void showToastInCenter(String msg) {
+    Toast toastCenter = Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT);
+    toastCenter.setGravity(Gravity.CENTER, 0, 0);
+    toastCenter.show();
   }
 
   private void killService() {
@@ -461,6 +509,19 @@ public class MainActivity extends AppCompatActivity
     alertDialog.show();
   }
 
+  private void showAlertUpload(String msg) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setMessage(msg);
+    builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        dialog.dismiss();
+      }
+    });
+    // Create and show the AlertDialog
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
+  }
+
   public class ServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
@@ -468,46 +529,79 @@ public class MainActivity extends AppCompatActivity
       Log.i(LOG_TAG, "Receiving smt from service");
       switch (intent.getAction()) {
         case R_UPDATE_UI:
-          String gpsString = intent.getStringExtra(R_GEO_INFO);
-          long newest = intent.getLongExtra(R_NEWEST_SCAN, 0);
-          long total = intent.getLongExtra(R_TOTAL_LIST, 0);
-          List<AccessPoint> list = intent.getParcelableArrayListExtra(R_LIST_AP);
-          String sortMethod = sharedPreferences.getString(PREF_SORT_METHOD, SORT_BY_TIME);
-          listAp.clear();
-          if (list != null && !list.isEmpty()) {
-            listAp.addAll(list);
-            switch (sortMethod) {
-              case SORT_BY_FREQ:
-                sortByFreq();
-                break;
-              case SORT_BY_RSSID:
-                sortBySignal();
-                break;
-              case SORT_BY_TIME:
-                sortByTimestamp();
-                break;
-              default:
-                break;
+          if (loading.getVisibility() == View.VISIBLE) {
+            listHeader.setVisibility(View.GONE);
+            listView.setVisibility(View.GONE);
+          } else {
+            String gpsString = intent.getStringExtra(R_GEO_INFO);
+            long newest = intent.getLongExtra(R_NEWEST_SCAN, 0);
+            List<AccessPoint> list = intent.getParcelableArrayListExtra(R_LIST_AP);
+            String sortMethod = sharedPreferences.getString(PREF_SORT_METHOD, SORT_BY_TIME);
+            listAp.clear();
+            if (list != null && !list.isEmpty()) {
+              listAp.addAll(list);
+              switch (sortMethod) {
+                case SORT_BY_FREQ:
+                  sortByFreq();
+                  break;
+                case SORT_BY_RSSID:
+                  sortBySignal();
+                  break;
+                case SORT_BY_TIME:
+                  sortByTimestamp();
+                  break;
+                default:
+                  break;
+              }
             }
+            adapter.notifyDataSetChanged();
+            gps.setText(gpsString);
+            newestScan.setText(String.valueOf(newest));
           }
-          adapter.notifyDataSetChanged();
-          gps.setText(gpsString);
-          newestScan.setText(String.valueOf(newest));
-          totalAp.setText(String.valueOf(total + apInDb));
-          addPreference(PREF_TOTAL_AP, total + apInDb);
+          break;
+        case R_UPDATE_DB:
+          long total = intent.getLongExtra(R_TOTAL_LIST, 0L);
+          totalAp.setText(String.valueOf(total));
+          addPreference(PREF_TOTAL_AP, total);
           break;
         case R_UPDATE_ERROR:
-          Log.e(LOG_TAG, "Could not validate position");
           gps.setText(getString(R.string.c_gps));
           newestScan.setText("0");
           break;
-        case R_UPDATE_LAST:
-          long totalLast = intent.getLongExtra(R_TOTAL_LIST, 0);
-          addPreference(PREF_TOTAL_AP, totalLast + apInDb);
+        case R_UPLOAD_UNDER_LIMIT:
+          showAlertUpload(getString(R.string.upload_under_limit));
+          resetListVisibility();
+          break;
+        case R_UPLOAD_ERROR:
+          String msg = intent.getStringExtra(R_UPLOAD_MSG);
+          showAlertUpload(msg);
+          resetListVisibility();
+          break;
+        case R_UPDATE_RANKING:
+          QueryUtils.RankingObject r = intent.getParcelableExtra(R_RANK);
+          String rp = r.uploadedRank
+              + "(" + r.uploadedCount + " "
+              + getString(R.string.point) + ")";
+          showAlertUpload(getString(R.string.uploadOK)
+              + "\n" + getString(R.string.upCount) + r.uploadedCount
+              + "\n" + getString(R.string.upRank) + r.uploadedRank
+              + "\n" + getString(R.string.upNewAp) + r.newAps
+              + "\n" + getString(R.string.upUpdAp) + r.updAps
+              + "\n" + getString(R.string.upDelAp) + r.delAps
+              + "\n" + getString(R.string.upNewPoint) + r.newPoints);
+          rank.setText(rp);
+          addPreference(PREF_RANKING, rp);
+          resetListVisibility();
           break;
         default:
           break;
       }
     }
+  }
+
+  private void resetListVisibility() {
+    loading.setVisibility(View.GONE);
+    listView.setVisibility(View.VISIBLE);
+    listHeader.setVisibility(View.VISIBLE);
   }
 }
