@@ -29,14 +29,18 @@ public class Utils {
    * This methods checks the location permission.
    *
    * @param activity : the activity where the onPermissionResult should be implemented
+   * @return true if the permission is already granted, otherwise false and ask for permission
    */
-  public static void checkLocationPermission(Activity activity) {
+  public static boolean checkLocationPermission(Activity activity) {
     if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED) {
       ActivityCompat.requestPermissions(
           activity,
           new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
           REQUEST_GPS);
+      return false;
+    }else{
+      return true;
     }
   }
 
