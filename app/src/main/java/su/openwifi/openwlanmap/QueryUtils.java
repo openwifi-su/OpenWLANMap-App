@@ -1,5 +1,7 @@
 package su.openwifi.openwlanmap;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import java.io.BufferedOutputStream;
@@ -11,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +24,9 @@ import org.json.JSONObject;
 
 public class QueryUtils {
   private static final String LOG_TAG = QueryUtils.class.getSimpleName();
+  private static final String URL_GET_LOCATION = "http://www.openwlanmap.org/getpos.php";
+  private static final String URL_GET_LOCATION_NEW = "http://openwifi.su/api/v1/bssids/";
+  private static final String URL_UPLOAD = "http://www.openwifi.su/android/upload.php";
 
   private QueryUtils() {
   }
@@ -33,7 +39,6 @@ public class QueryUtils {
    */
   public static LocationObject fetchLocationOld(Set<String> bssids) {
     LocationObject locator = null;
-    String response = "";
     if (!bssids.isEmpty()) {
       StringBuilder builder = new StringBuilder();
       for (String bssid : bssids) {
@@ -41,31 +46,20 @@ public class QueryUtils {
         builder.append("\r\n");
       }
       String content = builder.toString();
-      URL url = create(Utils.URL_GET_LOCATION);
+      URL url = create(URL_GET_LOCATION);
       Log.i(LOG_TAG, "creating url successfully");
-      response = makeHttpRequest(url, "POST", content);
-    }
-    Log.i(LOG_TAG, "Response from server " + response);
-    response = response.trim();
-    if (!TextUtils.isEmpty(response)
-        && response.contains("result=")
-        && response.contains("quality=")
-        && response.contains("lat=")
-        && response.contains("lon=")) {
-      String[] splits = response.split("result=");
-      splits = splits[1].split("quality=");
-      int result = Integer.parseInt(splits[0]);
-      if (result > 0) {
-        locator = new LocationObject();
-        splits = splits[1].split("lat=");
-        locator.quality = (short) Integer.parseInt(splits[0]);
-        splits = splits[1].split("lon=");
-        locator.lat = Double.parseDouble(splits[0]);
-        locator.lon = Double.parseDouble(splits[1]);
-        Log.i(LOG_TAG, "Setting lat lon ..." + locator.lat + "-" + locator.lon);
+      InputStream ins = makeHttpRequest(url, "POST", content);
+      locator = streamToLocationObject(ins);
+      Log.i(LOG_TAG, "Successfully getting location");
+      if (ins != null) {
+        try {
+          ins.close();
+        } catch (IOException e) {
+          Log.e(LOG_TAG, "Error closing inputstream");
+        }
       }
     }
-    return locator;
+    return locator != null && locator.result > 0 ? locator : null;
   }
 
   /**
@@ -84,11 +78,20 @@ public class QueryUtils {
         builder.append(",");
       }
       String content = builder.toString();
-      String urlString = Utils.URL_GET_LOCATION_NEW + content.substring(0, content.length());
+      String urlString = URL_GET_LOCATION_NEW + content.substring(0, content.length());
       Log.i(LOG_TAG, urlString);
       URL url = create(urlString);
       Log.i(LOG_TAG, "creating url successfully");
-      response = makeHttpRequest(url, "GET", null);
+      InputStream ins = makeHttpRequest(url, "POST", null);
+      response = streamToString(ins);
+      Log.i(LOG_TAG, "Successfully getting " + response);
+      if (ins != null) {
+        try {
+          ins.close();
+        } catch (IOException e) {
+          Log.e(LOG_TAG, "Error closing inputstream");
+        }
+      }
     }
     Log.i(LOG_TAG, "Response from server " + response);
     response = response.trim();
@@ -105,10 +108,56 @@ public class QueryUtils {
     return locator;
   }
 
-  private static String makeHttpRequest(URL url, String method, String content) {
-    String response = "";
+  /**
+   * This method uploads a list of access point to backend.
+   * @param uploadEntries : a list of access point
+   * @param mac : own generated bssid
+   * @param teamTag : team tag as user defines
+   * @return a RankingObject
+   */
+  public static RankingObject uploadData(List<AccessPoint> uploadEntries, String mac, String teamTag) {
+    URL url = create(URL_UPLOAD);
+    InputStream ins = makeHttpRequest(url, "POST", prepareUploading(uploadEntries, mac, teamTag));
+    RankingObject rankingObject = streamToRankingObject(ins);
+    Log.i(LOG_TAG, "Successfully getting ranking back");
+    if (ins != null) {
+      try {
+        ins.close();
+      } catch (IOException e) {
+        Log.e(LOG_TAG, "Error closing inputstream");
+      }
+    }
+    return rankingObject;
+  }
+
+  private static String prepareUploading(List<AccessPoint> uploadEntries, String mac, String tag) {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(mac + "\n");
+    stringBuilder.append("T\t");
+    stringBuilder.append(tag +"\n");
+    stringBuilder.append("E\t");
+    stringBuilder.append(mac + "\n");
+    stringBuilder.append("F\t");
+    stringBuilder.append(1 + "\n");
+    for (AccessPoint ap : uploadEntries) {
+      if (ap.isToUpdate()) {
+        stringBuilder.append(1 + "\t");
+        stringBuilder.append(ap.getBssid() + "\t");
+        stringBuilder.append(ap.getLat() + "\t");
+        stringBuilder.append(ap.getLon() + "\t");
+        stringBuilder.append("\n");
+      } else {
+        stringBuilder.append("U\t");
+        stringBuilder.append(ap.getBssid());
+        stringBuilder.append("\n");
+      }
+    }
+    return stringBuilder.toString();
+  }
+
+  private static InputStream makeHttpRequest(URL url, String method, String content) {
     if (url == null) {
-      return response;
+      return null;
     }
     HttpURLConnection httpUrlConnection = null;
     InputStream ins = null;
@@ -132,8 +181,6 @@ public class QueryUtils {
       int code = httpUrlConnection.getResponseCode();
       if (code == HttpURLConnection.HTTP_OK) {
         ins = httpUrlConnection.getInputStream();
-        response = streamToString(ins);
-        Log.i(LOG_TAG, "Successfully getting " + response);
       }
     } catch (IOException e) {
       Log.e(LOG_TAG, "Error getting geolocation");
@@ -142,31 +189,66 @@ public class QueryUtils {
       if (httpUrlConnection != null) {
         httpUrlConnection.disconnect();
       }
-      if (ins != null) {
-        try {
-          ins.close();
-        } catch (IOException e) {
-          Log.e(LOG_TAG, "Error closing inputstream");
-        }
-      }
     }
-    return response;
+    return ins;
   }
 
   private static String streamToString(InputStream ins) {
     StringBuilder builder = new StringBuilder();
-    InputStreamReader inputStreamReader = new InputStreamReader(ins, Charset.forName("UTF-8"));
-    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-    try {
-      String line = bufferedReader.readLine();
-      while (line != null) {
-        builder.append(line);
-        line = bufferedReader.readLine();
+    if (ins != null) {
+      InputStreamReader inputStreamReader = new InputStreamReader(ins, Charset.forName("UTF-8"));
+      BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+      try {
+        String line = bufferedReader.readLine();
+        while (line != null) {
+          builder.append(line);
+          line = bufferedReader.readLine();
+        }
+      } catch (IOException e) {
+        Log.e(LOG_TAG, "Error reading inputstream");
       }
-    } catch (IOException e) {
-      Log.e(LOG_TAG, "Error reading inputstream");
     }
     return builder.toString();
+  }
+
+  private static LocationObject streamToLocationObject(InputStream ins) {
+    LocationObject locationObject = new LocationObject();
+    if (ins != null) {
+      InputStreamReader inputStreamReader = new InputStreamReader(ins, Charset.forName("UTF-8"));
+      BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+      try {
+        locationObject.result = Integer.parseInt(bufferedReader.readLine().substring(7));
+        locationObject.quality = (short) Integer.parseInt(bufferedReader.readLine().substring(8));
+        locationObject.lat = Double.parseDouble(bufferedReader.readLine().substring(4));
+        locationObject.lon = Double.parseDouble(bufferedReader.readLine().substring(4));
+      } catch (IOException e) {
+        Log.e(LOG_TAG, "Error reading inputstream");
+      }
+      return locationObject;
+    }
+    return null;
+  }
+
+
+  private static RankingObject streamToRankingObject(InputStream ins) {
+    if (ins != null) {
+      RankingObject rankingObject = new RankingObject();
+      InputStreamReader inputStreamReader = new InputStreamReader(ins, Charset.forName("UTF-8"));
+      BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+      try {
+        rankingObject.remoteVersion = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.uploadedCount = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.uploadedRank = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.newAps = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.updAps = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.delAps = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.newPoints = Integer.parseInt(bufferedReader.readLine());
+      } catch (IOException e) {
+        Log.e(LOG_TAG, "Error reading inputstream");
+      }
+      return rankingObject;
+    }
+    return null;
   }
 
   private static URL create(String urlString) {
@@ -186,6 +268,7 @@ public class QueryUtils {
     public double lat;
     public double lon;
     public short quality;
+    public int result;
 
     /**
      * Constructor of LocationObject.
@@ -197,9 +280,63 @@ public class QueryUtils {
       this.lat = lat;
       this.lon = lon;
       this.quality = (short) 0;
+      this.result = 0;
     }
 
     public LocationObject() {
     }
+  }
+
+  /**
+   * This class describes a ranking result from backend.
+   */
+  public static class RankingObject implements Parcelable {
+    public int remoteVersion;
+    public int uploadedCount;
+    public int uploadedRank;
+    public int newAps;
+    public int updAps;
+    public int delAps;
+    public int newPoints;
+
+    public RankingObject() {
+    }
+
+    @Override
+    public int describeContents() {
+      return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+      dest.writeInt(uploadedRank);
+      dest.writeInt(uploadedCount);
+      dest.writeInt(newAps);
+      dest.writeInt(updAps);
+      dest.writeInt(delAps);
+      dest.writeInt(newPoints);
+    }
+
+    protected RankingObject(Parcel in) {
+      uploadedRank = in.readInt();
+      uploadedCount = in.readInt();
+      newAps = in.readInt();
+      updAps = in.readInt();
+      delAps = in.readInt();
+      newPoints = in.readInt();
+    }
+
+    public static final Creator<RankingObject> CREATOR = new Creator<RankingObject>() {
+
+      @Override
+      public RankingObject createFromParcel(Parcel source) {
+        return new RankingObject(source);
+      }
+
+      @Override
+      public RankingObject[] newArray(int size) {
+        return new RankingObject[0];
+      }
+    };
   }
 }
