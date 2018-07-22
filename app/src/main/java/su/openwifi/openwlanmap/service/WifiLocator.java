@@ -150,7 +150,7 @@ public class WifiLocator implements Runnable {
     if (locationObject != null && isValidLatLng(locationObject.lat, locationObject.lon)) {
       lastLat = locationObject.lat;
       lastLon = locationObject.lon;
-      wlocReturnPosition(WLOC_REPONSE_CODE.OK, lastLat, lastLon, 10000.0f, (short) 0);
+      wlocReturnPosition(WLOC_REPONSE_CODE.OK, lastLat, lastLon, 0.0f, (short) 0);
     } else {
       wlocReturnPosition(WLOC_REPONSE_CODE.REQUEST_ERROR, 0.0, 0.0, (float) 0.0, (short) 0);
     }

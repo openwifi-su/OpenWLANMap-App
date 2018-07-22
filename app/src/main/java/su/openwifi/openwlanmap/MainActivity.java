@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
   public static final String R_NEWEST_SCAN = "newest_scan";
   public static final String R_LIST_AP = "location_info_object";
   public static final String R_UPDATE_UI = "update_ui";
+  public static final String R_SPEED = "update_speed";
   public static final String R_UPDATE_ERROR = "update_error";
   public static final String R_TOTAL_LIST = "total_list";
   public static final String R_UPLOAD_ERROR = "upload_error_msg";
@@ -533,8 +534,9 @@ public class MainActivity extends AppCompatActivity
             listHeader.setVisibility(View.GONE);
             listView.setVisibility(View.GONE);
           } else {
-            String gpsString = intent.getStringExtra(R_GEO_INFO);
-            long newest = intent.getLongExtra(R_NEWEST_SCAN, 0);
+            final String gpsString = intent.getStringExtra(R_GEO_INFO);
+            final long newest = intent.getLongExtra(R_NEWEST_SCAN, 0);
+            final float speedUpdate = intent.getFloatExtra(R_SPEED, 0f);
             List<AccessPoint> list = intent.getParcelableArrayListExtra(R_LIST_AP);
             String sortMethod = sharedPreferences.getString(PREF_SORT_METHOD, SORT_BY_TIME);
             listAp.clear();
@@ -557,6 +559,11 @@ public class MainActivity extends AppCompatActivity
             adapter.notifyDataSetChanged();
             gps.setText(gpsString);
             newestScan.setText(String.valueOf(newest));
+            if(speedUpdate > 0){
+              speed.setText(speedUpdate+" m/s");
+            }else{
+              speed.setText("?");
+            }
           }
           break;
         case R_UPDATE_DB:

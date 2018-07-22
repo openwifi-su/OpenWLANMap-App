@@ -4,6 +4,7 @@ import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
 import static su.openwifi.openwlanmap.MainActivity.R_RANK;
+import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
 import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_DB;
 import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_ERROR;
@@ -16,6 +17,7 @@ import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_UNDER_LIMIT;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -37,10 +39,14 @@ public class ServiceController extends Service implements Runnable, Observer {
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 50;
   private static final long MIN_UPLOAD_ALLOWED = 250;
+  private static final float MAX_RADIUS = 98;
+  private static final double OVER = 180;
   private boolean running = true;
   private WifiLocator simpleWifiLocator;
-  private double lastLat;
-  private double lastLon;
+  private double lastLat = 190;
+  private double lastLon = 190;
+  private float lastSpeed = -1f;
+  private long lastTime = SystemClock.elapsedRealtime();
   private Thread controller = null;
   private ArrayList<AccessPoint> listAp = new ArrayList<>();
   private Intent intent;
@@ -162,7 +168,6 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
       controller = null;
     }
-    //TODO check quality and save all the unsaved APs
     buffer.putNextData(listAp);
     while (!buffer.isEmpty()) {
       Log.i(LOG_TAG, "Waiting for storage to finish job");
@@ -181,10 +186,33 @@ public class ServiceController extends Service implements Runnable, Observer {
     return null;
   }
 
-  private boolean qualityCheck(double lat, double lon) {
-    lastLat = lat;
-    lastLon = lon;
-    return true;
+  private boolean qualityCheck(double lat, double lon, float radius) {
+    switch (simpleWifiLocator.getLastLocMethod()){
+      case LIBWLOCATE:
+        if(lastLon <OVER && lastLat < OVER ){
+          float[] dist = new float[1];
+          Location.distanceBetween(lastLat,lastLon,lat, lon,dist);
+          lastSpeed = dist[0]*1000 / (SystemClock.elapsedRealtime() - lastTime);
+        }else{
+          lastSpeed = -1f;
+        }
+        lastLat = lat;
+        lastLon = lon;
+        lastTime = SystemClock.elapsedRealtime();
+        return true;
+      case GPS:
+        if (radius < MAX_RADIUS) {
+          lastLat = lat;
+          lastLon = lon;
+          lastSpeed = simpleWifiLocator.getLastSpeed();
+          lastTime = SystemClock.elapsedRealtime();
+          return true;
+        }
+        break;
+      default:
+        break;
+    }
+    return false;
   }
 
   @Override
@@ -205,7 +233,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     protected void wlocReturnPosition(WLOC_REPONSE_CODE ret, double lat, double lon, float radius, short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       intent = new Intent();
-      if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon)) {
+      if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         AccessPoint ap;
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
@@ -249,6 +277,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         intent.setAction(R_UPDATE_UI);
         intent.putExtra(R_GEO_INFO, lastLat + "-" + lastLon);
         intent.putExtra(R_NEWEST_SCAN, (long) resultList.size());
+        intent.putExtra(R_SPEED, lastSpeed);
         intent.putParcelableArrayListExtra(R_LIST_AP, listAp);
         Log.i(LOG_TAG, "Notify ui update");
       } else {
