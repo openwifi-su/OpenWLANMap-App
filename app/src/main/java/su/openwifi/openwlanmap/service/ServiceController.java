@@ -52,7 +52,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private Intent intent;
   private Thread storer = null;
   private DataQueue buffer = new DataQueue();
-  private boolean getLocation = false;
+  private boolean getLocation = true;
   private WifiUploader uploader;
   private TotalApWrapper totalAps = new TotalApWrapper();
 
@@ -104,14 +104,16 @@ public class ServiceController extends Service implements Runnable, Observer {
           Config.setMode(Config.MODE.SCAN_MODE);
           break;
         case SCAN_MODE:
-          getLocation = false;
-          Log.i(LOG_TAG, "Scanning thread is running...");
-          simpleWifiLocator.wlocRequestPosition();
-          try {
-            Thread.sleep(SCAN_PERIOD);
-          } catch (InterruptedException e) {
-            Log.i(LOG_TAG, "Do next request...");
-            Thread.currentThread().interrupt();
+          if(getLocation){
+            getLocation = false;
+            Log.i(LOG_TAG, "Scanning thread is running...");
+            simpleWifiLocator.wlocRequestPosition();
+            try {
+              Thread.sleep(SCAN_PERIOD);
+            } catch (InterruptedException e) {
+              Log.i(LOG_TAG, "Do next request...");
+              Thread.currentThread().interrupt();
+            }
           }
           break;
         default:
@@ -187,6 +189,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   }
 
   private boolean qualityCheck(double lat, double lon, float radius) {
+    Log.e(LOG_TAG, "check quality");
     switch (simpleWifiLocator.getLastLocMethod()){
       case LIBWLOCATE:
         if(lastLon <OVER && lastLat < OVER ){
@@ -201,10 +204,12 @@ public class ServiceController extends Service implements Runnable, Observer {
         lastTime = SystemClock.elapsedRealtime();
         return true;
       case GPS:
+        Log.e(LOG_TAG, "in gps");
         if (radius < MAX_RADIUS) {
           lastLat = lat;
           lastLon = lon;
           lastSpeed = simpleWifiLocator.getLastSpeed();
+          Log.e(LOG_TAG, "get last speed"+lastSpeed);
           lastTime = SystemClock.elapsedRealtime();
           return true;
         }
