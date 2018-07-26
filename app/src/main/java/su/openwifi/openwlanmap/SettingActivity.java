@@ -4,7 +4,10 @@ import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -12,11 +15,48 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class SettingActivity extends AppCompatActivity {
+  private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
+  private PreferenceFragment fragment;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_setting);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    //set up pref listener
+    if (fragment == null) {
+      fragment = new SettingFragment();
+      getFragmentManager()
+          .beginTransaction()
+          .replace(android.R.id.content, fragment)
+          .commit();
+      getFragmentManager().executePendingTransactions();
+    }
+    final boolean pref_privacy = PreferenceManager
+        .getDefaultSharedPreferences(this).getBoolean("pref_privacy", false);
+    hideIfAnonym(pref_privacy);
+    if (sharedPreferenceChangeListener == null) {
+      sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+          if (key.equalsIgnoreCase("pref_privacy")) {
+            hideIfAnonym(sharedPreferences.getBoolean(key, false));
+          }
+        }
+      };
+    }
+  }
+
+  private void hideIfAnonym(boolean isAnonym) {
+    final Preference pref_team = fragment.findPreference("pref_team");
+    final Preference pref_team_tag = fragment.findPreference("pref_team_tag");
+    if (isAnonym) {
+      pref_team.setEnabled(false);
+      pref_team_tag.setEnabled(false);
+    } else {
+      pref_team.setEnabled(true);
+      pref_team_tag.setEnabled(true);
+    }
   }
 
   @Override
@@ -58,5 +98,19 @@ public class SettingActivity extends AppCompatActivity {
         break;
     }
     return true;
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    PreferenceManager.getDefaultSharedPreferences(this)
+        .unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    PreferenceManager.getDefaultSharedPreferences(this)
+        .registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
   }
 }
