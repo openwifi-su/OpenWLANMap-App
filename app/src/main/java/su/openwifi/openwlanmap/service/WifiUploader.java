@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import java.util.List;
+import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
 import su.openwifi.openwlanmap.QueryUtils;
 import su.openwifi.openwlanmap.database.MyDatabase;
@@ -29,11 +30,15 @@ public class WifiUploader {
   /**
    * This method upload all data in database to backend.
    * @return true if successful otherwise false
+   * @param id
+   * @param tag
+   * @param pref_support_project
    */
-  public boolean upload() {
+  public boolean upload(String id, String tag, Set<String> pref_support_project) {
     //TODO read from preference
-    String testOwnBssid = "8911CDEE5A14";
-    String testTeam = "Team42";
+    //String testOwnBssid = "8911CDEE5A14";
+    //String testTeam = "Team42";
+    Log.e(LOG_TAG,id+"-"+tag+pref_support_project.toString());
     long count = MyDatabase.getInstance(context)
         .getAccessPointDao()
         .countEntries();
@@ -46,7 +51,7 @@ public class WifiUploader {
       Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
       if (checkConnection()) {
         //Upload
-        ranking = QueryUtils.uploadData(uploadEntries, testOwnBssid, testTeam);
+        ranking = QueryUtils.uploadData(uploadEntries, id, tag);
         if (ranking != null) {
           //Delete
           Log.e(LOG_TAG, "Getting back from upload response");

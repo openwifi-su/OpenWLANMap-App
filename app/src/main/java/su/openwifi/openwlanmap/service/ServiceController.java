@@ -17,16 +17,22 @@ import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_UNDER_LIMIT;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
 import su.openwifi.openwlanmap.QueryUtils;
 
@@ -55,6 +61,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private boolean getLocation = true;
   private WifiUploader uploader;
   private TotalApWrapper totalAps = new TotalApWrapper();
+  private SharedPreferences sharedPreferences;
 
   @Override
   public void run() {
@@ -85,7 +92,20 @@ public class ServiceController extends Service implements Runnable, Observer {
             intent.setAction(R_UPLOAD_UNDER_LIMIT);
             sendBroadcast(intent);
           } else {
-            boolean uploaded = uploader.upload();
+            String id = "";
+            String tag = "";
+            final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
+            final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
+            if(!pref_privacy){
+              if(pref_in_team){
+                id = sharedPreferences.getString("pref_team","");
+              }else{
+                id = sharedPreferences.getString("own_bssid","");
+              }
+              tag = sharedPreferences.getString("pref_team_tag","");
+            }
+            final Set<String> pref_support_project = sharedPreferences.getStringSet("pref_support_project", new HashSet<String>());
+            boolean uploaded = uploader.upload(id, tag, pref_support_project);
             if (uploaded) {
               //update ranking
               QueryUtils.RankingObject ranking = uploader.getRanking();
@@ -135,6 +155,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     Log.i(LOG_TAG, "on start command service");
     running = true;
     totalAps.addObserver(this);
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     controller = new Thread(this);
     controller.start();
     storer = new WifiStorer(this, buffer, totalAps);
