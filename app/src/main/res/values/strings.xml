@@ -77,4 +77,5 @@
     <string name="error_ownbssid">Could not get your identifier!</string>
     <string name="team_tag">Tag</string>
     <string name="not_set">none</string>
+    <string name="setting_team">Member of a team</string>
 </resources>

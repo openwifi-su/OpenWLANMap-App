@@ -41,6 +41,15 @@ public class SettingActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
           if (key.equalsIgnoreCase("pref_privacy")) {
             hideIfAnonym(sharedPreferences.getBoolean(key, false));
+          }else if(key.equalsIgnoreCase("pref_in_team")){
+            final Preference pref_team = fragment.findPreference("pref_team");
+            final boolean pref_in_team_status = PreferenceManager
+                .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_in_team", false);
+            if(pref_in_team_status){
+              pref_team.setEnabled(true);
+            }else{
+              pref_team.setEnabled(false);
+            }
           }
         }
       };
@@ -50,12 +59,21 @@ public class SettingActivity extends AppCompatActivity {
   private void hideIfAnonym(boolean isAnonym) {
     final Preference pref_team = fragment.findPreference("pref_team");
     final Preference pref_team_tag = fragment.findPreference("pref_team_tag");
+    final Preference pref_in_team = fragment.findPreference("pref_in_team");
     if (isAnonym) {
       pref_team.setEnabled(false);
       pref_team_tag.setEnabled(false);
+      pref_in_team.setEnabled(false);
     } else {
-      pref_team.setEnabled(true);
       pref_team_tag.setEnabled(true);
+      pref_in_team.setEnabled(true);
+      final boolean pref_in_team_status = PreferenceManager
+          .getDefaultSharedPreferences(this).getBoolean("pref_in_team", false);
+      if(pref_in_team_status){
+        pref_team.setEnabled(true);
+      }else{
+        pref_team.setEnabled(false);
+      }
     }
   }
 

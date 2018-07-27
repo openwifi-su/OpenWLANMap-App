@@ -5,6 +5,10 @@
             android:defaultValue="true"
             android:key="pref_privacy"
             android:title="@string/setting_privacy"></CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_in_team"
+            android:title="@string/setting_team"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
             android:defaultValue="@string/not_set"
             android:key="pref_team"
