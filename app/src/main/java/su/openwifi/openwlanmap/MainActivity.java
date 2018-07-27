@@ -560,7 +560,7 @@ public class MainActivity extends AppCompatActivity
             gps.setText(gpsString);
             newestScan.setText(String.valueOf(newest));
             if(speedUpdate > 0){
-              speed.setText(speedUpdate+" m/s");
+              speed.setText(String.format("%.2f m/s (%.2f km/h)" , speedUpdate, speedUpdate*60*60/1000.0));
             }else{
               speed.setText("?");
             }

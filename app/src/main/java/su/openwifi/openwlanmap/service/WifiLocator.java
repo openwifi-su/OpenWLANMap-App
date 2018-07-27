@@ -215,7 +215,6 @@ public class WifiLocator implements Runnable {
             requestData.add(bssid);
           }
           lastLocMethod = LOC_METHOD.NOT_DEFINE;
-          lastSpeed = -1.0f;
           if (gpsAvailable) {
             gpsAvailable = (SystemClock.elapsedRealtime() - lastLocationMillis) < WAIT_FOR_SIGNAL;
             Log.i(LOG_TAG, "Waited for " + (SystemClock.elapsedRealtime() - lastLocationMillis));
