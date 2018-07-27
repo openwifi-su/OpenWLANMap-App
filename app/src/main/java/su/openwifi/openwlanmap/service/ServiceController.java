@@ -259,44 +259,51 @@ public class ServiceController extends Service implements Runnable, Observer {
     protected void wlocReturnPosition(WLOC_REPONSE_CODE ret, double lat, double lon, float radius, short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       intent = new Intent();
+      final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "");
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         AccessPoint ap;
+        double limit = -10000;
+        if(!TextUtils.isEmpty(pref_min_rssi) && !pref_min_rssi.equalsIgnoreCase("no limit")){
+          limit = Integer.valueOf(pref_min_rssi.substring(1, pref_min_rssi.length() -2))*-1.0;
+        }
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
-          int channel = 0;
-          try {
-            channel = result.channelWidth;
-          } catch (NoSuchFieldError e) {
-            //Some old version can not read channelwidth field
-          }
-          ap = new AccessPoint(
-              result.BSSID.toUpperCase().replace(":", "").replace(".", ""),
-              result.SSID,
-              result.level,
-              System.currentTimeMillis() - SystemClock.elapsedRealtime()
-                  + (result.timestamp / 1000),
-              result.frequency / 1000.0,
-              channel,
-              result.capabilities,
-              lastLat,
-              lastLon,
-              WifiFilterer.isToUpdate(result)
-          );
-          if (listAp.contains(ap)) {
-            int i = listAp.indexOf(ap);
-            AccessPoint accessPoint = listAp.get(i);
-            if (ap.getRssid() > accessPoint.getRssid()) {
-              //update locate
-              accessPoint.setRssid(ap.getRssid());
-              accessPoint.setLat(lastLat);
-              accessPoint.setLon(lastLon);
+          if(result.level > limit){
+            int channel = 0;
+            try {
+              channel = result.channelWidth;
+            } catch (NoSuchFieldError e) {
+              //Some old version can not read channelwidth field
             }
-          } else {
-            listAp.add(ap);
-          }
-          if (listAp.size() >= BUFFER_ENTRY_MAX) {
-            buffer.putNextData(new ArrayList<>(listAp));
-            listAp.clear();
+            ap = new AccessPoint(
+                result.BSSID.toUpperCase().replace(":", "").replace(".", ""),
+                result.SSID,
+                result.level,
+                System.currentTimeMillis() - SystemClock.elapsedRealtime()
+                    + (result.timestamp / 1000),
+                result.frequency / 1000.0,
+                channel,
+                result.capabilities,
+                lastLat,
+                lastLon,
+                WifiFilterer.isToUpdate(result)
+            );
+            if (listAp.contains(ap)) {
+              int i = listAp.indexOf(ap);
+              AccessPoint accessPoint = listAp.get(i);
+              if (ap.getRssid() > accessPoint.getRssid()) {
+                //update locate
+                accessPoint.setRssid(ap.getRssid());
+                accessPoint.setLat(lastLat);
+                accessPoint.setLon(lastLon);
+              }
+            } else {
+              listAp.add(ap);
+            }
+            if (listAp.size() >= BUFFER_ENTRY_MAX) {
+              buffer.putNextData(new ArrayList<>(listAp));
+              listAp.clear();
+            }
           }
 
         }
