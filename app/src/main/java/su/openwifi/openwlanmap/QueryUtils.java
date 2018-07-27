@@ -221,6 +221,9 @@ public class QueryUtils {
       BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
       try {
         locationObject.result = Integer.parseInt(bufferedReader.readLine().substring(7));
+        if(locationObject.result <1){
+          return null;
+        }
         locationObject.quality = (short) Integer.parseInt(bufferedReader.readLine().substring(8));
         locationObject.lat = Double.parseDouble(bufferedReader.readLine().substring(4));
         locationObject.lon = Double.parseDouble(bufferedReader.readLine().substring(4));
