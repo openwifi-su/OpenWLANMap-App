@@ -61,12 +61,22 @@
             android:key="pref_show_counter"
             android:layout="@layout/custom_pref_layout"
             android:title="@string/setting_show_counter"></CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_public_data"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/setting_public_data"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference
             android:defaultValue="@array/arr_summary_default"
             android:entries="@array/arr_summary"
             android:entryValues="@array/arr_summary"
             android:key="pref_show_summary"
             android:title="@string/setting_summary"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_use_map"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/setting_map"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference
             android:defaultValue="@array/arr_list_default"
             android:entries="@array/arr_list"

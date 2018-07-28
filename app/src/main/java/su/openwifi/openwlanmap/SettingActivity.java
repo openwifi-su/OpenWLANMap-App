@@ -34,7 +34,10 @@ public class SettingActivity extends AppCompatActivity {
     }
     final boolean pref_privacy = PreferenceManager
         .getDefaultSharedPreferences(this).getBoolean("pref_privacy", false);
+    final boolean pref_use_map = PreferenceManager
+        .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
     hideIfAnonym(pref_privacy);
+    hideIfUsingMap(pref_use_map);
     if (sharedPreferenceChangeListener == null) {
       sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
@@ -50,9 +53,20 @@ public class SettingActivity extends AppCompatActivity {
             }else{
               pref_team.setEnabled(false);
             }
+          }else if(key.equalsIgnoreCase("pref_use_map")){
+            hideIfUsingMap(sharedPreferences.getBoolean("pref_use_map", false));
           }
         }
       };
+    }
+  }
+
+  private void hideIfUsingMap(boolean useMap) {
+    final Preference pref_show_list = fragment.findPreference("pref_show_list");
+    if(useMap){
+      pref_show_list.setEnabled(false);
+    }else{
+      pref_show_list.setEnabled(true);
     }
   }
 
