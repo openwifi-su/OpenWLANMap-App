@@ -105,7 +105,10 @@ public class ServiceController extends Service implements Runnable, Observer {
               tag = sharedPreferences.getString("pref_team_tag","");
             }
             final Set<String> pref_support_project = sharedPreferences.getStringSet("pref_support_project", new HashSet<String>());
-            boolean uploaded = uploader.upload(id, tag, pref_support_project);
+            int mode = 0;
+            if (sharedPreferences.getBoolean("pref_public_data", true)) mode = 1;
+            if (sharedPreferences.getBoolean("pref_publish_map", false)) mode |= 2;
+            boolean uploaded = uploader.upload(id, tag, mode, pref_support_project);
             if (uploaded) {
               //update ranking
               QueryUtils.RankingObject ranking = uploader.getRanking();

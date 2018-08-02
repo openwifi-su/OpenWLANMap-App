@@ -113,14 +113,16 @@ public class QueryUtils {
    * @param uploadEntries : a list of access point
    * @param mac : own generated bssid
    * @param teamTag : team tag as user defines
+   * @param mode : mode for public data, as well as map
    * @return a RankingObject
    */
   public static RankingObject uploadData(
       List<AccessPoint> uploadEntries,
       String mac,
-      String teamTag) {
+      String teamTag,
+      int mode) {
     URL url = create(URL_UPLOAD);
-    InputStream ins = makeHttpRequest(url, "POST", prepareUploading(uploadEntries, mac, teamTag));
+    InputStream ins = makeHttpRequest(url, "POST", prepareUploading(uploadEntries, mac, teamTag, mode));
     RankingObject rankingObject = streamToRankingObject(ins);
     Log.i(LOG_TAG, "Successfully getting ranking back");
     if (ins != null) {
@@ -133,7 +135,7 @@ public class QueryUtils {
     return rankingObject;
   }
 
-  private static String prepareUploading(List<AccessPoint> uploadEntries, String mac, String tag) {
+  private static String prepareUploading(List<AccessPoint> uploadEntries, String mac, String tag, int mode) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(mac + "\n");
     stringBuilder.append("T\t");
@@ -141,7 +143,7 @@ public class QueryUtils {
     stringBuilder.append("E\t");
     stringBuilder.append(mac + "\n");
     stringBuilder.append("F\t");
-    stringBuilder.append(1 + "\n");
+    stringBuilder.append(mode + "\n");
     for (AccessPoint ap : uploadEntries) {
       if (ap.isToUpdate()) {
         stringBuilder.append(1 + "\t");

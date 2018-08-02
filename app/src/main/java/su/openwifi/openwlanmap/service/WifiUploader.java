@@ -32,9 +32,10 @@ public class WifiUploader {
    * @return true if successful otherwise false
    * @param id
    * @param tag
+   * @param mode
    * @param pref_support_project
    */
-  public boolean upload(String id, String tag, Set<String> pref_support_project) {
+  public boolean upload(String id, String tag, int mode, Set<String> pref_support_project) {
     //TODO read from preference
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
@@ -51,7 +52,7 @@ public class WifiUploader {
       Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
       if (checkConnection()) {
         //Upload
-        ranking = QueryUtils.uploadData(uploadEntries, id, tag);
+        ranking = QueryUtils.uploadData(uploadEntries, id, tag, mode);
         if (ranking != null) {
           //Delete
           Log.e(LOG_TAG, "Getting back from upload response");
