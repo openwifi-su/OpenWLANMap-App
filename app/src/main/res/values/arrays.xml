@@ -1,93 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="arr_start_modes">
-        <item>@string/always_in_background</item>
-        <item>@string/after_start_in_background</item>
+        <item>Run in background after booting device</item>
+        <item>Run in background after starting the application</item>
     </string-array>
-    <string name="always_in_background">Run in background after booting device</string>
-    <string name="after_start_in_background">Run in background after starting the application</string>
+    <string-array name="arr_start_modes_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 
     <string-array name="arr_upload_modes">
-        <item>@string/manual</item>
-        <item>@string/if_internet</item>
-        <item>@string/if_wifi</item>
+        <item>Manual</item>
+        <item>Automatic if internet connection is available</item>
+        <item>Automatic if wireless connection is available</item>
     </string-array>
-    <string name="manual">Manual</string>
-    <string name="if_internet">Automatic if internet connection is available</string>
-    <string name="if_wifi">Automatic if wireless connection is available</string>
+    <string-array name="arr_upload_modes_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 
     <string-array name="arr_battery">
-        <item>@string/never</item>
-        <item>@string/five</item>
-        <item>@string/ten</item>
-        <item>@string/fifteen</item>
+        <item>5%</item>
+        <item>10%</item>
+        <item>15%</item>
+        <item>Never</item>
     </string-array>
-    <string name="five">5 percent</string>
-    <string name="ten">10 percent</string>
-    <string name="fifteen">15 percent</string>
-    <string name="never">Never</string>
+    <string-array name="arr_battery_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>Never</item>
+    </string-array>
 
     <string-array name="arr_time_kill_app">
-        <item>@string/never</item>
-        <item>@string/hour</item>
-        <item>@string/ten_m</item>
-        <item>@string/fifteen_m</item>
-        <item>@string/thirty_m</item>
+        <item>Never</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>an hour</item>
     </string-array>
-    <string name="ten_m">10 minutes</string>
-    <string name="fifteen_m">15 minutes</string>
-    <string name="thirty_m">30 minutes</string>
-    <string name="hour">an hour</string>
-
-    <string-array name="arr_time_stop_scan">
-        <item>@string/never</item>
-        <item>@string/two_m</item>
-        <item>@string/five_m</item>
-        <item>@string/ten_m</item>
-        <item>@string/twenty_m</item>
+    <string-array name="arr_time_kill_app_values">
+        <item>Never</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
     </string-array>
-    <string name="one_m">1 minute</string>
-    <string name="two_m">2 minutes</string>
-    <string name="twenty_m">20 minutes</string>
-    <string name="five_m">5 minutes</string>
 
     <string-array name="arr_brightness">
-        <item>@string/never</item>
-        <item>@string/always</item>
-        <item>@string/reduce_at_5</item>
-        <item>@string/reduce_at_10</item>
-        <item>@string/reduce_at_20</item>
+        <item>Never</item>
+        <item>Always</item>
+        <item>Automatic reduce when battery is smaller than 5%</item>
+        <item>Automatic reduce when battery is smaller than 10%</item>
+        <item>Automatic reduce when battery is smaller than 20%</item>
     </string-array>
-    <string name="always">Always</string>
-    <string name="reduce_at_5">Automatic reduce when battery is smaller than 5 percent</string>
-    <string name="reduce_at_10">Automatic reduce when battery is smaller than 10 percent</string>
-    <string name="reduce_at_20">Automatic reduce when battery is smaller than 20 percent</string>
+    <string-array name="arr_brightness_values">
+        <item>0</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 
     <string-array name="arr_rssi">
-        <item>@string/r70</item>
-        <item>@string/r80</item>
-        <item>@string/r90</item>
-        <item>@string/r100</item>
-        <item>@string/r110</item>
-        <item>@string/r120</item>
-        <item>@string/r_never</item>
+        <item>-70dB</item>
+        <item>-80dB</item>
+        <item>-90dB</item>
+        <item>-100dB</item>
+        <item>-110dB</item>
+        <item>-120dB</item>
+        <item>Never</item>
     </string-array>
-    <string name="r70">-70dB</string>
-    <string name="r80">-80dB</string>
-    <string name="r90">-90dB</string>
-    <string name="r100">-100dB</string>
-    <string name="r110">-110dB</string>
-    <string name="r120">-120dB</string>
-    <string name="r_never">no limit</string>
+    <string-array name="arr_rssi_values">
+        <item>-70</item>
+        <item>-80</item>
+        <item>-90</item>
+        <item>-100</item>
+        <item>-110</item>
+        <item>-120</item>
+        <item>-1000</item>
+    </string-array>
 
     <string-array name="arr_project">
         <item>@string/openwifi_su</item>
-        <item>@string/mozilla</item>
         <item>@string/virtualworlds</item>
         <item>@string/openwlanmap</item>
     </string-array>
     <string name="openwifi_su">openwifi.su</string>
-    <string name="mozilla">Mozilla Location Services</string>
     <string name="virtualworlds">virtualworlds.de</string>
     <string name="openwlanmap">openwlanmap.org</string>
     <string-array name="arr_default_project">

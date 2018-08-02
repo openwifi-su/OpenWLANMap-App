@@ -20,7 +20,6 @@
     <string name="setting_min_rssi">Minimum RSSI allowed</string>
     <string name="setting_battery">Kill application if battery is lower than</string>
     <string name="kill_ap_no_gps">Kill application if there is no GPS after</string>
-    <string name="stop_scan_no_gps">Stop scan service if there is no GPS after</string>
     <string name="setting_brightness">Reduce brightness</string>
     <string name="setting_user">ACCOUNT SETTINGS</string>
     <string name="setting_privacy">Stay anonym</string>
@@ -76,8 +75,9 @@
     <string name="ownbssid">This number identifies a team. In case you have other members in team. Please follow them this. They have to set it up in settings!</string>
     <string name="error_ownbssid">Could not get your identifier!</string>
     <string name="team_tag">Tag</string>
-    <string name="not_set">none</string>
     <string name="setting_team">Member of a team</string>
     <string name="setting_public_data">Public your data in openwlanmap.org</string>
     <string name="setting_map">Using map instead of access point list</string>
+    <string name="adaptive_scanning">Adaptive scanning</string>
+    <string name="adaptive_info">Scale scanning period dynamically to save resources by detecting movement with sensor, speed etc.</string>
 </resources>
