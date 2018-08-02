@@ -18,9 +18,9 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setting_project">
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference
-            android:defaultValue="@array/arr_default_project"
             android:entries="@array/arr_project"
             android:entryValues="@array/arr_project"
+            android:layout="@layout/custom_pref_layout"
             android:key="pref_support_project"
             android:title="@string/setting_support_project"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
     </PreferenceCategory>
@@ -63,10 +63,17 @@
             android:layout="@layout/custom_pref_layout"
             android:title="@string/setting_show_counter"></CheckBoxPreference>
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="pref_public_data"
             android:layout="@layout/custom_pref_layout"
-            android:title="@string/setting_public_data"></CheckBoxPreference>
+            android:title="@string/setting_public_data"
+            android:summary="@string/setting_public_data_info"></CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_publish_map"
+            android:layout="@layout/custom_pref_layout"
+            android:title="@string/setting_public_map"
+            />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_use_map"

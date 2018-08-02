@@ -32,7 +32,7 @@ public class CustomMultiListPreference extends MultiSelectListPreference {
   protected void onDialogClosed(boolean positiveResult) {
     super.onDialogClosed(positiveResult);
     if (positiveResult && getValues().size() == 0) {
-      setSummary("none");
+      setSummary("");
     }
   }
 }

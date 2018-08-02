@@ -52,7 +52,7 @@
     <string name="h_newest_scan">Newest scan:</string>
     <string name="lat">latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="setting_support_project">Projects to be supported</string>
+    <string name="setting_support_project">Projects(optional) to be supported besides openwifi.su(default)</string>
     <string name="setting_summary">Show in summary</string>
     <string name="exist">Kill the application and exist?</string>
     <string name="yes">Exist</string>
@@ -80,4 +80,6 @@
     <string name="setting_map">Using map instead of access point list</string>
     <string name="adaptive_scanning">Adaptive scanning</string>
     <string name="adaptive_info">Scale scanning period dynamically to save resources by detecting movement with sensor, speed etc.</string>
+    <string name="setting_public_data_info">Allow other to download your data from openwifi.su</string>
+    <string name="setting_public_map">Show your map data in openwifi.su</string>
 </resources>
