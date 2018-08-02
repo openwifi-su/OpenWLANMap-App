@@ -259,13 +259,9 @@ public class ServiceController extends Service implements Runnable, Observer {
     protected void wlocReturnPosition(WLOC_REPONSE_CODE ret, double lat, double lon, float radius, short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       intent = new Intent();
-      final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "");
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
-        AccessPoint ap;
-        double limit = -10000;
-        if(!TextUtils.isEmpty(pref_min_rssi) && !pref_min_rssi.equalsIgnoreCase("no limit")){
-          limit = Integer.valueOf(pref_min_rssi.substring(1, pref_min_rssi.length() -2))*-1.0;
-        }
+        final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "");
+        double limit = Double.valueOf(pref_min_rssi);
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
           if(result.level > limit){
@@ -275,7 +271,7 @@ public class ServiceController extends Service implements Runnable, Observer {
             } catch (NoSuchFieldError e) {
               //Some old version can not read channelwidth field
             }
-            ap = new AccessPoint(
+            AccessPoint ap = new AccessPoint(
                 result.BSSID.toUpperCase().replace(":", "").replace(".", ""),
                 result.SSID,
                 result.level,
