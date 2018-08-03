@@ -83,9 +83,14 @@
     </string-array>
 
     <string-array name="arr_project">
+        <item>@string/openwifi_su</item>
         <item>@string/virtualworlds</item>
     </string-array>
-    <string name="virtualworlds">virtualworlds.de</string>
+    <string name="openwifi_su">openwifi.su</string>
+    <string name="virtualworlds">virtualworlds.de (closed project)</string>
+    <string-array name="arr_default_project">
+        <item>@string/openwifi_su</item>
+    </string-array>
     <string-array name="arr_summary">
         <item>@string/rank_sum</item>
         <item>@string/gps_sum</item>

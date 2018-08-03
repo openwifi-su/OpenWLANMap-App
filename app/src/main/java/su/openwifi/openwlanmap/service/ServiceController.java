@@ -22,10 +22,8 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,7 +32,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
-import su.openwifi.openwlanmap.QueryUtils;
+import su.openwifi.openwlanmap.utils.RankingObject;
 
 /**
  * Created by tali on 01.06.18.
@@ -43,7 +41,7 @@ import su.openwifi.openwlanmap.QueryUtils;
 public class ServiceController extends Service implements Runnable, Observer {
   private static final long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
-  private static final int BUFFER_ENTRY_MAX = 50;
+  private static final int BUFFER_ENTRY_MAX = 100;
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
@@ -96,22 +94,26 @@ public class ServiceController extends Service implements Runnable, Observer {
             String tag = "";
             final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
             final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
-            if(!pref_privacy){
-              if(pref_in_team){
-                id = sharedPreferences.getString("pref_team","");
-              }else{
-                id = sharedPreferences.getString("own_bssid","");
+            if (!pref_privacy) {
+              if (pref_in_team) {
+                id = sharedPreferences.getString("pref_team", "");
+              } else {
+                id = sharedPreferences.getString("own_bssid", "");
               }
-              tag = sharedPreferences.getString("pref_team_tag","");
+              tag = sharedPreferences.getString("pref_team_tag", "");
             }
             final Set<String> pref_support_project = sharedPreferences.getStringSet("pref_support_project", new HashSet<String>());
             int mode = 0;
-            if (sharedPreferences.getBoolean("pref_public_data", true)) mode = 1;
-            if (sharedPreferences.getBoolean("pref_publish_map", false)) mode |= 2;
+            if (sharedPreferences.getBoolean("pref_public_data", true)) {
+              mode = 1;
+            }
+            if (sharedPreferences.getBoolean("pref_publish_map", false)) {
+              mode |= 2;
+            }
             boolean uploaded = uploader.upload(id, tag, mode, pref_support_project);
             if (uploaded) {
               //update ranking
-              QueryUtils.RankingObject ranking = uploader.getRanking();
+              RankingObject ranking = uploader.getRanking();
               Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
               intent = new Intent();
               intent.setAction(R_UPDATE_RANKING);
@@ -127,7 +129,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           Config.setMode(Config.MODE.SCAN_MODE);
           break;
         case SCAN_MODE:
-          if(getLocation){
+          if (getLocation) {
             getLocation = false;
             Log.i(LOG_TAG, "Scanning thread is running...");
             simpleWifiLocator.wlocRequestPosition();
@@ -214,13 +216,13 @@ public class ServiceController extends Service implements Runnable, Observer {
 
   private boolean qualityCheck(double lat, double lon, float radius) {
     Log.e(LOG_TAG, "check quality");
-    switch (simpleWifiLocator.getLastLocMethod()){
+    switch (simpleWifiLocator.getLastLocMethod()) {
       case LIBWLOCATE:
-        if(lastLon <OVER && lastLat < OVER ){
+        if (lastLon < OVER && lastLat < OVER) {
           float[] dist = new float[1];
-          Location.distanceBetween(lastLat,lastLon,lat, lon,dist);
-          lastSpeed = dist[0]*1000 / (SystemClock.elapsedRealtime() - lastTime);
-        }else{
+          Location.distanceBetween(lastLat, lastLon, lat, lon, dist);
+          lastSpeed = dist[0] * 1000 / (SystemClock.elapsedRealtime() - lastTime);
+        } else {
           lastSpeed = -1f;
         }
         lastLat = lat;
@@ -233,7 +235,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           lastLat = lat;
           lastLon = lon;
           lastSpeed = simpleWifiLocator.getLastSpeed();
-          Log.e(LOG_TAG, "get last speed"+lastSpeed);
+          Log.e(LOG_TAG, "get last speed" + lastSpeed);
           lastTime = SystemClock.elapsedRealtime();
           return true;
         }
@@ -267,7 +269,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         double limit = Double.valueOf(pref_min_rssi);
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
-          if(result.level > limit){
+          if (result.level > limit) {
             int channel = 0;
             try {
               channel = result.channelWidth;

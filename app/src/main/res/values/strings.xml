@@ -52,7 +52,7 @@
     <string name="h_newest_scan">Newest scan:</string>
     <string name="lat">latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="setting_support_project">Projects(optional) to be supported besides openwifi.su(default)</string>
+    <string name="setting_support_project">Projects to be supported</string>
     <string name="setting_summary">Show in summary</string>
     <string name="exist">Kill the application and exist?</string>
     <string name="yes">Exist</string>

@@ -18,6 +18,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setting_project">
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference
+            android:defaultValue="@array/arr_default_project"
             android:entries="@array/arr_project"
             android:entryValues="@array/arr_project"
             android:layout="@layout/custom_pref_layout"

@@ -7,8 +7,9 @@ import android.util.Log;
 import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
-import su.openwifi.openwlanmap.QueryUtils;
 import su.openwifi.openwlanmap.database.MyDatabase;
+import su.openwifi.openwlanmap.utils.RankingObject;
+import su.openwifi.openwlanmap.utils.UploadQueryUtils;
 
 /**
  * Created by tali on 31.05.18.
@@ -19,7 +20,7 @@ public class WifiUploader {
   private static final String LOG_TAG = WifiUploader.class.getName();
   private Context context;
   private TotalApWrapper totalAps;
-  private QueryUtils.RankingObject ranking;
+  private RankingObject ranking;
   private String error;
 
   public WifiUploader(Context context, TotalApWrapper totalAps) {
@@ -36,7 +37,7 @@ public class WifiUploader {
    * @param pref_support_project
    */
   public boolean upload(String id, String tag, int mode, Set<String> pref_support_project) {
-    //TODO read from preference
+    //TODO read from preference and check project to upload
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
     Log.e(LOG_TAG,id+"-"+tag+pref_support_project.toString());
@@ -52,7 +53,7 @@ public class WifiUploader {
       Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
       if (checkConnection()) {
         //Upload
-        ranking = QueryUtils.uploadData(uploadEntries, id, tag, mode);
+        ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries, id, tag, mode);
         if (ranking != null) {
           //Delete
           Log.e(LOG_TAG, "Getting back from upload response");
@@ -87,7 +88,7 @@ public class WifiUploader {
     return (info != null && info.isConnected());
   }
 
-  public QueryUtils.RankingObject getRanking() {
+  public RankingObject getRanking() {
     return ranking;
   }
 

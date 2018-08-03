@@ -19,25 +19,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import su.openwifi.openwlanmap.QueryUtils;
+import su.openwifi.openwlanmap.utils.LocationObject;
+import su.openwifi.openwlanmap.utils.LocationQueryUtils;
 
 /**
  * Created by tali on 01.06.18.
  */
 
 public class WifiLocator implements Runnable {
-  public enum WLOC_REPONSE_CODE  {
-    OK, REQUEST_ERROR, ERROR
-  }
-
-  public enum LOC_METHOD {
-    LIBWLOCATE, GPS, NOT_DEFINE
-  }
-
   private static final String LOG_TAG = WifiLocator.class.getSimpleName();
   private static final long WAIT_FOR_SIGNAL = 7500;
   private static final long GPS_PERIOD = 100;
-
   private Context context;
   private LocationManager locationManager;
   private LocationListener gpsLocationListener;
@@ -55,7 +47,6 @@ public class WifiLocator implements Runnable {
   private LOC_METHOD lastLocMethod;
   private Set<String> requestData;
   private List<ScanResult> wifiScanResult;
-
   /**
    * Constructor of WifiLocator object.
    *
@@ -143,7 +134,7 @@ public class WifiLocator implements Runnable {
   @Override
   public void run() {
     Log.i(LOG_TAG, "Request started");
-    QueryUtils.LocationObject locationObject = QueryUtils.fetchLocationOld(
+    LocationObject locationObject = LocationQueryUtils.fetchLocationOld(
         requestData);
     lastLocMethod = LOC_METHOD.LIBWLOCATE;
     Log.i(LOG_TAG, "Finish request with response=" + locationObject);
@@ -193,6 +184,14 @@ public class WifiLocator implements Runnable {
                                     double lat, double lon,
                                     float radius, short ccode) {
     //should be implemented by child class
+  }
+
+  public enum WLOC_REPONSE_CODE {
+    OK, REQUEST_ERROR, ERROR
+  }
+
+  public enum LOC_METHOD {
+    LIBWLOCATE, GPS, NOT_DEFINE
   }
 
   private class WifiScanReceiver extends BroadcastReceiver {

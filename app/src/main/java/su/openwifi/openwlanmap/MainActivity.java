@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.service.Config;
 import su.openwifi.openwlanmap.service.ServiceController;
+import su.openwifi.openwlanmap.utils.RankingObject;
 
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity
   public static final String R_UPDATE_RANKING = "update_ranking";
   public static final String R_RANK = "rank_position";
   public static final String R_UPLOAD_UNDER_LIMIT = "update_under_limit";
+  public static final String PREF_RANKING = "p_ranking";
+  public static final String PREF_OWN_BSSID = "own_bssid";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
   private static final String PREF_SORT_METHOD = "sort_method";
   private static final String SORT_BY_TIME = "sort_by_time";
@@ -69,8 +72,6 @@ public class MainActivity extends AppCompatActivity
   private static final String SORT_BY_FREQ = "sort_by_freq";
   private static final String S_SCANN_STATUS = "scan_status";
   private static final String PREF_TOTAL_AP = "p_total_ap";
-  public static final String PREF_RANKING = "p_ranking";
-  public static final String PREF_OWN_BSSID = "own_bssid";
   private TextView gps;
   private TextView scanningStatus;
   private TextView totalAp;
@@ -523,6 +524,12 @@ public class MainActivity extends AppCompatActivity
     alertDialog.show();
   }
 
+  private void resetListVisibility() {
+    loading.setVisibility(View.GONE);
+    listView.setVisibility(View.VISIBLE);
+    listHeader.setVisibility(View.VISIBLE);
+  }
+
   public class ServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
@@ -559,9 +566,9 @@ public class MainActivity extends AppCompatActivity
             adapter.notifyDataSetChanged();
             gps.setText(gpsString);
             newestScan.setText(String.valueOf(newest));
-            if(speedUpdate > 0){
-              speed.setText(String.format("%.2f m/s (%.2f km/h)" , speedUpdate, speedUpdate*60*60/1000.0));
-            }else{
+            if (speedUpdate > 0) {
+              speed.setText(String.format("%.2f m/s (%.2f km/h)", speedUpdate, speedUpdate * 60 * 60 / 1000.0));
+            } else {
               speed.setText("?");
             }
           }
@@ -585,7 +592,7 @@ public class MainActivity extends AppCompatActivity
           resetListVisibility();
           break;
         case R_UPDATE_RANKING:
-          QueryUtils.RankingObject r = intent.getParcelableExtra(R_RANK);
+          RankingObject r = intent.getParcelableExtra(R_RANK);
           String rp = r.uploadedRank
               + "(" + r.uploadedCount + " "
               + getString(R.string.point) + ")";
@@ -604,11 +611,5 @@ public class MainActivity extends AppCompatActivity
           break;
       }
     }
-  }
-
-  private void resetListVisibility() {
-    loading.setVisibility(View.GONE);
-    listView.setVisibility(View.VISIBLE);
-    listHeader.setVisibility(View.VISIBLE);
   }
 }
