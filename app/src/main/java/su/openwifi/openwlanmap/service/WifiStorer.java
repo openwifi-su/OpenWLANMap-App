@@ -15,6 +15,7 @@ public class WifiStorer extends Thread {
   private DataQueue buffer;
   private TotalApWrapper totalAps;
   private Context context;
+  public boolean running;
 
   /**
    * WifiStorer Constructor.
@@ -26,11 +27,12 @@ public class WifiStorer extends Thread {
     this.context = context;
     this.buffer = buffer;
     this.totalAps = totalAps;
+    this.running = true;
   }
 
   @Override
   public void run() {
-    while (true) {
+    while (running) {
       List<AccessPoint> list = buffer.getNextData();
       if (list != null) {
         Log.i(TAG, "Now inserting ......");

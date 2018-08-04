@@ -25,7 +25,7 @@
             android:key="pref_support_project"
             android:title="@string/setting_support_project"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/setting_general">
+    <PreferenceCategory android:title="@string/setting_general" android:key="cat_general">
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/arr_start_modes"
@@ -40,6 +40,13 @@
             android:key="pref_upload_mode"
             android:summary="%s"
             android:title="@string/setting_upload_mode"></ListPreference>
+        <ListPreference
+            android:defaultValue="5000"
+            android:entries="@array/arr_upload_entries"
+            android:entryValues="@array/arr_upload_entry_values"
+            android:key="pref_upload_entry"
+            android:summary="%s"
+            android:title="@string/setting_upload_count"></ListPreference>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_autoconnect_freifunk"
@@ -96,7 +103,7 @@
 
     <PreferenceCategory android:title="@string/setting_resource">
         <ListPreference
-            android:defaultValue="Never"
+            android:defaultValue="0"
             android:entries="@array/arr_battery"
             android:entryValues="@array/arr_battery_values"
             android:key="pref_battery"
@@ -104,7 +111,7 @@
             android:title="@string/setting_battery"></ListPreference>
 
         <ListPreference
-            android:defaultValue="Never"
+            android:defaultValue="0"
             android:entries="@array/arr_time_kill_app"
             android:entryValues="@array/arr_time_kill_app_values"
             android:key="pref_kill_ap_no_gps"
@@ -118,14 +125,6 @@
             android:layout="@layout/custom_pref_layout"
             android:summary="@string/adaptive_info"
             android:title="@string/adaptive_scanning"></CheckBoxPreference>
-
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/arr_brightness"
-            android:entryValues="@array/arr_brightness_values"
-            android:key="pref_brightness"
-            android:summary="%s"
-            android:title="@string/setting_brightness"></ListPreference>
     </PreferenceCategory>
 
 

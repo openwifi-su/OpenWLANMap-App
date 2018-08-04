@@ -1,18 +1,19 @@
 package su.openwifi.openwlanmap.service;
 
+import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
 import static su.openwifi.openwlanmap.MainActivity.R_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
-import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_DB;
-import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_ERROR;
-import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_RANKING;
-import static su.openwifi.openwlanmap.MainActivity.R_UPDATE_UI;
-import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
-import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_UNDER_LIMIT;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_UNDER_LIMIT;
 
 import android.app.Service;
 import android.content.Context;
@@ -42,7 +43,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private static final long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 100;
-  private static final long MIN_UPLOAD_ALLOWED = 250;
+  private static final long MIN_UPLOAD_ALLOWED = 20;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
   private boolean running = true;
@@ -54,12 +55,13 @@ public class ServiceController extends Service implements Runnable, Observer {
   private Thread controller = null;
   private ArrayList<AccessPoint> listAp = new ArrayList<>();
   private Intent intent;
-  private Thread storer = null;
+  private WifiStorer storer = null;
   private DataQueue buffer = new DataQueue();
   private boolean getLocation = true;
   private WifiUploader uploader;
   private TotalApWrapper totalAps = new TotalApWrapper();
   private SharedPreferences sharedPreferences;
+  private ResourceManager resourceManager;
 
   @Override
   public void run() {
@@ -87,7 +89,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           Log.i(LOG_TAG, "Now uploading......");
           if (totalAps.getTotalAps() < MIN_UPLOAD_ALLOWED) {
             intent = new Intent();
-            intent.setAction(R_UPLOAD_UNDER_LIMIT);
+            intent.setAction(ACTION_UPLOAD_UNDER_LIMIT);
             sendBroadcast(intent);
           } else {
             String id = "";
@@ -116,12 +118,12 @@ public class ServiceController extends Service implements Runnable, Observer {
               RankingObject ranking = uploader.getRanking();
               Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
               intent = new Intent();
-              intent.setAction(R_UPDATE_RANKING);
+              intent.setAction(ACTION_UPDATE_RANKING);
               intent.putExtra(R_RANK, ranking);
               sendBroadcast(intent);
             } else {
               intent = new Intent();
-              intent.setAction(R_UPLOAD_ERROR);
+              intent.setAction(ACTION_UPLOAD_ERROR);
               intent.putExtra(R_UPLOAD_MSG, uploader.getError());
               sendBroadcast(intent);
             }
@@ -140,6 +142,14 @@ public class ServiceController extends Service implements Runnable, Observer {
               Thread.currentThread().interrupt();
             }
           }
+          break;
+        case KILL_MODE:
+          Log.e(LOG_TAG, "killing service because lack of resource....");
+          intent = new Intent();
+          intent.setAction(ACTION_KILL_APP);
+          sendBroadcast(intent);
+          stopSelf();
+          running = false;
           break;
         default:
           break;
@@ -166,6 +176,9 @@ public class ServiceController extends Service implements Runnable, Observer {
     storer = new WifiStorer(this, buffer, totalAps);
     storer.start();
     uploader = new WifiUploader(this, totalAps);
+    resourceManager = new ResourceManager(this);
+    ResourceManager.lastLocationTime = lastTime;
+    resourceManager.start();
     Log.i(LOG_TAG, "starting scan thread " + controller.isAlive());
     return START_STICKY;
   }
@@ -174,6 +187,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   public void onDestroy() {
     Log.i(LOG_TAG, "destroy service");
     running = false;
+    //clean up scanner
     if (simpleWifiLocator != null) {
       simpleWifiLocator.doUnregister();
       if (simpleWifiLocator.getNetThread() != null && simpleWifiLocator.getNetThread().isAlive()) {
@@ -186,16 +200,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         simpleWifiLocator.setNetThread(null);
       }
     }
-    if (controller != null && controller.isAlive()) {
-      controller.interrupt();
-      try {
-        controller.join();
-      } catch (InterruptedException e) {
-        Log.i(LOG_TAG, "Error join scan thread");
-        Thread.currentThread().interrupt();
-      }
-      controller = null;
-    }
+    //clean up storer
     buffer.putNextData(listAp);
     while (!buffer.isEmpty()) {
       Log.i(LOG_TAG, "Waiting for storage to finish job");
@@ -206,6 +211,43 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
     }
     Log.i(LOG_TAG, "Saving " + listAp.size() + " before destroying service");
+    if (storer != null && storer.isAlive()) {
+      storer.running = false;
+      storer.interrupt();
+      try {
+        storer.join();
+        Log.i(LOG_TAG, "Join store thread");
+      } catch (InterruptedException e) {
+        Log.i(LOG_TAG, "Error join store thread");
+        Thread.currentThread().interrupt();
+      }
+      storer = null;
+    }
+    //clean up resource manager
+    if(resourceManager !=null && resourceManager.isAlive()){
+      resourceManager.running = false;
+      resourceManager.interrupt();
+      try {
+        resourceManager.join();
+        Log.i(LOG_TAG, "Join resource thread");
+      } catch (InterruptedException e) {
+        Log.i(LOG_TAG, "Error join resource thread");
+        Thread.currentThread().interrupt();
+      }
+    }
+    //clean up controller
+    if (controller != null && controller.isAlive()) {
+      controller.interrupt();
+      try {
+        controller.join();
+        Log.i(LOG_TAG, "Join controller thread");
+      } catch (InterruptedException e) {
+        Log.i(LOG_TAG, "Error join controller thread");
+        Thread.currentThread().interrupt();
+      }
+      controller = null;
+    }
+    Log.e(LOG_TAG, "Finish clean up");
   }
 
   @Nullable
@@ -215,7 +257,6 @@ public class ServiceController extends Service implements Runnable, Observer {
   }
 
   private boolean qualityCheck(double lat, double lon, float radius) {
-    Log.e(LOG_TAG, "check quality");
     switch (simpleWifiLocator.getLastLocMethod()) {
       case LIBWLOCATE:
         if (lastLon < OVER && lastLat < OVER) {
@@ -228,6 +269,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         lastLat = lat;
         lastLon = lon;
         lastTime = SystemClock.elapsedRealtime();
+        ResourceManager.lastLocationTime = lastTime;
         return true;
       case GPS:
         Log.e(LOG_TAG, "in gps");
@@ -237,6 +279,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           lastSpeed = simpleWifiLocator.getLastSpeed();
           Log.e(LOG_TAG, "get last speed" + lastSpeed);
           lastTime = SystemClock.elapsedRealtime();
+          ResourceManager.lastLocationTime = lastTime;
           return true;
         }
         break;
@@ -249,7 +292,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   @Override
   public void update(Observable o, Object arg) {
     intent = new Intent();
-    intent.setAction(R_UPDATE_DB);
+    intent.setAction(ACTION_UPDATE_DB);
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
   }
@@ -308,14 +351,14 @@ public class ServiceController extends Service implements Runnable, Observer {
           }
 
         }
-        intent.setAction(R_UPDATE_UI);
+        intent.setAction(ACTION_UPDATE_UI);
         intent.putExtra(R_GEO_INFO, lastLat + "-" + lastLon);
         intent.putExtra(R_NEWEST_SCAN, (long) resultList.size());
         intent.putExtra(R_SPEED, lastSpeed);
         intent.putParcelableArrayListExtra(R_LIST_AP, listAp);
         Log.i(LOG_TAG, "Notify ui update");
       } else {
-        intent.setAction(R_UPDATE_ERROR);
+        intent.setAction(ACTION_UPDATE_ERROR);
         lastLon = 0.0;
         lastLon = 0.0;
       }

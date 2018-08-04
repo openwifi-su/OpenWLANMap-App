@@ -7,12 +7,15 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import su.openwifi.openwlanmap.service.ResourceManager;
 
 public class SettingActivity extends AppCompatActivity {
   private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
@@ -36,8 +39,11 @@ public class SettingActivity extends AppCompatActivity {
         .getDefaultSharedPreferences(this).getBoolean("pref_privacy", false);
     final boolean pref_use_map = PreferenceManager
         .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
+    final int pref_upload = Integer.parseInt(PreferenceManager
+        .getDefaultSharedPreferences(this).getString("pref_upload_mode",""));
     hideIfAnonym(pref_privacy);
     hideIfUsingMap(pref_use_map);
+    hideIfManual(pref_upload);
     if (sharedPreferenceChangeListener == null) {
       sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
@@ -48,15 +54,34 @@ public class SettingActivity extends AppCompatActivity {
             final Preference pref_team = fragment.findPreference("pref_team");
             hideIfNotInTeam(sharedPreferences.getBoolean(key,false), pref_team);
           }else if(key.equalsIgnoreCase("pref_use_map")){
-            hideIfUsingMap(sharedPreferences.getBoolean("pref_use_map", false));
+            hideIfUsingMap(sharedPreferences.getBoolean(key, false));
+          }else if(key.equalsIgnoreCase("pref_battery")){
+            final String pref_battery = sharedPreferences.getString(key, "");
+            ResourceManager.allowBattery = Integer.parseInt(pref_battery);
+          }else if(key.equalsIgnoreCase("pref_kill_ap_no_gps")){
+            final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
+            ResourceManager.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
+          }else if(key.equalsIgnoreCase("pref_upload_mode")){
+            final int pref_upload = Integer.parseInt(sharedPreferences.getString(key,""));
+            hideIfManual(pref_upload);
           }
         }
       };
     }
   }
 
+  private void hideIfManual(int pref_upload) {
+    final Preference pref_upload_count = fragment.findPreference("pref_upload_entry");
+    if(pref_upload == 0){
+      pref_upload_count.setEnabled(false);
+    }else{
+      pref_upload_count.setEnabled(true);
+    }
+  }
+
   private void hideIfUsingMap(boolean useMap) {
     final Preference pref_show_list = fragment.findPreference("pref_show_list");
+    final PreferenceCategory cat_general = (PreferenceCategory) fragment.findPreference("cat_general");
     if(useMap){
       pref_show_list.setEnabled(false);
     }else{

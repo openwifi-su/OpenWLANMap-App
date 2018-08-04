@@ -19,7 +19,7 @@
     <string name="setting_autoconnect">Autoconnect to openwifi and upload data</string>
     <string name="setting_min_rssi">Minimum RSSI allowed</string>
     <string name="setting_battery">Kill application if battery is lower than</string>
-    <string name="kill_ap_no_gps">Kill application if there is no GPS after</string>
+    <string name="kill_ap_no_gps">Kill application if there is no location defined after</string>
     <string name="setting_brightness">Reduce brightness</string>
     <string name="setting_user">ACCOUNT SETTINGS</string>
     <string name="setting_privacy">Stay anonym</string>
@@ -82,4 +82,6 @@
     <string name="adaptive_info">Scale scanning period dynamically to save resources by detecting movement with sensor, speed etc.</string>
     <string name="setting_public_data_info">Allow other to download your data from openwifi.su</string>
     <string name="setting_public_map">Show your map data in openwifi.su</string>
+    <string name="alert_kill">Kill openwlanmap app on critical resources :(</string>
+    <string name="setting_upload_count">Automatic upload on</string>
 </resources>

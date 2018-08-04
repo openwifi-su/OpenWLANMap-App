@@ -53,16 +53,17 @@ public class MainActivity extends AppCompatActivity
   public static final String R_GEO_INFO = "geo_info";
   public static final String R_NEWEST_SCAN = "newest_scan";
   public static final String R_LIST_AP = "location_info_object";
-  public static final String R_UPDATE_UI = "update_ui";
+  public static final String ACTION_UPDATE_UI = "update_ui";
   public static final String R_SPEED = "update_speed";
-  public static final String R_UPDATE_ERROR = "update_error";
+  public static final String ACTION_UPDATE_ERROR = "update_error";
   public static final String R_TOTAL_LIST = "total_list";
-  public static final String R_UPLOAD_ERROR = "upload_error_msg";
+  public static final String ACTION_UPLOAD_ERROR = "upload_error_msg";
   public static final String R_UPLOAD_MSG = "upload_msg";
-  public static final String R_UPDATE_DB = "database_status";
-  public static final String R_UPDATE_RANKING = "update_ranking";
+  public static final String ACTION_UPDATE_DB = "database_status";
+  public static final String ACTION_UPDATE_RANKING = "update_ranking";
   public static final String R_RANK = "rank_position";
-  public static final String R_UPLOAD_UNDER_LIMIT = "update_under_limit";
+  public static final String ACTION_UPLOAD_UNDER_LIMIT = "update_under_limit";
+  public static final String ACTION_KILL_APP = "kill_app";
   public static final String PREF_RANKING = "p_ranking";
   public static final String PREF_OWN_BSSID = "own_bssid";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -178,6 +179,7 @@ public class MainActivity extends AppCompatActivity
         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
       if (savedInstanceState == null || savedInstanceState.getBoolean(S_SCANN_STATUS)) {
         scanning = true;
+        Config.setMode(Config.MODE.SCAN_MODE);
         startService(intent);
         scanningStatus.setText(getString(R.string.scanning));
       } else {
@@ -225,16 +227,18 @@ public class MainActivity extends AppCompatActivity
 
   private void doRegister() {
     IntentFilter intentFilter = new IntentFilter();
-    intentFilter.addAction(R_UPDATE_UI);
-    intentFilter.addAction(R_UPDATE_ERROR);
+    intentFilter.addAction(ACTION_UPDATE_UI);
+    intentFilter.addAction(ACTION_UPDATE_ERROR);
     //Upload under limit
-    intentFilter.addAction(R_UPLOAD_UNDER_LIMIT);
+    intentFilter.addAction(ACTION_UPLOAD_UNDER_LIMIT);
     //Upload status
-    intentFilter.addAction(R_UPLOAD_ERROR);
+    intentFilter.addAction(ACTION_UPLOAD_ERROR);
     //Database status
-    intentFilter.addAction(R_UPDATE_DB);
+    intentFilter.addAction(ACTION_UPDATE_DB);
     //Ranking
-    intentFilter.addAction(R_UPDATE_RANKING);
+    intentFilter.addAction(ACTION_UPDATE_RANKING);
+    //Kill app signal
+    intentFilter.addAction(ACTION_KILL_APP);
     registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
@@ -348,7 +352,9 @@ public class MainActivity extends AppCompatActivity
         break;
       case R.id.gps_map:
         //go to gps map
-        startActivity(new Intent(MainActivity.this, MapActivity.class));
+        //startActivity(new Intent(MainActivity.this, MapActivity.class));
+        //test kill app
+        Config.setMode(Config.MODE.KILL_MODE);
         break;
       case R.id.sort_signal:
         addPreference(PREF_SORT_METHOD, SORT_BY_RSSID);
@@ -536,7 +542,7 @@ public class MainActivity extends AppCompatActivity
     public void onReceive(Context context, Intent intent) {
       Log.i(LOG_TAG, "Receiving smt from service");
       switch (intent.getAction()) {
-        case R_UPDATE_UI:
+        case ACTION_UPDATE_UI:
           if (loading.getVisibility() == View.VISIBLE) {
             listHeader.setVisibility(View.GONE);
             listView.setVisibility(View.GONE);
@@ -573,25 +579,25 @@ public class MainActivity extends AppCompatActivity
             }
           }
           break;
-        case R_UPDATE_DB:
+        case ACTION_UPDATE_DB:
           long total = intent.getLongExtra(R_TOTAL_LIST, 0L);
           totalAp.setText(String.valueOf(total));
           addPreference(PREF_TOTAL_AP, total);
           break;
-        case R_UPDATE_ERROR:
+        case ACTION_UPDATE_ERROR:
           gps.setText(getString(R.string.c_gps));
           newestScan.setText("0");
           break;
-        case R_UPLOAD_UNDER_LIMIT:
+        case ACTION_UPLOAD_UNDER_LIMIT:
           showAlertUpload(getString(R.string.upload_under_limit));
           resetListVisibility();
           break;
-        case R_UPLOAD_ERROR:
+        case ACTION_UPLOAD_ERROR:
           String msg = intent.getStringExtra(R_UPLOAD_MSG);
           showAlertUpload(msg);
           resetListVisibility();
           break;
-        case R_UPDATE_RANKING:
+        case ACTION_UPDATE_RANKING:
           RankingObject r = intent.getParcelableExtra(R_RANK);
           String rp = r.uploadedRank
               + "(" + r.uploadedCount + " "
@@ -606,6 +612,9 @@ public class MainActivity extends AppCompatActivity
           rank.setText(rp);
           addPreference(PREF_RANKING, rp);
           resetListVisibility();
+          break;
+        case ACTION_KILL_APP:
+          finish();
           break;
         default:
           break;
