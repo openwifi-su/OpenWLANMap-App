@@ -55,7 +55,7 @@ public class UploadQueryUtils {
             "POST",
             prepareUploading(uploadEntries, mac, teamTag, mode));
     RankingObject rankingObject = streamToRankingObject(ins);
-    Log.i(LOG_TAG, "Successfully getting ranking back +" + rankingObject.toString());
+    Log.i(LOG_TAG, "Finish uploaded");
     if (ins != null) {
       try {
         ins.close();

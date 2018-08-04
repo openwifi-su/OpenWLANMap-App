@@ -39,7 +39,7 @@ public class Utils {
           new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
           REQUEST_GPS);
       return false;
-    }else{
+    } else {
       return true;
     }
   }

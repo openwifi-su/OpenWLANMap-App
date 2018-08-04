@@ -32,11 +32,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
 import su.openwifi.openwlanmap.utils.RankingObject;
 
@@ -47,7 +45,7 @@ import su.openwifi.openwlanmap.utils.RankingObject;
 public class ServiceController extends Service implements Runnable, Observer {
   private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
-  private static final int BUFFER_ENTRY_MAX = 100;
+  private static final int BUFFER_ENTRY_MAX = 50;
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
@@ -150,7 +148,6 @@ public class ServiceController extends Service implements Runnable, Observer {
             try {
               Thread.sleep(SCAN_PERIOD);
             } catch (InterruptedException e) {
-              Log.i(LOG_TAG, "Do next request...");
               Thread.currentThread().interrupt();
             }
           }
@@ -417,6 +414,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       Log.i(LOG_TAG, "Getting result###################################");
       //controller.interrupt();
     }
+
   }
 
   private void doAutoConnect(ScanResult result) {
