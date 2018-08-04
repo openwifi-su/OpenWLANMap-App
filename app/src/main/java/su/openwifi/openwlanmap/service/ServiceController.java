@@ -111,8 +111,8 @@ public class ServiceController extends Service implements Runnable, Observer {
               }
               tag = sharedPreferences.getString("pref_team_tag", "");
             }
-            final Set<String> pref_support_project = sharedPreferences
-                .getStringSet("pref_support_project", new HashSet<String>());
+            //final Set<String> pref_support_project = sharedPreferences
+            //  .getStringSet("pref_support_project", new HashSet<String>());
             int mode = 0;
             if (sharedPreferences.getBoolean("pref_public_data", true)) {
               mode = 1;

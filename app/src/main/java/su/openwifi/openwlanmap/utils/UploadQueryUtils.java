@@ -25,12 +25,14 @@ public class UploadQueryUtils {
     return uploadData(uploadEntries, mac, teamTag, mode, URL_UPLOAD_OPEN_WIFI);
   }
 
+  /*
   public static RankingObject uploadVirtualWorld(List<AccessPoint> uploadEntries,
                                                  String mac,
                                                  String teamTag,
                                                  int mode) {
     return uploadData(uploadEntries, mac, teamTag, mode, URL_UPLOAD_VIRTUAL_WORLD);
   }
+  */
 
   /**
    * This method uploads a list of access point to backend.

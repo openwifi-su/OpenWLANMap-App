@@ -41,7 +41,6 @@ public class WifiUploader {
     //TODO read from preference and check project to upload
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
-    Log.e(LOG_TAG, id + "-" + tag + prefSupportProject.toString());
     long count = MyDatabase.getInstance(context)
         .getAccessPointDao()
         .countEntries();

@@ -16,6 +16,7 @@
             android:key="pref_team_tag"
             android:title="@string/team_tag"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
     </PreferenceCategory>
+    <!-- to add in the future if supporting more projects
     <PreferenceCategory android:title="@string/setting_project">
         <su.openwifi.openwlanmap.custom.CustomMultiListPreference
             android:defaultValue="@array/arr_default_project"
@@ -25,6 +26,7 @@
             android:key="pref_support_project"
             android:title="@string/setting_support_project"></su.openwifi.openwlanmap.custom.CustomMultiListPreference>
     </PreferenceCategory>
+    -->
     <PreferenceCategory android:title="@string/setting_general" android:key="cat_general">
         <ListPreference
             android:defaultValue="0"
