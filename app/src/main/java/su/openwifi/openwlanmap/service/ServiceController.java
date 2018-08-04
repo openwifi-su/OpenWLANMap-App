@@ -443,7 +443,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           || (pref_autoconnect_openwifi) && WifiFilterer.isOpenWifi(result)) {
         //connection now
         WifiConfiguration configuration = new WifiConfiguration();
-        configuration.SSID = result.SSID;
+        configuration.SSID = "\"" + result.SSID + "\"";
         configuration.hiddenSSID = true;
         configuration.status = WifiConfiguration.Status.ENABLED;
         configuration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
