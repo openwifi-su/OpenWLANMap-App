@@ -278,6 +278,10 @@ public class ServiceController extends Service implements Runnable, Observer {
           float[] dist = new float[1];
           Location.distanceBetween(lastLat, lastLon, lat, lon, dist);
           lastSpeed = dist[0] * 1000 / (SystemClock.elapsedRealtime() - lastTime);
+          if(lastSpeed > 140){
+            //>500km/h --> error
+            lastSpeed = -1f;
+          }
         } else {
           lastSpeed = -1f;
         }
