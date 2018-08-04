@@ -40,10 +40,10 @@ import su.openwifi.openwlanmap.utils.RankingObject;
  */
 
 public class ServiceController extends Service implements Runnable, Observer {
-  private static final long SCAN_PERIOD = 2000;
+  private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 100;
-  private static final long MIN_UPLOAD_ALLOWED = 20;
+  private static final long MIN_UPLOAD_ALLOWED = 250;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
   private boolean running = true;
@@ -363,6 +363,20 @@ public class ServiceController extends Service implements Runnable, Observer {
         lastLon = 0.0;
       }
       sendBroadcast(intent);
+      //set up next scan period
+      if (!sharedPreferences.getBoolean("pref_adaptive_scanning", true)) {
+        SCAN_PERIOD = 2000;
+      } else if (lastSpeed > 15) {
+        //from  about 55km/h
+        SCAN_PERIOD = 750;
+      } else if (lastSpeed < 0) {
+        // no speed information, may be because of WLAN localisation
+        SCAN_PERIOD = 2000;
+      }else if (lastSpeed < 2) {
+        // user seems to walk
+        SCAN_PERIOD = 3000;
+      }
+      //TODO detect not moving and extend scan period
       getLocation = true;
       Log.i(LOG_TAG, "Getting result###################################");
       //controller.interrupt();
