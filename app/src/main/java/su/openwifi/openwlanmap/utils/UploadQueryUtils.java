@@ -108,7 +108,7 @@ public class UploadQueryUtils {
         rankingObject.updAps = Integer.parseInt(bufferedReader.readLine());
         rankingObject.delAps = Integer.parseInt(bufferedReader.readLine());
         rankingObject.newPoints = Integer.parseInt(bufferedReader.readLine());
-      } catch (IOException e) {
+      } catch (Exception e) {
         Log.e(LOG_TAG, "Error reading inputstream");
       }
       return rankingObject;

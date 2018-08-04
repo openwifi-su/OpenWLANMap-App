@@ -311,13 +311,18 @@ public class ServiceController extends Service implements Runnable, Observer {
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
     Log.e(LOG_TAG, "ap=" + numberOfApToUpload);
-    if (numberOfApToUpload > 0 && totalAps.getTotalAps() > numberOfApToUpload) {
+    if (numberOfApToUpload > 0 && totalAps.getTotalAps() >= numberOfApToUpload) {
       //trigger upload
       ConnectivityManager manager = (ConnectivityManager)
           getSystemService(Context.CONNECTIVITY_SERVICE);
       NetworkInfo info = manager.getActiveNetworkInfo();
       if (info != null && info.isConnected()) {
-        if (Config.getMode() == Config.MODE.SCAN_MODE) {
+        final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
+        if (Config.getMode() == Config.MODE.SCAN_MODE &&
+            (pref_upload_mode.equalsIgnoreCase("1") ||
+                (pref_upload_mode.equalsIgnoreCase("2") &&
+                    info.getType() == ConnectivityManager.TYPE_WIFI))
+            ) {
           Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
         }
       }
