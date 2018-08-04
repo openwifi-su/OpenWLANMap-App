@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import su.openwifi.openwlanmap.service.ResourceManager;
+import su.openwifi.openwlanmap.service.ServiceController;
 
 public class SettingActivity extends AppCompatActivity {
   private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
@@ -73,8 +74,10 @@ public class SettingActivity extends AppCompatActivity {
     final Preference pref_upload_count = fragment.findPreference("pref_upload_entry");
     if (prefUpload == 0) {
       pref_upload_count.setEnabled(false);
+      ServiceController.numberOfApToUpload = -1;
     } else {
       pref_upload_count.setEnabled(true);
+      ServiceController.numberOfApToUpload = prefUpload;
     }
   }
 

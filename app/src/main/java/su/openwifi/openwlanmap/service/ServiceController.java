@@ -1,5 +1,6 @@
 package su.openwifi.openwlanmap.service;
 
+import static su.openwifi.openwlanmap.MainActivity.ACTION_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
@@ -66,12 +67,14 @@ public class ServiceController extends Service implements Runnable, Observer {
   private TotalApWrapper totalAps = new TotalApWrapper();
   private SharedPreferences sharedPreferences;
   private ResourceManager resourceManager;
+  public static int numberOfApToUpload;
 
   @Override
   public void run() {
     while (running) {
       switch (Config.getMode()) {
         case UPLOAD_MODE:
+        case AUTO_UPLOAD_MODE:
           Log.i(LOG_TAG, "Uploading...");
           while (!getLocation) {
             Log.i(LOG_TAG, "Waiting for wlocator to finish job = " + getLocation);
@@ -117,20 +120,24 @@ public class ServiceController extends Service implements Runnable, Observer {
             if (sharedPreferences.getBoolean("pref_publish_map", false)) {
               mode |= 2;
             }
-            boolean uploaded = uploader.upload(id, tag, mode, pref_support_project);
+            boolean uploaded = uploader.upload(id, tag, mode, null);
+            boolean autoUpload = Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE;
             if (uploaded) {
               //update ranking
+              String action = autoUpload ? ACTION_AUTO_RANK : ACTION_UPDATE_RANKING;
               RankingObject ranking = uploader.getRanking();
               Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
               intent = new Intent();
-              intent.setAction(ACTION_UPDATE_RANKING);
+              intent.setAction(action);
               intent.putExtra(R_RANK, ranking);
               sendBroadcast(intent);
             } else {
-              intent = new Intent();
-              intent.setAction(ACTION_UPLOAD_ERROR);
-              intent.putExtra(R_UPLOAD_MSG, uploader.getError());
-              sendBroadcast(intent);
+              if (!autoUpload) {
+                intent = new Intent();
+                intent.setAction(ACTION_UPLOAD_ERROR);
+                intent.putExtra(R_UPLOAD_MSG, uploader.getError());
+                sendBroadcast(intent);
+              }
             }
           }
           Config.setMode(Config.MODE.SCAN_MODE);
@@ -184,6 +191,12 @@ public class ServiceController extends Service implements Runnable, Observer {
     resourceManager = new ResourceManager(this);
     ResourceManager.lastLocationTime = lastTime;
     resourceManager.start();
+    final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
+    if (pref_upload != 0) {
+      numberOfApToUpload = Integer.parseInt(sharedPreferences.getString("pref_upload_entry", "5000"));
+    } else {
+      numberOfApToUpload = -1;
+    }
     Log.i(LOG_TAG, "starting scan thread " + controller.isAlive());
     return START_STICKY;
   }
@@ -300,6 +313,18 @@ public class ServiceController extends Service implements Runnable, Observer {
     intent.setAction(ACTION_UPDATE_DB);
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
+    Log.e(LOG_TAG, "ap=" + numberOfApToUpload);
+    if (numberOfApToUpload > 0 && totalAps.getTotalAps() > numberOfApToUpload) {
+      //trigger upload
+      ConnectivityManager manager = (ConnectivityManager)
+          getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo info = manager.getActiveNetworkInfo();
+      if (info != null && info.isConnected()) {
+        if (Config.getMode() == Config.MODE.SCAN_MODE) {
+          Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
+        }
+      }
+    }
   }
 
   public class SimpleWifiLocator extends WifiLocator {

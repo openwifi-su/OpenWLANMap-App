@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
   public static final String R_RANK = "rank_position";
   public static final String ACTION_UPLOAD_UNDER_LIMIT = "update_under_limit";
   public static final String ACTION_KILL_APP = "kill_app";
+  public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
   public static final String PREF_OWN_BSSID = "own_bssid";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -239,6 +240,8 @@ public class MainActivity extends AppCompatActivity
     intentFilter.addAction(ACTION_UPDATE_RANKING);
     //Kill app signal
     intentFilter.addAction(ACTION_KILL_APP);
+    //Auto rank
+    intentFilter.addAction(ACTION_AUTO_RANK);
     registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
@@ -612,6 +615,14 @@ public class MainActivity extends AppCompatActivity
           rank.setText(rp);
           addPreference(PREF_RANKING, rp);
           resetListVisibility();
+          break;
+        case ACTION_AUTO_RANK:
+          RankingObject autoRank = intent.getParcelableExtra(R_RANK);
+          String autoRp = autoRank.uploadedRank
+              + "(" + autoRank.uploadedCount + " "
+              + getString(R.string.point) + ")";
+          rank.setText(autoRp);
+          addPreference(PREF_RANKING, autoRp);
           break;
         case ACTION_KILL_APP:
           finish();

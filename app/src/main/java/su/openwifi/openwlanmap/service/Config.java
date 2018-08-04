@@ -6,7 +6,7 @@ package su.openwifi.openwlanmap.service;
  */
 public class Config {
   public enum MODE {
-    SCAN_MODE, UPLOAD_MODE, SUSPEND_MODE, KILL_MODE
+    SCAN_MODE, UPLOAD_MODE, SUSPEND_MODE, KILL_MODE, AUTO_UPLOAD_MODE
   }
 
   private static MODE mode = MODE.SCAN_MODE;
