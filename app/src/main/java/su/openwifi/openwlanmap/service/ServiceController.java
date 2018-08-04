@@ -20,7 +20,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -211,8 +215,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
     }
     Log.i(LOG_TAG, "Saving " + listAp.size() + " before destroying service");
+    storer.running = false;
     if (storer != null && storer.isAlive()) {
-      storer.running = false;
       storer.interrupt();
       try {
         storer.join();
@@ -224,8 +228,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       storer = null;
     }
     //clean up resource manager
+    resourceManager.running = false;
     if(resourceManager !=null && resourceManager.isAlive()){
-      resourceManager.running = false;
       resourceManager.interrupt();
       try {
         resourceManager.join();
@@ -319,6 +323,8 @@ public class ServiceController extends Service implements Runnable, Observer {
             } catch (NoSuchFieldError e) {
               //Some old version can not read channelwidth field
             }
+            //do Autoconnect if setting
+            doAutoConnect(result);
             AccessPoint ap = new AccessPoint(
                 result.BSSID.toUpperCase().replace(":", "").replace(".", ""),
                 result.SSID,
@@ -380,6 +386,37 @@ public class ServiceController extends Service implements Runnable, Observer {
       getLocation = true;
       Log.i(LOG_TAG, "Getting result###################################");
       //controller.interrupt();
+    }
+  }
+
+  private void doAutoConnect(ScanResult result) {
+    //TODO test + ask mentor for more information
+    ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo info = manager.getActiveNetworkInfo();
+    if (info == null
+        || !info.isConnected()
+        || info.getType()!=ConnectivityManager.TYPE_WIFI) {
+      //no wifi connection yet --> do autoconnect if possible and if configured
+      final boolean pref_autoconnect_freifunk = sharedPreferences.getBoolean("pref_autoconnect_freifunk", false);
+      final boolean pref_autoconnect_openwifi = sharedPreferences.getBoolean("pref_autoconnect_openwifi", false);
+      if( (pref_autoconnect_freifunk && WifiFilterer.isFreifunk(result))
+          || (pref_autoconnect_openwifi) && WifiFilterer.isOpenWifi(result)){
+        //connection now
+        WifiConfiguration configuration = new WifiConfiguration();
+        configuration.SSID = result.SSID;
+        configuration.hiddenSSID = true;
+        configuration.status = WifiConfiguration.Status.ENABLED;
+        configuration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext()
+            .getSystemService(Context.WIFI_SERVICE);
+        final int id = wifiManager.addNetwork(configuration);
+        if(id != -1){
+          //successfully add network
+          wifiManager.disconnect();
+          wifiManager.enableNetwork(id, true);
+          wifiManager.reconnect();
+        }
+      }
     }
   }
 }
