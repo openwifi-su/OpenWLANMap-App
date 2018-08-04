@@ -30,17 +30,18 @@ public class WifiUploader {
 
   /**
    * This method upload all data in database to backend.
+   *
+   * @param id : identifier of user/team
+   * @param tag : tag which will be shown in openwifi.su
+   * @param mode : mode to publish data and map
+   * @param prefSupportProject : support projects
    * @return true if successful otherwise false
-   * @param id
-   * @param tag
-   * @param mode
-   * @param pref_support_project
    */
-  public boolean upload(String id, String tag, int mode, Set<String> pref_support_project) {
+  public boolean upload(String id, String tag, int mode, Set<String> prefSupportProject) {
     //TODO read from preference and check project to upload
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
-    Log.e(LOG_TAG,id+"-"+tag+pref_support_project.toString());
+    Log.e(LOG_TAG, id + "-" + tag + prefSupportProject.toString());
     long count = MyDatabase.getInstance(context)
         .getAccessPointDao()
         .countEntries();

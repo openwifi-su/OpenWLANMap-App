@@ -19,7 +19,15 @@ public class QueryUtils {
   private QueryUtils() {
   }
 
-  public static InputStream makeHttpRequest(URL url, String method, String content) {
+  /**
+   * This method does a http unsecure connection.
+   * @param urlString : url to connect
+   * @param method : http method
+   * @param content : payload
+   * @return an inputstream
+   */
+  public static InputStream makeHttpRequest(String urlString, String method, String content) {
+    URL url = QueryUtils.create(urlString);
     if (url == null) {
       return null;
     }
@@ -57,7 +65,12 @@ public class QueryUtils {
     return ins;
   }
 
-  public static URL create(String urlString) {
+  /**
+   * This method helps create an URL object out of an url String.
+   * @param urlString : url in String
+   * @return URL object
+   */
+  private static URL create(String urlString) {
     URL url = null;
     try {
       url = new URL(urlString);

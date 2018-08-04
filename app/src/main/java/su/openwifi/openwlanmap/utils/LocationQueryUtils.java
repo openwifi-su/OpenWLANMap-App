@@ -35,9 +35,7 @@ public class LocationQueryUtils {
         builder.append("\r\n");
       }
       String content = builder.toString();
-      URL url = QueryUtils.create(URL_GET_LOCATION);
-      Log.i(LOG_TAG, "creating url successfully");
-      InputStream ins = QueryUtils.makeHttpRequest(url, "POST", content);
+      InputStream ins = QueryUtils.makeHttpRequest(URL_GET_LOCATION, "POST", content);
       locator = streamToLocationObject(ins);
       Log.i(LOG_TAG, "Successfully getting location");
       if (ins != null) {
@@ -69,9 +67,7 @@ public class LocationQueryUtils {
       String content = builder.toString();
       String urlString = URL_GET_LOCATION_NEW + content.substring(0, content.length());
       Log.i(LOG_TAG, urlString);
-      URL url = QueryUtils.create(urlString);
-      Log.i(LOG_TAG, "creating url successfully");
-      InputStream ins = QueryUtils.makeHttpRequest(url, "POST", null);
+      InputStream ins = QueryUtils.makeHttpRequest(urlString, "POST", null);
       response = streamToString(ins);
       Log.i(LOG_TAG, "Successfully getting " + response);
       if (ins != null) {

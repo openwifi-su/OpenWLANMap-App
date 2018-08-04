@@ -11,7 +11,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -40,7 +39,7 @@ public class SettingActivity extends AppCompatActivity {
     final boolean pref_use_map = PreferenceManager
         .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
     final int pref_upload = Integer.parseInt(PreferenceManager
-        .getDefaultSharedPreferences(this).getString("pref_upload_mode",""));
+        .getDefaultSharedPreferences(this).getString("pref_upload_mode", ""));
     hideIfAnonym(pref_privacy);
     hideIfUsingMap(pref_use_map);
     hideIfManual(pref_upload);
@@ -50,19 +49,19 @@ public class SettingActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
           if (key.equalsIgnoreCase("pref_privacy")) {
             hideIfAnonym(sharedPreferences.getBoolean(key, false));
-          }else if(key.equalsIgnoreCase("pref_in_team")){
+          } else if (key.equalsIgnoreCase("pref_in_team")) {
             final Preference pref_team = fragment.findPreference("pref_team");
-            hideIfNotInTeam(sharedPreferences.getBoolean(key,false), pref_team);
-          }else if(key.equalsIgnoreCase("pref_use_map")){
+            hideIfNotInTeam(sharedPreferences.getBoolean(key, false), pref_team);
+          } else if (key.equalsIgnoreCase("pref_use_map")) {
             hideIfUsingMap(sharedPreferences.getBoolean(key, false));
-          }else if(key.equalsIgnoreCase("pref_battery")){
+          } else if (key.equalsIgnoreCase("pref_battery")) {
             final String pref_battery = sharedPreferences.getString(key, "");
             ResourceManager.allowBattery = Integer.parseInt(pref_battery);
-          }else if(key.equalsIgnoreCase("pref_kill_ap_no_gps")){
+          } else if (key.equalsIgnoreCase("pref_kill_ap_no_gps")) {
             final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
             ResourceManager.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
-          }else if(key.equalsIgnoreCase("pref_upload_mode")){
-            final int pref_upload = Integer.parseInt(sharedPreferences.getString(key,""));
+          } else if (key.equalsIgnoreCase("pref_upload_mode")) {
+            final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
             hideIfManual(pref_upload);
           }
         }
@@ -70,21 +69,22 @@ public class SettingActivity extends AppCompatActivity {
     }
   }
 
-  private void hideIfManual(int pref_upload) {
+  private void hideIfManual(int prefUpload) {
     final Preference pref_upload_count = fragment.findPreference("pref_upload_entry");
-    if(pref_upload == 0){
+    if (prefUpload == 0) {
       pref_upload_count.setEnabled(false);
-    }else{
+    } else {
       pref_upload_count.setEnabled(true);
     }
   }
 
   private void hideIfUsingMap(boolean useMap) {
     final Preference pref_show_list = fragment.findPreference("pref_show_list");
-    final PreferenceCategory cat_general = (PreferenceCategory) fragment.findPreference("cat_general");
-    if(useMap){
+    final PreferenceCategory cat_general =
+        (PreferenceCategory) fragment.findPreference("cat_general");
+    if (useMap) {
       pref_show_list.setEnabled(false);
-    }else{
+    } else {
       pref_show_list.setEnabled(true);
     }
   }
@@ -106,11 +106,11 @@ public class SettingActivity extends AppCompatActivity {
     }
   }
 
-  private void hideIfNotInTeam(boolean pref_in_team_status, Preference pref_team) {
-    if(pref_in_team_status){
-      pref_team.setEnabled(true);
-    }else{
-      pref_team.setEnabled(false);
+  private void hideIfNotInTeam(boolean prefInTeamStatus, Preference prefTeam) {
+    if (prefInTeamStatus) {
+      prefTeam.setEnabled(true);
+    } else {
+      prefTeam.setEnabled(false);
     }
   }
 

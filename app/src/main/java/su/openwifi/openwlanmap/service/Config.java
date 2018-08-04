@@ -8,6 +8,7 @@ public class Config {
   public enum MODE {
     SCAN_MODE, UPLOAD_MODE, SUSPEND_MODE, KILL_MODE
   }
+
   private static MODE mode = MODE.SCAN_MODE;
 
   public static synchronized MODE getMode() {

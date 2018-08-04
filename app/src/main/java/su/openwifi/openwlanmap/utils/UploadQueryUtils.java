@@ -14,6 +14,7 @@ public class UploadQueryUtils {
   private static final String LOG_TAG = UploadQueryUtils.class.getName();
   private static final String URL_UPLOAD_OPEN_WIFI = "http://www.openwifi.su/android/upload.php";
   private static final String URL_UPLOAD_VIRTUAL_WORLD = "http://tracker.virtualworlds.de/android/upload.php";
+
   private UploadQueryUtils() {
   }
 
@@ -46,8 +47,11 @@ public class UploadQueryUtils {
       String teamTag,
       int mode,
       String urlString) {
-    URL url = QueryUtils.create(urlString);
-    InputStream ins = QueryUtils.makeHttpRequest(url, "POST", prepareUploading(uploadEntries, mac, teamTag, mode));
+    InputStream ins = QueryUtils
+        .makeHttpRequest(
+            urlString,
+            "POST",
+            prepareUploading(uploadEntries, mac, teamTag, mode));
     RankingObject rankingObject = streamToRankingObject(ins);
     Log.i(LOG_TAG, "Successfully getting ranking back +" + rankingObject.toString());
     if (ins != null) {
@@ -60,7 +64,11 @@ public class UploadQueryUtils {
     return rankingObject;
   }
 
-  private static String prepareUploading(List<AccessPoint> uploadEntries, String mac, String tag, int mode) {
+  private static String prepareUploading(
+      List<AccessPoint> uploadEntries,
+      String mac,
+      String tag,
+      int mode) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(mac + "\n");
     stringBuilder.append("T\t");

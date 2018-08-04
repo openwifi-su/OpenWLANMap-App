@@ -18,9 +18,14 @@ public class ResourceManager extends Thread {
   public boolean running = true;
   private Context context;
 
-  public ResourceManager(Context context){
+  /**
+   * Constructor.
+   * @param context : app context
+   */
+  public ResourceManager(Context context) {
     this.context = context;
-    final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
+    final SharedPreferences sharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this.context);
     final String pref_battery = sharedPreferences.getString("pref_battery", "");
     allowBattery = Integer.parseInt(pref_battery);
     final String pref_kill_ap_no_gps = sharedPreferences.getString("pref_kill_ap_no_gps", "");
@@ -29,19 +34,16 @@ public class ResourceManager extends Thread {
 
   @Override
   public void run() {
-    while(running){
-      Log.e(LOG_TAG,".............." +
-          "battery="+allowBattery+
-          "no location="+allowNoLocation);
+    while (running) {
       IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
       Intent batteryStatus = context.registerReceiver(null, ifilter);
       int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
       int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-      int batteryPct = (int) (level / (float)scale * 100);
-      Log.e(LOG_TAG, "bat="+batteryPct+"no time="+(SystemClock.elapsedRealtime() - lastLocationTime)/1000 );
-      boolean existOnLowBattery = allowBattery !=0 && batteryPct < allowBattery;
-      boolean existOnNoLocation = allowNoLocation !=0 && (SystemClock.elapsedRealtime() - lastLocationTime ) > allowNoLocation*60*1000;
-      if(existOnLowBattery || existOnNoLocation){
+      int batteryPct = (int) (level / (float) scale * 100);
+      boolean existOnLowBattery = allowBattery != 0 && batteryPct < allowBattery;
+      boolean existOnNoLocation = allowNoLocation != 0
+          && (SystemClock.elapsedRealtime() - lastLocationTime) > allowNoLocation * 60 * 1000;
+      if (existOnLowBattery || existOnNoLocation) {
         Config.setMode(Config.MODE.KILL_MODE);
       }
       try {

@@ -1,19 +1,19 @@
 package su.openwifi.openwlanmap.service;
 
 import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_UNDER_LIMIT;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
 import static su.openwifi.openwlanmap.MainActivity.R_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_UNDER_LIMIT;
 
 import android.app.Service;
 import android.content.Context;
@@ -108,7 +108,8 @@ public class ServiceController extends Service implements Runnable, Observer {
               }
               tag = sharedPreferences.getString("pref_team_tag", "");
             }
-            final Set<String> pref_support_project = sharedPreferences.getStringSet("pref_support_project", new HashSet<String>());
+            final Set<String> pref_support_project = sharedPreferences
+                .getStringSet("pref_support_project", new HashSet<String>());
             int mode = 0;
             if (sharedPreferences.getBoolean("pref_public_data", true)) {
               mode = 1;
@@ -229,7 +230,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
     //clean up resource manager
     resourceManager.running = false;
-    if(resourceManager !=null && resourceManager.isAlive()){
+    if (resourceManager != null && resourceManager.isAlive()) {
       resourceManager.interrupt();
       try {
         resourceManager.join();
@@ -308,7 +309,11 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
 
     @Override
-    protected void wlocReturnPosition(WLOC_REPONSE_CODE ret, double lat, double lon, float radius, short ccode) {
+    protected void wlocReturnPosition(WLOC_REPONSE_CODE ret,
+                                      double lat,
+                                      double lon,
+                                      float radius,
+                                      short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
@@ -378,7 +383,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       } else if (lastSpeed < 0) {
         // no speed information, may be because of WLAN localisation
         SCAN_PERIOD = 2000;
-      }else if (lastSpeed < 2) {
+      } else if (lastSpeed < 2) {
         // user seems to walk
         SCAN_PERIOD = 3000;
       }
@@ -391,16 +396,19 @@ public class ServiceController extends Service implements Runnable, Observer {
 
   private void doAutoConnect(ScanResult result) {
     //TODO test + ask mentor for more information
-    ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    ConnectivityManager manager = (ConnectivityManager)
+        getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo info = manager.getActiveNetworkInfo();
     if (info == null
         || !info.isConnected()
-        || info.getType()!=ConnectivityManager.TYPE_WIFI) {
-      //no wifi connection yet --> do autoconnect if possible and if configured
-      final boolean pref_autoconnect_freifunk = sharedPreferences.getBoolean("pref_autoconnect_freifunk", false);
-      final boolean pref_autoconnect_openwifi = sharedPreferences.getBoolean("pref_autoconnect_openwifi", false);
-      if( (pref_autoconnect_freifunk && WifiFilterer.isFreifunk(result))
-          || (pref_autoconnect_openwifi) && WifiFilterer.isOpenWifi(result)){
+        || info.getType() != ConnectivityManager.TYPE_WIFI) {
+      //no wifi connection yet
+      final boolean pref_autoconnect_freifunk = sharedPreferences
+          .getBoolean("pref_autoconnect_freifunk", false);
+      final boolean pref_autoconnect_openwifi = sharedPreferences
+          .getBoolean("pref_autoconnect_openwifi", false);
+      if ((pref_autoconnect_freifunk && WifiFilterer.isFreifunk(result))
+          || (pref_autoconnect_openwifi) && WifiFilterer.isOpenWifi(result)) {
         //connection now
         WifiConfiguration configuration = new WifiConfiguration();
         configuration.SSID = result.SSID;
@@ -410,7 +418,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         WifiManager wifiManager = (WifiManager) getApplicationContext()
             .getSystemService(Context.WIFI_SERVICE);
         final int id = wifiManager.addNetwork(configuration);
-        if(id != -1){
+        if (id != -1) {
           //successfully add network
           wifiManager.disconnect();
           wifiManager.enableNetwork(id, true);
