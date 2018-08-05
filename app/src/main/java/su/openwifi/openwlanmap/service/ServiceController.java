@@ -7,7 +7,6 @@ import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
-import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_UNDER_LIMIT;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
@@ -46,7 +45,6 @@ public class ServiceController extends Service implements Runnable, Observer {
   private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 50;
-  private static final long MIN_UPLOAD_ALLOWED = 250;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
   private boolean running = true;
@@ -66,6 +64,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private SharedPreferences sharedPreferences;
   private ResourceManager resourceManager;
   public static int numberOfApToUpload;
+  private Thread autoUploadTrigger;
 
   @Override
   public void run() {
@@ -92,50 +91,44 @@ public class ServiceController extends Service implements Runnable, Observer {
             }
           }
           Log.i(LOG_TAG, "Now uploading......");
-          if (totalAps.getTotalAps() < MIN_UPLOAD_ALLOWED) {
+          String id = "";
+          String tag = "";
+          final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
+          final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
+          if (!pref_privacy) {
+            if (pref_in_team) {
+              id = sharedPreferences.getString("pref_team", "");
+            } else {
+              id = sharedPreferences.getString("own_bssid", "");
+            }
+            tag = sharedPreferences.getString("pref_team_tag", "");
+          }
+          //final Set<String> pref_support_project = sharedPreferences
+          //  .getStringSet("pref_support_project", new HashSet<String>());
+          int mode = 0;
+          if (sharedPreferences.getBoolean("pref_public_data", true)) {
+            mode = 1;
+          }
+          if (sharedPreferences.getBoolean("pref_publish_map", false)) {
+            mode |= 2;
+          }
+          boolean uploaded = uploader.upload(id, tag, mode, null);
+          boolean autoUpload = Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE;
+          if (uploaded && !pref_privacy) {
+            //update ranking
+            String action = autoUpload ? ACTION_AUTO_RANK : ACTION_UPDATE_RANKING;
+            RankingObject ranking = uploader.getRanking();
+            Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
             intent = new Intent();
-            intent.setAction(ACTION_UPLOAD_UNDER_LIMIT);
+            intent.setAction(action);
+            intent.putExtra(R_RANK, ranking);
             sendBroadcast(intent);
           } else {
-            String id = "";
-            String tag = "";
-            final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
-            final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
-            if (!pref_privacy) {
-              if (pref_in_team) {
-                id = sharedPreferences.getString("pref_team", "");
-              } else {
-                id = sharedPreferences.getString("own_bssid", "");
-              }
-              tag = sharedPreferences.getString("pref_team_tag", "");
-            }
-            //final Set<String> pref_support_project = sharedPreferences
-            //  .getStringSet("pref_support_project", new HashSet<String>());
-            int mode = 0;
-            if (sharedPreferences.getBoolean("pref_public_data", true)) {
-              mode = 1;
-            }
-            if (sharedPreferences.getBoolean("pref_publish_map", false)) {
-              mode |= 2;
-            }
-            boolean uploaded = uploader.upload(id, tag, mode, null);
-            boolean autoUpload = Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE;
-            if (uploaded) {
-              //update ranking
-              String action = autoUpload ? ACTION_AUTO_RANK : ACTION_UPDATE_RANKING;
-              RankingObject ranking = uploader.getRanking();
-              Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
+            if (!autoUpload) {
               intent = new Intent();
-              intent.setAction(action);
-              intent.putExtra(R_RANK, ranking);
+              intent.setAction(ACTION_UPLOAD_ERROR);
+              intent.putExtra(R_UPLOAD_MSG, uploader.getError());
               sendBroadcast(intent);
-            } else {
-              if (!autoUpload) {
-                intent = new Intent();
-                intent.setAction(ACTION_UPLOAD_ERROR);
-                intent.putExtra(R_UPLOAD_MSG, uploader.getError());
-                sendBroadcast(intent);
-              }
             }
           }
           Config.setMode(Config.MODE.SCAN_MODE);
@@ -250,6 +243,15 @@ public class ServiceController extends Service implements Runnable, Observer {
         Thread.currentThread().interrupt();
       }
     }
+    //clean up autoUpload trigger
+    if(autoUploadTrigger !=null && autoUploadTrigger.isAlive()){
+      autoUploadTrigger.interrupt();
+      try {
+        autoUploadTrigger.join();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
     //clean up controller
     if (controller != null && controller.isAlive()) {
       controller.interrupt();
@@ -278,7 +280,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           float[] dist = new float[1];
           Location.distanceBetween(lastLat, lastLon, lat, lon, dist);
           lastSpeed = dist[0] * 1000 / (SystemClock.elapsedRealtime() - lastTime);
-          if(lastSpeed > 140){
+          if (lastSpeed > 140) {
             //>500km/h --> error
             lastSpeed = -1f;
           }
@@ -317,19 +319,34 @@ public class ServiceController extends Service implements Runnable, Observer {
     Log.e(LOG_TAG, "ap=" + numberOfApToUpload);
     if (numberOfApToUpload > 0 && totalAps.getTotalAps() >= numberOfApToUpload) {
       //trigger upload
-      ConnectivityManager manager = (ConnectivityManager)
-          getSystemService(Context.CONNECTIVITY_SERVICE);
-      NetworkInfo info = manager.getActiveNetworkInfo();
-      if (info != null && info.isConnected()) {
-        final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
-        if (Config.getMode() == Config.MODE.SCAN_MODE &&
-            (pref_upload_mode.equalsIgnoreCase("1") ||
-                (pref_upload_mode.equalsIgnoreCase("2") &&
-                    info.getType() == ConnectivityManager.TYPE_WIFI))
-            ) {
-          Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
-        }
-      }
+      autoUploadTrigger = new Thread(
+          new Runnable() {
+            @Override
+            public void run() {
+              while(totalAps.getTotalAps() >=numberOfApToUpload){
+                ConnectivityManager manager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo info = manager.getActiveNetworkInfo();
+                if (info != null && info.isConnected()) {
+                  final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
+                  if (Config.getMode() == Config.MODE.SCAN_MODE &&
+                      (pref_upload_mode.equalsIgnoreCase("1") ||
+                          (pref_upload_mode.equalsIgnoreCase("2") &&
+                              info.getType() == ConnectivityManager.TYPE_WIFI))
+                      ) {
+                    Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
+                  }
+                }
+                try {
+                  Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
+              }
+            }
+          }
+      );
+      autoUploadTrigger.start();
     }
   }
 

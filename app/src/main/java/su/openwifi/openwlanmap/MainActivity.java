@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity
   public static final String ACTION_UPDATE_DB = "database_status";
   public static final String ACTION_UPDATE_RANKING = "update_ranking";
   public static final String R_RANK = "rank_position";
-  public static final String ACTION_UPLOAD_UNDER_LIMIT = "update_under_limit";
   public static final String ACTION_KILL_APP = "kill_app";
   public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity
   private static final String SORT_BY_FREQ = "sort_by_freq";
   private static final String S_SCANN_STATUS = "scan_status";
   private static final String PREF_TOTAL_AP = "p_total_ap";
+  private static final long MIN_UPLOAD_ALLOWED = 250;
   private TextView gps;
   private TextView scanningStatus;
   private TextView totalAp;
@@ -230,8 +230,6 @@ public class MainActivity extends AppCompatActivity
     IntentFilter intentFilter = new IntentFilter();
     intentFilter.addAction(ACTION_UPDATE_UI);
     intentFilter.addAction(ACTION_UPDATE_ERROR);
-    //Upload under limit
-    intentFilter.addAction(ACTION_UPLOAD_UNDER_LIMIT);
     //Upload status
     intentFilter.addAction(ACTION_UPLOAD_ERROR);
     //Database status
@@ -375,11 +373,16 @@ public class MainActivity extends AppCompatActivity
         adapter.notifyDataSetChanged();
         break;
       case R.id.upload:
-        showToastInCenter(getString(R.string.uploading));
-        listView.setVisibility(View.GONE);
-        listHeader.setVisibility(View.GONE);
-        loading.setVisibility(View.VISIBLE);
-        Config.setMode(Config.MODE.UPLOAD_MODE);
+        long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
+        if(apInDb < MIN_UPLOAD_ALLOWED){
+          showAlertUpload(getString(R.string.upload_under_limit));
+        }else{
+          showToastInCenter(getString(R.string.uploading));
+          listView.setVisibility(View.GONE);
+          listHeader.setVisibility(View.GONE);
+          loading.setVisibility(View.VISIBLE);
+          Config.setMode(Config.MODE.UPLOAD_MODE);
+        }
         break;
       default:
         break;
@@ -590,10 +593,6 @@ public class MainActivity extends AppCompatActivity
         case ACTION_UPDATE_ERROR:
           gps.setText(getString(R.string.c_gps));
           newestScan.setText("0");
-          break;
-        case ACTION_UPLOAD_UNDER_LIMIT:
-          showAlertUpload(getString(R.string.upload_under_limit));
-          resetListVisibility();
           break;
         case ACTION_UPLOAD_ERROR:
           String msg = intent.getStringExtra(R_UPLOAD_MSG);
