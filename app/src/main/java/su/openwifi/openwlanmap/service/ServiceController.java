@@ -316,13 +316,17 @@ public class ServiceController extends Service implements Runnable, Observer {
     intent.setAction(ACTION_UPDATE_DB);
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
-    Log.e(LOG_TAG, "ap=" + numberOfApToUpload);
+    Log.e(LOG_TAG, "print out="+numberOfApToUpload+"/"+totalAps.getTotalAps());
+    if(autoUploadTrigger !=null){
+      Log.e(LOG_TAG, "--trigger thread="+autoUploadTrigger.isAlive());
+    }
     if (numberOfApToUpload > 0 && totalAps.getTotalAps() >= numberOfApToUpload) {
       //trigger upload
       autoUploadTrigger = new Thread(
           new Runnable() {
             @Override
             public void run() {
+              Log.e(LOG_TAG, "trigger="+numberOfApToUpload+"/"+totalAps.getTotalAps());
               while(totalAps.getTotalAps() >=numberOfApToUpload){
                 ConnectivityManager manager = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -338,7 +342,7 @@ public class ServiceController extends Service implements Runnable, Observer {
                   }
                 }
                 try {
-                  Thread.sleep(30000);
+                  Thread.sleep(1000);
                 } catch (InterruptedException e) {
                   e.printStackTrace();
                 }

@@ -84,4 +84,5 @@
     <string name="setting_public_map">Show your map data in openwifi.su</string>
     <string name="alert_kill">Kill openwlanmap app on critical resources :(</string>
     <string name="setting_upload_count">Automatic upload on</string>
+    <string name="default_5000">5000</string>
 </resources>

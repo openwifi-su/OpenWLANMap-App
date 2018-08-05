@@ -108,11 +108,15 @@
         <item>@string/l_freq</item>
         <item>@string/l_timestamp</item>
     </string-array>
+    <string name="l5000">5000 APs</string>
+    <string name="l10000">10000 APs</string>
+    <string name="l20000">20000 APs</string>
+    <string name="l50000">50000 APs</string>
     <string-array name="arr_upload_entries">
-        <item>5000 APs</item>
-        <item>10000 APs</item>
-        <item>20000 APs</item>
-        <item>50000 APs</item>
+        <item>@string/l5000</item>
+        <item>@string/l10000</item>
+        <item>@string/l20000</item>
+        <item>@string/l50000</item>
     </string-array>
     <string-array name="arr_upload_entry_values">
         <item>300</item>

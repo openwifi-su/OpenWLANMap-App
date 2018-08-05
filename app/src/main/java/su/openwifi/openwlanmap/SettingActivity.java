@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -40,7 +41,7 @@ public class SettingActivity extends AppCompatActivity {
     final boolean pref_use_map = PreferenceManager
         .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
     final int pref_upload = Integer.parseInt(PreferenceManager
-        .getDefaultSharedPreferences(this).getString("pref_upload_mode", ""));
+        .getDefaultSharedPreferences(this).getString("pref_upload_mode", "0"));
     hideIfAnonym(pref_privacy);
     hideIfUsingMap(pref_use_map);
     hideIfManual(pref_upload);
@@ -64,6 +65,8 @@ public class SettingActivity extends AppCompatActivity {
           } else if (key.equalsIgnoreCase("pref_upload_mode")) {
             final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
             hideIfManual(pref_upload);
+          } else if(key.equalsIgnoreCase("pref_upload_entry")){
+            ServiceController.numberOfApToUpload = Integer.parseInt(sharedPreferences.getString(key, "5000"));
           }
         }
       };
@@ -71,20 +74,20 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void hideIfManual(int prefUpload) {
-    final Preference pref_upload_count = fragment.findPreference("pref_upload_entry");
+    final ListPreference pref_upload_count = (ListPreference) fragment.findPreference("pref_upload_entry");
+    final int pref_upload_entry = Integer.parseInt(PreferenceManager
+        .getDefaultSharedPreferences(this).getString("pref_upload_entry", "5000"));
     if (prefUpload == 0) {
       pref_upload_count.setEnabled(false);
       ServiceController.numberOfApToUpload = -1;
     } else {
       pref_upload_count.setEnabled(true);
-      ServiceController.numberOfApToUpload = prefUpload;
+      ServiceController.numberOfApToUpload = pref_upload_entry;
     }
   }
 
   private void hideIfUsingMap(boolean useMap) {
     final Preference pref_show_list = fragment.findPreference("pref_show_list");
-    final PreferenceCategory cat_general =
-        (PreferenceCategory) fragment.findPreference("cat_general");
     if (useMap) {
       pref_show_list.setEnabled(false);
     } else {
