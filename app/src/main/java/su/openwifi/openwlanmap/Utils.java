@@ -3,8 +3,12 @@ package su.openwifi.openwlanmap;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
@@ -20,7 +24,8 @@ public class Utils {
   public static final String MAILING_LIST = "caothivananh98@gmail.com";
   //request code
   public static final int REQUEST_GPS = 100;
-  public static final int REQUEST_WRITE = 102;
+  public static final int REQUEST_WRITE = 101;
+  public static final int REQUEST_OVERLAY = 102;
 
   private Utils() {
   }
@@ -56,8 +61,21 @@ public class Utils {
           Context.LOCATION_SERVICE);
       if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
         Toast.makeText(context, context.getString(R.string.enable_gps), Toast.LENGTH_SHORT).show();
-        //Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        //context.startActivity(intent);
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        context.startActivity(intent);
+      }
+    }
+  }
+
+  public static void checkDrawOverlayPermission(Activity activity) {
+    /** check if we already  have permission to draw over other apps */
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (!Settings.canDrawOverlays(activity)) {
+        /** if not construct intent to request permission */
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:" + activity.getPackageName()));
+        /** request permission via start activity for result */
+        activity.startActivityForResult(intent, REQUEST_OVERLAY);
       }
     }
   }

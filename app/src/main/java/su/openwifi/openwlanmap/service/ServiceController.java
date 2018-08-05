@@ -1,5 +1,6 @@
 package su.openwifi.openwlanmap.service;
 
+import static su.openwifi.openwlanmap.MainActivity.ACTION_ASK_PERMISSION;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
@@ -7,9 +8,11 @@ import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
+import static su.openwifi.openwlanmap.MainActivity.R_PERMISSION;
 import static su.openwifi.openwlanmap.MainActivity.R_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
@@ -19,22 +22,29 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import su.openwifi.openwlanmap.AccessPoint;
+import su.openwifi.openwlanmap.MainActivity;
+import su.openwifi.openwlanmap.Utils;
 import su.openwifi.openwlanmap.utils.RankingObject;
 
 /**
@@ -44,7 +54,7 @@ import su.openwifi.openwlanmap.utils.RankingObject;
 public class ServiceController extends Service implements Runnable, Observer {
   private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
-  private static final int BUFFER_ENTRY_MAX = 50;
+  private static final int BUFFER_ENTRY_MAX = 10;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
   private boolean running = true;
@@ -65,6 +75,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private ResourceManager resourceManager;
   public static int numberOfApToUpload;
   private Thread autoUploadTrigger;
+  private HudView overlayView;
 
   @Override
   public void run() {
@@ -165,6 +176,45 @@ public class ServiceController extends Service implements Runnable, Observer {
     while (simpleWifiLocator == null) {
       simpleWifiLocator = new SimpleWifiLocator(this);
     }
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      while (!Settings.canDrawOverlays(this)){
+        Intent intent = new Intent();
+        intent.setAction(ACTION_ASK_PERMISSION);
+        intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
+        sendBroadcast(intent);
+        try {
+          Thread.sleep(3000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+      iniOverlayView();
+    }else{
+      iniOverlayView();
+    }
+  }
+
+  private void iniOverlayView() {
+    WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+    overlayView = new HudView(this, sharedPreferences);
+    overlayView.setValue(sharedPreferences.getLong(PREF_TOTAL_AP, 0L));
+    overlayView.invalidate();
+
+    //TODO most of flags are deprecated --> find alternatives
+    WindowManager.LayoutParams params = new WindowManager.
+        LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+            WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
+        PixelFormat.TRANSLUCENT);
+    params.gravity = Gravity.LEFT | Gravity.TOP;
+    windowManager.addView(overlayView, params);
   }
 
   @Override
@@ -172,7 +222,6 @@ public class ServiceController extends Service implements Runnable, Observer {
     Log.i(LOG_TAG, "on start command service");
     running = true;
     totalAps.addObserver(this);
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     controller = new Thread(this);
     controller.start();
     storer = new WifiStorer(this, buffer, totalAps);
@@ -243,8 +292,9 @@ public class ServiceController extends Service implements Runnable, Observer {
         Thread.currentThread().interrupt();
       }
     }
+    resourceManager = null;
     //clean up autoUpload trigger
-    if(autoUploadTrigger !=null && autoUploadTrigger.isAlive()){
+    if (autoUploadTrigger != null && autoUploadTrigger.isAlive()) {
       autoUploadTrigger.interrupt();
       try {
         autoUploadTrigger.join();
@@ -252,6 +302,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         Thread.currentThread().interrupt();
       }
     }
+    autoUploadTrigger = null;
     //clean up controller
     if (controller != null && controller.isAlive()) {
       controller.interrupt();
@@ -263,6 +314,10 @@ public class ServiceController extends Service implements Runnable, Observer {
         Thread.currentThread().interrupt();
       }
       controller = null;
+    }
+    if (overlayView != null) {
+      ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(overlayView);
+      overlayView = null;
     }
     Log.e(LOG_TAG, "Finish clean up");
   }
@@ -316,9 +371,11 @@ public class ServiceController extends Service implements Runnable, Observer {
     intent.setAction(ACTION_UPDATE_DB);
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
-    Log.e(LOG_TAG, "print out="+numberOfApToUpload+"/"+totalAps.getTotalAps());
-    if(autoUploadTrigger !=null){
-      Log.e(LOG_TAG, "--trigger thread="+autoUploadTrigger.isAlive());
+    overlayView.setValue(totalAps.getTotalAps());
+    overlayView.postInvalidate();
+    Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
+    if (autoUploadTrigger != null) {
+      Log.e(LOG_TAG, "--trigger thread=" + autoUploadTrigger.isAlive());
     }
     if (numberOfApToUpload > 0 && totalAps.getTotalAps() >= numberOfApToUpload) {
       //trigger upload
@@ -326,8 +383,8 @@ public class ServiceController extends Service implements Runnable, Observer {
           new Runnable() {
             @Override
             public void run() {
-              Log.e(LOG_TAG, "trigger="+numberOfApToUpload+"/"+totalAps.getTotalAps());
-              while(totalAps.getTotalAps() >=numberOfApToUpload){
+              Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
+              while (totalAps.getTotalAps() >= numberOfApToUpload) {
                 ConnectivityManager manager = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo info = manager.getActiveNetworkInfo();

@@ -3,6 +3,7 @@ package su.openwifi.openwlanmap;
 import static android.support.v4.view.GravityCompat.START;
 import static su.openwifi.openwlanmap.Utils.MAILING_LIST;
 import static su.openwifi.openwlanmap.Utils.REQUEST_GPS;
+import static su.openwifi.openwlanmap.Utils.REQUEST_OVERLAY;
 import static su.openwifi.openwlanmap.Utils.REQUEST_WRITE;
 
 import android.Manifest;
@@ -66,13 +67,15 @@ public class MainActivity extends AppCompatActivity
   public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
   public static final String PREF_OWN_BSSID = "own_bssid";
+  public static final String ACTION_ASK_PERMISSION = "ask_for_permission";
+  public static final String R_PERMISSION = "permission_code";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
   private static final String PREF_SORT_METHOD = "sort_method";
   private static final String SORT_BY_TIME = "sort_by_time";
   private static final String SORT_BY_RSSID = "sort_by_rssid";
   private static final String SORT_BY_FREQ = "sort_by_freq";
   private static final String S_SCANN_STATUS = "scan_status";
-  private static final String PREF_TOTAL_AP = "p_total_ap";
+  public static final String PREF_TOTAL_AP = "p_total_ap";
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private TextView gps;
   private TextView scanningStatus;
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     if (!sharedPreferences.contains(PREF_TOTAL_AP)) {
       addPreference(PREF_TOTAL_AP, 0);
     } else {
-      long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0);
+      long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
       totalAp.setText(String.valueOf(apInDb));
     }
 
@@ -240,6 +243,8 @@ public class MainActivity extends AppCompatActivity
     intentFilter.addAction(ACTION_KILL_APP);
     //Auto rank
     intentFilter.addAction(ACTION_AUTO_RANK);
+    //Permission
+    intentFilter.addAction(ACTION_ASK_PERMISSION);
     registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
@@ -251,6 +256,7 @@ public class MainActivity extends AppCompatActivity
     super.onStart();
     Utils.checkLocationPermission(this);
     Utils.checkGpsSignal(this);
+    Utils.checkDrawOverlayPermission(this);
     final Set<String> summarySet = sharedPreferences.getStringSet("pref_show_summary", null);
     rankField.setVisibility(View.GONE);
     gpsField.setVisibility(View.GONE);
@@ -323,6 +329,8 @@ public class MainActivity extends AppCompatActivity
         }
         break;
       case REQUEST_WRITE:
+        break;
+      case REQUEST_OVERLAY:
         break;
       default:
         break;
@@ -625,6 +633,22 @@ public class MainActivity extends AppCompatActivity
           break;
         case ACTION_KILL_APP:
           finish();
+          break;
+        case ACTION_ASK_PERMISSION:
+          switch (intent.getIntExtra(R_PERMISSION, 0)){
+            case REQUEST_GPS:
+              break;
+            case REQUEST_WRITE:
+              break;
+            case REQUEST_OVERLAY:
+              startActivityForResult(
+                  new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                      Uri.parse("package:" + getPackageName())),
+                  REQUEST_OVERLAY);
+              break;
+            default:
+              break;
+          }
           break;
         default:
           break;

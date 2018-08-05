@@ -43,8 +43,7 @@
             android:summary="%s"
             android:title="@string/setting_upload_mode"></ListPreference>
         <ListPreference
-            android:defaultValue="5000"
-            android:inputType="number"
+            android:defaultValue="300"
             android:entries="@array/arr_upload_entries"
             android:entryValues="@array/arr_upload_entry_values"
             android:key="pref_upload_entry"
