@@ -58,7 +58,6 @@
     <string name="yes">Exist</string>
     <string name="cancel">Cancel</string>
     <string name="setting_list">Show in access point list</string>
-    <string name="scanning">Scanning...</string>
     <string name="stopped">Stopped</string>
     <string name="closeDialog">CLOSE</string>
     <string name="uploading">Uploading...</string>

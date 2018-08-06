@@ -8,6 +8,7 @@ import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
+import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
 import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
@@ -17,6 +18,7 @@ import static su.openwifi.openwlanmap.MainActivity.R_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
+import static su.openwifi.openwlanmap.service.Config.MODE.SCAN_MODE;
 
 import android.app.Service;
 import android.content.Context;
@@ -43,7 +45,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import su.openwifi.openwlanmap.AccessPoint;
-import su.openwifi.openwlanmap.MainActivity;
 import su.openwifi.openwlanmap.Utils;
 import su.openwifi.openwlanmap.utils.RankingObject;
 
@@ -76,73 +77,63 @@ public class ServiceController extends Service implements Runnable, Observer {
   public static int numberOfApToUpload;
   private Thread autoUploadTrigger;
   private HudView overlayView;
+  private ConnectivityManager connectivityManager;
+  private String id;
+  private String tag;
+  private int mode;
 
   @Override
   public void run() {
     while (running) {
       switch (Config.getMode()) {
         case UPLOAD_MODE:
-        case AUTO_UPLOAD_MODE:
           Log.i(LOG_TAG, "Uploading...");
-          while (!getLocation) {
-            Log.i(LOG_TAG, "Waiting for wlocator to finish job = " + getLocation);
-            try {
-              Thread.sleep(100);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-          }
-          buffer.putNextData(listAp);
-          while (!buffer.isEmpty()) {
-            Log.i(LOG_TAG, "Waiting for storage to finish job");
-            try {
-              Thread.sleep(100);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-          }
-          Log.i(LOG_TAG, "Now uploading......");
-          String id = "";
-          String tag = "";
-          final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
-          final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
-          if (!pref_privacy) {
-            if (pref_in_team) {
-              id = sharedPreferences.getString("pref_team", "");
-            } else {
-              id = sharedPreferences.getString("own_bssid", "");
-            }
-            tag = sharedPreferences.getString("pref_team_tag", "");
-          }
-          //final Set<String> pref_support_project = sharedPreferences
-          //  .getStringSet("pref_support_project", new HashSet<String>());
-          int mode = 0;
-          if (sharedPreferences.getBoolean("pref_public_data", true)) {
-            mode = 1;
-          }
-          if (sharedPreferences.getBoolean("pref_publish_map", false)) {
-            mode |= 2;
-          }
+          cleanUpData();
           boolean uploaded = uploader.upload(id, tag, mode, null);
-          boolean autoUpload = Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE;
-          if (uploaded && !pref_privacy) {
+          if (uploaded) {
             //update ranking
-            String action = autoUpload ? ACTION_AUTO_RANK : ACTION_UPDATE_RANKING;
             RankingObject ranking = uploader.getRanking();
             Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
             intent = new Intent();
-            intent.setAction(action);
+            intent.setAction(ACTION_UPDATE_RANKING);
             intent.putExtra(R_RANK, ranking);
             sendBroadcast(intent);
           } else {
-            if (!autoUpload) {
-              intent = new Intent();
-              intent.setAction(ACTION_UPLOAD_ERROR);
-              intent.putExtra(R_UPLOAD_MSG, uploader.getError());
-              sendBroadcast(intent);
+            intent = new Intent();
+            intent.setAction(ACTION_UPLOAD_ERROR);
+            intent.putExtra(R_UPLOAD_MSG, uploader.getError());
+            sendBroadcast(intent);
+          }
+          Config.setMode(SCAN_MODE);
+          break;
+        case AUTO_UPLOAD_MODE:
+          Log.i(LOG_TAG, "Auto Uploading...");
+          //trigger upload
+          //clean up unsaved data
+          cleanUpData();
+          final long start = System.currentTimeMillis();
+          Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
+          while (totalAps.getTotalAps() >= numberOfApToUpload && (System.currentTimeMillis() - start) < 1 * 60 * 1000) {
+            if (canTrigger()) {
+              //do uploading
+              if (uploader.upload(id, tag, mode, null)) {
+                RankingObject ranking = uploader.getRanking();
+                Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
+                intent = new Intent();
+                intent.setAction(ACTION_AUTO_RANK);
+                intent.putExtra(R_RANK, ranking);
+                sendBroadcast(intent);
+              }
+            }
+            Log.e(LOG_TAG, "time=" + (System.currentTimeMillis() - start));
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
             }
           }
-          Config.setMode(Config.MODE.SCAN_MODE);
+          Config.setMode(SCAN_MODE);
+          Log.e(LOG_TAG, "finish autoupload and reset scan mode");
           break;
         case SCAN_MODE:
           if (getLocation) {
@@ -170,6 +161,46 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
   }
 
+  private void cleanUpData() {
+    while (!getLocation) {
+      Log.i(LOG_TAG, "Waiting for wlocator to finish job = " + getLocation);
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    buffer.putNextData(listAp);
+    while (!buffer.isEmpty()) {
+      Log.i(LOG_TAG, "Waiting for storage to finish job");
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    Log.i(LOG_TAG, "Now uploading......");
+    id = sharedPreferences.getString(PREF_OWN_BSSID, "");
+    tag = "";
+    final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
+    final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
+    if (!pref_privacy) {
+      if (pref_in_team) {
+        id = sharedPreferences.getString("pref_team", "");
+      }
+      tag = sharedPreferences.getString("pref_team_tag", "");
+    }
+    //final Set<String> pref_support_project = sharedPreferences
+    //  .getStringSet("pref_support_project", new HashSet<String>());
+    mode = 0;
+    if (sharedPreferences.getBoolean("pref_public_data", true)) {
+      mode = 1;
+    }
+    if (sharedPreferences.getBoolean("pref_publish_map", false)) {
+      mode |= 2;
+    }
+  }
+
   @Override
   public void onCreate() {
     Log.i(LOG_TAG, "create service");
@@ -177,8 +208,10 @@ public class ServiceController extends Service implements Runnable, Observer {
       simpleWifiLocator = new SimpleWifiLocator(this);
     }
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    connectivityManager = (ConnectivityManager)
+        getSystemService(Context.CONNECTIVITY_SERVICE);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      while (!Settings.canDrawOverlays(this)){
+      while (!Settings.canDrawOverlays(this)) {
         Intent intent = new Intent();
         intent.setAction(ACTION_ASK_PERMISSION);
         intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
@@ -190,7 +223,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         }
       }
       iniOverlayView();
-    }else{
+    } else {
       iniOverlayView();
     }
   }
@@ -375,41 +408,23 @@ public class ServiceController extends Service implements Runnable, Observer {
     overlayView.setMode(simpleWifiLocator.getLastLocMethod());
     overlayView.postInvalidate();
     Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
-    if (autoUploadTrigger != null) {
-      Log.e(LOG_TAG, "--trigger thread=" + autoUploadTrigger.isAlive());
+    if (canTrigger() && totalAps.getTotalAps() >= numberOfApToUpload && Config.getMode() == SCAN_MODE) {
+      Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
     }
-    if (numberOfApToUpload > 0 && totalAps.getTotalAps() >= numberOfApToUpload) {
-      //trigger upload
-      autoUploadTrigger = new Thread(
-          new Runnable() {
-            @Override
-            public void run() {
-              Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
-              while (totalAps.getTotalAps() >= numberOfApToUpload) {
-                ConnectivityManager manager = (ConnectivityManager)
-                    getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo info = manager.getActiveNetworkInfo();
-                if (info != null && info.isConnected()) {
-                  final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
-                  if (Config.getMode() == Config.MODE.SCAN_MODE &&
-                      (pref_upload_mode.equalsIgnoreCase("1") ||
-                          (pref_upload_mode.equalsIgnoreCase("2") &&
-                              info.getType() == ConnectivityManager.TYPE_WIFI))
-                      ) {
-                    Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
-                  }
-                }
-                try {
-                  Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                  e.printStackTrace();
-                }
-              }
-            }
-          }
-      );
-      autoUploadTrigger.start();
+  }
+
+  private boolean canTrigger() {
+    NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+    if (info != null && info.isConnected()) {
+      final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
+      if (pref_upload_mode.equalsIgnoreCase("1") ||
+              (pref_upload_mode.equalsIgnoreCase("2") &&
+                  info.getType() == ConnectivityManager.TYPE_WIFI)
+          ) {
+        return true;
+      }
     }
+    return false;
   }
 
   public class SimpleWifiLocator extends WifiLocator {

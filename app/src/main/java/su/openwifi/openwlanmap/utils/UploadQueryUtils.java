@@ -49,6 +49,7 @@ public class UploadQueryUtils {
       String teamTag,
       int mode,
       String urlString) {
+    Log.e(LOG_TAG, String.format("Value to upload=%d mac=%s tag=%s mode =%d",uploadEntries.size(),mac,teamTag,mode));
     InputStream ins = QueryUtils
         .makeHttpRequest(
             urlString,
@@ -108,10 +109,10 @@ public class UploadQueryUtils {
         rankingObject.updAps = Integer.parseInt(bufferedReader.readLine());
         rankingObject.delAps = Integer.parseInt(bufferedReader.readLine());
         rankingObject.newPoints = Integer.parseInt(bufferedReader.readLine());
+        return rankingObject;
       } catch (Exception e) {
         Log.e(LOG_TAG, "Error reading inputstream");
       }
-      return rankingObject;
     }
     return null;
   }
