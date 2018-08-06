@@ -76,7 +76,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private DataQueue buffer = new DataQueue();
   private boolean getLocation = true;
   private WifiUploader uploader;
-  private TotalApWrapper totalAps = new TotalApWrapper();
+  private TotalApWrapper totalAps;
   private SharedPreferences sharedPreferences;
   private ResourceManager resourceManager;
   public static int numberOfApToUpload;
@@ -282,6 +282,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.i(LOG_TAG, "on start command service");
     running = true;
+    totalAps = new TotalApWrapper(sharedPreferences.getLong(PREF_TOTAL_AP, 0L));
     totalAps.addObserver(this);
     controller = new Thread(this);
     controller.start();

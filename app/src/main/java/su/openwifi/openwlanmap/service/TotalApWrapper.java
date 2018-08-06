@@ -5,7 +5,8 @@ import java.util.Observable;
 public class TotalApWrapper extends Observable {
   private long totalAps;
 
-  public TotalApWrapper() {
+  public TotalApWrapper(long start) {
+    this.totalAps = start;
   }
 
   /**
