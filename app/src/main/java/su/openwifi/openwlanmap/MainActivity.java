@@ -74,11 +74,9 @@ public class MainActivity extends AppCompatActivity
   private static final String SORT_BY_TIME = "sort_by_time";
   private static final String SORT_BY_RSSID = "sort_by_rssid";
   private static final String SORT_BY_FREQ = "sort_by_freq";
-  private static final String S_SCANN_STATUS = "scan_status";
   public static final String PREF_TOTAL_AP = "p_total_ap";
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private TextView gps;
-  private TextView scanningStatus;
   private TextView totalAp;
   private TextView newestScan;
   private TextView speed;
@@ -106,7 +104,6 @@ public class MainActivity extends AppCompatActivity
 
     //get all summary view
     gps = findViewById(R.id.gps);
-    scanningStatus = findViewById(R.id.scan_status);
     totalAp = findViewById(R.id.ap_total);
     newestScan = findViewById(R.id.newest_scan);
     speed = findViewById(R.id.speed);
@@ -181,18 +178,8 @@ public class MainActivity extends AppCompatActivity
     if (ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-      if (savedInstanceState == null || savedInstanceState.getBoolean(S_SCANN_STATUS)) {
-        scanning = true;
         Config.setMode(Config.MODE.SCAN_MODE);
         startService(intent);
-        scanningStatus.setText(getString(R.string.scanning));
-      } else {
-        scanning = false;
-        Log.e(LOG_TAG, "Service currently stopped + Scan status = " + scanning);
-        scanningStatus.setText(getString(R.string.stopped));
-        listAp.clear();
-        adapter.notifyDataSetChanged();
-      }
     }
   }
 
@@ -207,13 +194,6 @@ public class MainActivity extends AppCompatActivity
       ownBssid = ownBssid.replace(" ", "");
     } while (ownBssid.length() < 12);
     return ownBssid;
-  }
-
-  @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    Log.e(LOG_TAG, "Saving scanning status =" + scanning);
-    outState.putBoolean(S_SCANN_STATUS, scanning);
-    super.onSaveInstanceState(outState);
   }
 
   @Override
@@ -346,19 +326,6 @@ public class MainActivity extends AppCompatActivity
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.scan_service:
-        String toast;
-        if (scanning) {
-          toast = getString(R.string.stopped);
-          killService();
-          scanning = false;
-        } else {
-          toast = getString(R.string.scanning);
-          startService(intent);
-          scanning = true;
-        }
-        scanningStatus.setText(toast);
-        break;
       case R.id.gps_map:
         //go to gps map
         //startActivity(new Intent(MainActivity.this, MapActivity.class));
@@ -512,9 +479,7 @@ public class MainActivity extends AppCompatActivity
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         dialog.cancel();
-        if (scanning) {
-          killService();
-        }
+        killService();
         finish();
       }
     });

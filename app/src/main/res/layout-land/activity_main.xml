@@ -99,23 +99,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:text="@string/h_scan"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/scan_status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:text="@string/c_scan" />
-                </LinearLayout>
-
-                <LinearLayout style="@style/HeaderCategory">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
                         android:text="@string/h_api_total"
                         android:textStyle="bold" />
 

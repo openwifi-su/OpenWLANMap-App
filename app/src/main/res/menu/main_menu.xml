@@ -4,9 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/scan_service"
-        android:title="Start/Stop scan service" />
-    <item
         android:id="@+id/gps_map"
         android:title="Show GPS in map" />
     <item
