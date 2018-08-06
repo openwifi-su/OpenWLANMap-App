@@ -76,7 +76,7 @@
     <string name="error_ownbssid">Could not get your identifier!</string>
     <string name="team_tag">Tag</string>
     <string name="setting_team">Member of a team</string>
-    <string name="setting_public_data">Public your data in openwlanmap.org</string>
+    <string name="setting_public_data">Public your data in openwifi.su</string>
     <string name="setting_map">Using map instead of access point list</string>
     <string name="adaptive_scanning">Adaptive scanning</string>
     <string name="adaptive_info">Scale scanning period dynamically to save resources by detecting movement with sensor, speed etc.</string>
@@ -84,5 +84,9 @@
     <string name="setting_public_map">Show your map data in openwifi.su</string>
     <string name="alert_kill">Kill openwlanmap app on critical resources :(</string>
     <string name="setting_upload_count">Automatic upload on</string>
-    <string name="default_5000">5000</string>
+    <string name="overlay_color"><![CDATA[
+        blue if gps is available
+        \nred if libwlocate is used
+        \nblack if no location method is defined
+  ]]></string>
 </resources>

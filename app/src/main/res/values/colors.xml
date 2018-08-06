@@ -18,4 +18,9 @@
 
     <!--timestamp color-->
     <color name="timestamp">#B4BAC0</color>
+
+    <!--color for overlay number-->
+    <color name="gps">@color/colorPrimary</color>
+    <color name="libwlocate">#ff0004</color>
+    <color name="not_define">#000000</color>
 </resources>

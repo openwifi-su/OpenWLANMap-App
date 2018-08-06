@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import su.openwifi.openwlanmap.R;
 
 public class HudView extends ViewGroup {
-  private final Paint paintConfig;
+  private Paint paintConfig;
   private String value;
   private SharedPreferences sharedPreferences;
 
@@ -19,7 +19,7 @@ public class HudView extends ViewGroup {
     paintConfig = new Paint();
     paintConfig.setAntiAlias(true);
     paintConfig.setTextSize(125);
-    paintConfig.setColor(getResources().getColor(R.color.colorPrimary));
+    paintConfig.setColor(getResources().getColor(R.color.not_define));
     paintConfig.setStyle(Paint.Style.FILL);
     paintConfig.setTypeface(Typeface.DEFAULT_BOLD);
   }
@@ -40,5 +40,21 @@ public class HudView extends ViewGroup {
 
   public void setValue(long ival) {
     value = "" + ival;
+  }
+
+  public void setMode(WifiLocator.LOC_METHOD mode) {
+    switch (mode) {
+      case GPS:
+        paintConfig.setColor(getResources().getColor(R.color.gps));
+        break;
+      case LIBWLOCATE:
+        paintConfig.setColor(getResources().getColor(R.color.libwlocate));
+        break;
+      case NOT_DEFINE:
+        paintConfig.setColor(getResources().getColor(R.color.not_define));
+        break;
+      default:
+        break;
+    }
   }
 }

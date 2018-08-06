@@ -71,6 +71,7 @@
             android:defaultValue="false"
             android:key="pref_show_counter"
             android:layout="@layout/custom_pref_layout"
+            android:summary="@string/overlay_color"
             android:title="@string/setting_show_counter"></CheckBoxPreference>
         <CheckBoxPreference
             android:defaultValue="true"

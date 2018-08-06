@@ -372,6 +372,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
     sendBroadcast(intent);
     overlayView.setValue(totalAps.getTotalAps());
+    overlayView.setMode(simpleWifiLocator.getLastLocMethod());
     overlayView.postInvalidate();
     Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
     if (autoUploadTrigger != null) {
