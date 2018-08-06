@@ -113,7 +113,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           cleanUpData();
           final long start = System.currentTimeMillis();
           Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
-          while (totalAps.getTotalAps() >= numberOfApToUpload && (System.currentTimeMillis() - start) < 1 * 60 * 1000) {
+          while (totalAps.getTotalAps() >= numberOfApToUpload && (System.currentTimeMillis() - start) < 30 * 1000) {
             if (canTrigger()) {
               //do uploading
               if (uploader.upload(id, tag, mode, null)) {
