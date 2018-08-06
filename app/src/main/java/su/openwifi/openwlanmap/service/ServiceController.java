@@ -20,6 +20,7 @@ import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
 import static su.openwifi.openwlanmap.service.Config.MODE.SCAN_MODE;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
@@ -45,6 +47,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import su.openwifi.openwlanmap.AccessPoint;
+import su.openwifi.openwlanmap.MainActivity;
+import su.openwifi.openwlanmap.R;
 import su.openwifi.openwlanmap.Utils;
 import su.openwifi.openwlanmap.utils.RankingObject;
 
@@ -53,9 +57,10 @@ import su.openwifi.openwlanmap.utils.RankingObject;
  */
 
 public class ServiceController extends Service implements Runnable, Observer {
+  private static final String CHANNEL_ID = "1234";
   private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
-  private static final int BUFFER_ENTRY_MAX = 10;
+  private static final int BUFFER_ENTRY_MAX = 50;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
   private boolean running = true;
@@ -80,6 +85,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private String id;
   private String tag;
   private int mode;
+  private NotificationCompat.Builder mBuilder;
 
   @Override
   public void run() {
@@ -88,6 +94,8 @@ public class ServiceController extends Service implements Runnable, Observer {
         case UPLOAD_MODE:
           Log.i(LOG_TAG, "Uploading...");
           cleanUpData();
+          mBuilder.setSmallIcon(R.drawable.upload_icon);
+          startForeground(1, mBuilder.build());
           boolean uploaded = uploader.upload(id, tag, mode, null);
           if (uploaded) {
             //update ranking
@@ -104,12 +112,16 @@ public class ServiceController extends Service implements Runnable, Observer {
             sendBroadcast(intent);
           }
           Config.setMode(SCAN_MODE);
+          mBuilder.setSmallIcon(R.drawable.scan_icon);
+          startForeground(1, mBuilder.build());
           break;
         case AUTO_UPLOAD_MODE:
           Log.i(LOG_TAG, "Auto Uploading...");
           //trigger upload
           //clean up unsaved data
           cleanUpData();
+          mBuilder.setSmallIcon(R.drawable.upload_icon);
+          startForeground(1, mBuilder.build());
           final long start = System.currentTimeMillis();
           Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
           while (totalAps.getTotalAps() >= numberOfApToUpload && (System.currentTimeMillis() - start) < 30 * 1000) {
@@ -132,6 +144,8 @@ public class ServiceController extends Service implements Runnable, Observer {
             }
           }
           Config.setMode(SCAN_MODE);
+          mBuilder.setSmallIcon(R.drawable.scan_icon);
+          startForeground(1, mBuilder.build());
           Log.e(LOG_TAG, "finish autoupload and reset scan mode");
           break;
         case SCAN_MODE:
@@ -225,6 +239,21 @@ public class ServiceController extends Service implements Runnable, Observer {
     } else {
       iniOverlayView();
     }
+
+    iniNotification();
+  }
+
+  private void iniNotification(){
+    Intent intent = new Intent(this, MainActivity.class);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    mBuilder=
+        new NotificationCompat.Builder(this, CHANNEL_ID)
+        .setSmallIcon(R.drawable.scan_icon)
+        .setContentTitle(getString(R.string.app_name))
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setContentIntent(pendingIntent)
+        .setCategory(NotificationCompat.CATEGORY_SERVICE);
+    startForeground(1, mBuilder.build());
   }
 
   private void iniOverlayView() {
