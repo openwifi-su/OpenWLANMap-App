@@ -75,7 +75,6 @@ public class ServiceController extends Service implements Runnable, Observer {
   private SharedPreferences sharedPreferences;
   private ResourceManager resourceManager;
   public static int numberOfApToUpload;
-  private Thread autoUploadTrigger;
   private HudView overlayView;
   private ConnectivityManager connectivityManager;
   private String id;
@@ -326,16 +325,6 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
     }
     resourceManager = null;
-    //clean up autoUpload trigger
-    if (autoUploadTrigger != null && autoUploadTrigger.isAlive()) {
-      autoUploadTrigger.interrupt();
-      try {
-        autoUploadTrigger.join();
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
-    }
-    autoUploadTrigger = null;
     //clean up controller
     if (controller != null && controller.isAlive()) {
       controller.interrupt();
