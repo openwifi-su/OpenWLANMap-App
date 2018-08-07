@@ -30,6 +30,7 @@
         <activity
             android:name=".SettingActivity"
             android:label="Settings"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MapActivity"

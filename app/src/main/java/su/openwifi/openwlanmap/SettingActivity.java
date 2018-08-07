@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +23,8 @@ public class SettingActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+    //Do not use savedInstanceState to avoid XML InflateException while rotating
+    super.onCreate(null);
     setContentView(R.layout.activity_setting);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     //set up pref listener
@@ -67,6 +67,8 @@ public class SettingActivity extends AppCompatActivity {
             hideIfManual(pref_upload);
           } else if(key.equalsIgnoreCase("pref_upload_entry")){
             ServiceController.numberOfApToUpload = Integer.parseInt(sharedPreferences.getString(key, "5000"));
+          } else if(key.equalsIgnoreCase("pref_show_counter")){
+            ServiceController.showCounterWrapper.setShouldShow(sharedPreferences.getBoolean(key, false));
           }
         }
       };

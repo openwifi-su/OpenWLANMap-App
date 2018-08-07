@@ -86,6 +86,9 @@ public class ServiceController extends Service implements Runnable, Observer {
   private String tag;
   private int mode;
   private NotificationCompat.Builder mBuilder;
+  public static ShowCounterWrapper showCounterWrapper;
+  private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
+  private long totalApsCount;
 
   @Override
   public void run() {
@@ -282,8 +285,11 @@ public class ServiceController extends Service implements Runnable, Observer {
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.i(LOG_TAG, "on start command service");
     running = true;
-    totalAps = new TotalApWrapper(sharedPreferences.getLong(PREF_TOTAL_AP, 0L));
+    totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
+    totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
+    showCounterWrapper = new ShowCounterWrapper(sharedPreferences.getBoolean("pref_show_counter", false));
+    showCounterWrapper.addObserver(this);
     controller = new Thread(this);
     controller.start();
     storer = new WifiStorer(this, buffer, totalAps);
@@ -419,17 +425,18 @@ public class ServiceController extends Service implements Runnable, Observer {
 
   @Override
   public void update(Observable o, Object arg) {
-    intent = new Intent();
-    intent.setAction(ACTION_UPDATE_DB);
-    intent.putExtra(R_TOTAL_LIST, totalAps.getTotalAps());
-    sendBroadcast(intent);
-    overlayView.setValue(totalAps.getTotalAps());
-    overlayView.setMode(simpleWifiLocator.getLastLocMethod());
-    overlayView.postInvalidate();
-    Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
-    if (canTrigger() && totalAps.getTotalAps() >= numberOfApToUpload && Config.getMode() == SCAN_MODE) {
-      Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
+    Log.e(LOG_TAG, "update");
+    if(arg ==null){
+      Log.e(LOG_TAG, "update not null means overlay update");
+      totalApsCount = totalAps.getTotalAps();
+      intent = new Intent();
+      intent.setAction(ACTION_UPDATE_DB);
+      intent.putExtra(R_TOTAL_LIST, totalApsCount);
+      sendBroadcast(intent);
     }
+    overlayView.setValue(totalApsCount);
+    overlayView.setMode(lastLocMethod);
+    overlayView.postInvalidate();
   }
 
   private boolean canTrigger() {
@@ -459,6 +466,12 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       float radius,
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
+      if(lastLocMethod != simpleWifiLocator.getLastLocMethod()){
+        //change color of overlay if loc method changes
+        lastLocMethod = simpleWifiLocator.getLastLocMethod();
+        overlayView.setMode(lastLocMethod);
+        overlayView.postInvalidate();
+      }
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "");
@@ -532,6 +545,10 @@ public class ServiceController extends Service implements Runnable, Observer {
         SCAN_PERIOD = 3000;
       }
       //TODO detect not moving and extend scan period
+      Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalApsCount);
+      if (totalApsCount >= numberOfApToUpload && canTrigger() && Config.getMode() == SCAN_MODE) {
+        Config.setMode(Config.MODE.AUTO_UPLOAD_MODE);
+      }
       getLocation = true;
       Log.i(LOG_TAG, "Getting result###################################");
       //controller.interrupt();

@@ -5,12 +5,12 @@ import java.util.Observable;
 public class TotalApWrapper extends Observable {
   private long totalAps;
 
-  public TotalApWrapper(long start) {
-    this.totalAps = start;
+  public TotalApWrapper() {
   }
 
   /**
    * Setter.
+   *
    * @param totalAps : total aps in database
    */
   public void setTotalAps(long totalAps) {
