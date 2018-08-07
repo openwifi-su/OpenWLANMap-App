@@ -24,7 +24,7 @@
     <string name="setting_user">ACCOUNT SETTINGS</string>
     <string name="setting_privacy">Stay anonym</string>
     <string name="setting_autoconnect_freifunk">Autoconnect to freifunk and upload data</string>
-    <string name="names">Your team\'s identifier</string>
+    <string name="names">Your team\'s identifier (12 characters) </string>
     <string name="gps_pop_up">This app requires GPS to work! Please allow permission</string>
     <string name="enable_gps">Please enable GPS!</string>
     <string name="gps_pop_up_ok">You allowed GPS permission</string>
@@ -88,4 +88,7 @@
         \nred if libwlocate is used
         \nblack if no location method is defined
   ]]></string>
+    <string name="autoconnect_info">WARNING! This option is dangerous and should only be chosen on device with high security.</string>
+    <string name="map_info">A map of your data will be created and published next to your rank in openwifi.su</string>
+    <string name="team_info">If you are a team member, be sure to set your team\'s identifier.</string>
 </resources>

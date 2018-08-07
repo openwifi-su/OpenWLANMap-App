@@ -55,7 +55,7 @@
         <item>-100dB</item>
         <item>-110dB</item>
         <item>-120dB</item>
-        <item>Never</item>
+        <item>No limit</item>
     </string-array>
     <string-array name="arr_rssi_values">
         <item>-70</item>

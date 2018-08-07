@@ -8,9 +8,11 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_in_team"
+            android:summary="@string/team_info"
             android:title="@string/setting_team"></CheckBoxPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
             android:key="pref_team"
+            android:layout="@layout/custom_pref_layout"
             android:title="@string/names"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
             android:key="pref_team_tag"
@@ -53,11 +55,13 @@
             android:defaultValue="false"
             android:key="pref_autoconnect_freifunk"
             android:layout="@layout/custom_pref_layout"
+            android:summary="@string/autoconnect_info"
             android:title="@string/setting_autoconnect_freifunk"></CheckBoxPreference>
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_autoconnect_openwifi"
             android:layout="@layout/custom_pref_layout"
+            android:summary="@string/autoconnect_info"
             android:title="@string/setting_autoconnect"></CheckBoxPreference>
         <ListPreference
             android:defaultValue="-120"
@@ -83,6 +87,7 @@
             android:defaultValue="false"
             android:key="pref_publish_map"
             android:layout="@layout/custom_pref_layout"
+            android:summary="@string/map_info"
             android:title="@string/setting_public_map"
             />
         <CheckBoxPreference
