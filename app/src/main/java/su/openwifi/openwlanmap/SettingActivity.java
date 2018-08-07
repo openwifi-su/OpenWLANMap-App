@@ -65,10 +65,13 @@ public class SettingActivity extends AppCompatActivity {
           } else if (key.equalsIgnoreCase("pref_upload_mode")) {
             final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
             hideIfManual(pref_upload);
-          } else if(key.equalsIgnoreCase("pref_upload_entry")){
-            ServiceController.numberOfApToUpload = Integer.parseInt(sharedPreferences.getString(key, "5000"));
-          } else if(key.equalsIgnoreCase("pref_show_counter")){
-            ServiceController.showCounterWrapper.setShouldShow(sharedPreferences.getBoolean(key, false));
+          } else if (key.equalsIgnoreCase("pref_upload_entry")) {
+            ServiceController.numberOfApToUpload =
+                Integer.parseInt(
+                    sharedPreferences.getString(key, "5000"));
+          } else if (key.equalsIgnoreCase("pref_show_counter")) {
+            ServiceController.showCounterWrapper
+                .setShouldShow(sharedPreferences.getBoolean(key, false));
           }
         }
       };
@@ -76,7 +79,8 @@ public class SettingActivity extends AppCompatActivity {
   }
 
   private void hideIfManual(int prefUpload) {
-    final ListPreference pref_upload_count = (ListPreference) fragment.findPreference("pref_upload_entry");
+    final ListPreference pref_upload_count =
+        (ListPreference) fragment.findPreference("pref_upload_entry");
     final int pref_upload_entry = Integer.parseInt(PreferenceManager
         .getDefaultSharedPreferences(this).getString("pref_upload_entry", "5000"));
     if (prefUpload == 0) {

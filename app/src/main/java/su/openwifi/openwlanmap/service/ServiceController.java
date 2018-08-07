@@ -85,7 +85,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private String id;
   private String tag;
   private int mode;
-  private NotificationCompat.Builder mBuilder;
+  private NotificationCompat.Builder notificationBuilder;
   public static ShowCounterWrapper showCounterWrapper;
   private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
   private long totalApsCount;
@@ -97,8 +97,8 @@ public class ServiceController extends Service implements Runnable, Observer {
         case UPLOAD_MODE:
           Log.i(LOG_TAG, "Uploading...");
           cleanUpData();
-          mBuilder.setSmallIcon(R.drawable.upload_icon);
-          startForeground(1, mBuilder.build());
+          notificationBuilder.setSmallIcon(R.drawable.upload_icon);
+          startForeground(1, notificationBuilder.build());
           boolean uploaded = uploader.upload(id, tag, mode, null);
           if (uploaded) {
             //update ranking
@@ -115,19 +115,20 @@ public class ServiceController extends Service implements Runnable, Observer {
             sendBroadcast(intent);
           }
           Config.setMode(SCAN_MODE);
-          mBuilder.setSmallIcon(R.drawable.scan_icon);
-          startForeground(1, mBuilder.build());
+          notificationBuilder.setSmallIcon(R.drawable.scan_icon);
+          startForeground(1, notificationBuilder.build());
           break;
         case AUTO_UPLOAD_MODE:
           Log.i(LOG_TAG, "Auto Uploading...");
           //trigger upload
           //clean up unsaved data
           cleanUpData();
-          mBuilder.setSmallIcon(R.drawable.upload_icon);
-          startForeground(1, mBuilder.build());
+          notificationBuilder.setSmallIcon(R.drawable.upload_icon);
+          startForeground(1, notificationBuilder.build());
           final long start = System.currentTimeMillis();
           Log.e(LOG_TAG, "trigger=" + numberOfApToUpload + "/" + totalAps.getTotalAps());
-          while (totalAps.getTotalAps() >= numberOfApToUpload && (System.currentTimeMillis() - start) < 30 * 1000) {
+          while (totalAps.getTotalAps() >= numberOfApToUpload
+              && (System.currentTimeMillis() - start) < 30 * 1000) {
             if (canTrigger()) {
               //do uploading
               if (uploader.upload(id, tag, mode, null)) {
@@ -147,8 +148,8 @@ public class ServiceController extends Service implements Runnable, Observer {
             }
           }
           Config.setMode(SCAN_MODE);
-          mBuilder.setSmallIcon(R.drawable.scan_icon);
-          startForeground(1, mBuilder.build());
+          notificationBuilder.setSmallIcon(R.drawable.scan_icon);
+          startForeground(1, notificationBuilder.build());
           Log.e(LOG_TAG, "finish autoupload and reset scan mode");
           break;
         case SCAN_MODE:
@@ -246,17 +247,17 @@ public class ServiceController extends Service implements Runnable, Observer {
     iniNotification();
   }
 
-  private void iniNotification(){
+  private void iniNotification() {
     Intent intent = new Intent(this, MainActivity.class);
     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-    mBuilder=
+    notificationBuilder =
         new NotificationCompat.Builder(this, CHANNEL_ID)
-        .setSmallIcon(R.drawable.scan_icon)
-        .setContentTitle(getString(R.string.app_name))
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setContentIntent(pendingIntent)
-        .setCategory(NotificationCompat.CATEGORY_SERVICE);
-    startForeground(1, mBuilder.build());
+            .setSmallIcon(R.drawable.scan_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE);
+    startForeground(1, notificationBuilder.build());
   }
 
   private void iniOverlayView() {
@@ -266,16 +267,16 @@ public class ServiceController extends Service implements Runnable, Observer {
     overlayView.invalidate();
 
     //TODO most of flags are deprecated --> find alternatives
-    WindowManager.LayoutParams params = new WindowManager.
-        LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+    WindowManager.LayoutParams params = new WindowManager
+        .LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
-            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-            WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+            | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
         PixelFormat.TRANSLUCENT);
     params.gravity = Gravity.LEFT | Gravity.TOP;
     windowManager.addView(overlayView, params);
@@ -288,7 +289,8 @@ public class ServiceController extends Service implements Runnable, Observer {
     totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
     totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
-    showCounterWrapper = new ShowCounterWrapper(sharedPreferences.getBoolean("pref_show_counter", false));
+    showCounterWrapper = new ShowCounterWrapper(
+        sharedPreferences.getBoolean("pref_show_counter", false));
     showCounterWrapper.addObserver(this);
     controller = new Thread(this);
     controller.start();
@@ -300,7 +302,8 @@ public class ServiceController extends Service implements Runnable, Observer {
     resourceManager.start();
     final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
     if (pref_upload != 0) {
-      numberOfApToUpload = Integer.parseInt(sharedPreferences.getString("pref_upload_entry", "5000"));
+      numberOfApToUpload = Integer.parseInt(
+          sharedPreferences.getString("pref_upload_entry", "5000"));
     } else {
       numberOfApToUpload = -1;
     }
@@ -426,7 +429,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   @Override
   public void update(Observable o, Object arg) {
     Log.e(LOG_TAG, "update");
-    if(arg ==null){
+    if (arg == null) {
       Log.e(LOG_TAG, "update not null means overlay update");
       totalApsCount = totalAps.getTotalAps();
       intent = new Intent();
@@ -443,9 +446,9 @@ public class ServiceController extends Service implements Runnable, Observer {
     NetworkInfo info = connectivityManager.getActiveNetworkInfo();
     if (info != null && info.isConnected()) {
       final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
-      if (pref_upload_mode.equalsIgnoreCase("1") ||
-              (pref_upload_mode.equalsIgnoreCase("2") &&
-                  info.getType() == ConnectivityManager.TYPE_WIFI)
+      if (pref_upload_mode.equalsIgnoreCase("1")
+          || (pref_upload_mode.equalsIgnoreCase("2")
+          && info.getType() == ConnectivityManager.TYPE_WIFI)
           ) {
         return true;
       }
@@ -466,7 +469,7 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       float radius,
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
-      if(lastLocMethod != simpleWifiLocator.getLastLocMethod()){
+      if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
         //change color of overlay if loc method changes
         lastLocMethod = simpleWifiLocator.getLastLocMethod();
         overlayView.setMode(lastLocMethod);

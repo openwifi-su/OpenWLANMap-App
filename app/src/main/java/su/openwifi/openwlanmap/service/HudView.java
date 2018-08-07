@@ -13,6 +13,11 @@ public class HudView extends ViewGroup {
   private String value;
   private SharedPreferences sharedPreferences;
 
+  /**
+   * Constructor.
+   * @param context : app context
+   * @param sharedPreferences : sharePreference to check overlay setting
+   */
   public HudView(Context context, SharedPreferences sharedPreferences) {
     super(context);
     this.sharedPreferences = sharedPreferences;
@@ -42,6 +47,10 @@ public class HudView extends ViewGroup {
     value = "" + ival;
   }
 
+  /**
+   * This method changes the color of overlay view after given mode.
+   * @param mode : last method used to define location
+   */
   public void setMode(WifiLocator.LOC_METHOD mode) {
     switch (mode) {
       case GPS:

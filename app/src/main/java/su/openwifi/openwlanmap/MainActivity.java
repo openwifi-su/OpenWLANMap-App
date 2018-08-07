@@ -178,8 +178,8 @@ public class MainActivity extends AppCompatActivity
     if (ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        Config.setMode(Config.MODE.SCAN_MODE);
-        startService(intent);
+      Config.setMode(Config.MODE.SCAN_MODE);
+      startService(intent);
     }
   }
 
@@ -349,9 +349,9 @@ public class MainActivity extends AppCompatActivity
         break;
       case R.id.upload:
         long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
-        if(apInDb < MIN_UPLOAD_ALLOWED){
+        if (apInDb < MIN_UPLOAD_ALLOWED) {
           showAlertUpload(getString(R.string.upload_under_limit));
-        }else{
+        } else {
           showToastInCenter(getString(R.string.uploading));
           listView.setVisibility(View.GONE);
           listHeader.setVisibility(View.GONE);
@@ -552,7 +552,8 @@ public class MainActivity extends AppCompatActivity
             gps.setText(gpsString);
             newestScan.setText(String.valueOf(newest));
             if (speedUpdate > 0) {
-              speed.setText(String.format("%.2f m/s (%.2f km/h)", speedUpdate, speedUpdate * 60 * 60 / 1000.0));
+              speed.setText(String
+                  .format("%.2f m/s (%.2f km/h)", speedUpdate, speedUpdate * 60 * 60 / 1000.0));
             } else {
               speed.setText("?");
             }
@@ -600,7 +601,7 @@ public class MainActivity extends AppCompatActivity
           finish();
           break;
         case ACTION_ASK_PERMISSION:
-          switch (intent.getIntExtra(R_PERMISSION, 0)){
+          switch (intent.getIntExtra(R_PERMISSION, 0)) {
             case REQUEST_GPS:
               break;
             case REQUEST_WRITE:

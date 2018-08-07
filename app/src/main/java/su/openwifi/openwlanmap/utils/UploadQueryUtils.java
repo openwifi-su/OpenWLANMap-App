@@ -49,7 +49,12 @@ public class UploadQueryUtils {
       String teamTag,
       int mode,
       String urlString) {
-    Log.e(LOG_TAG, String.format("Value to upload=%d mac=%s tag=%s mode =%d",uploadEntries.size(),mac,teamTag,mode));
+    Log.e(LOG_TAG,
+        String.format("Value to upload=%d mac=%s tag=%s mode =%d",
+            uploadEntries.size(),
+            mac,
+            teamTag,
+            mode));
     InputStream ins = QueryUtils
         .makeHttpRequest(
             urlString,
