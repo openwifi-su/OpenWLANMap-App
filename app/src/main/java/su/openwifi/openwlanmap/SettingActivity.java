@@ -49,29 +49,55 @@ public class SettingActivity extends AppCompatActivity {
       sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-          if (key.equalsIgnoreCase("pref_privacy")) {
-            hideIfAnonym(sharedPreferences.getBoolean(key, false));
-          } else if (key.equalsIgnoreCase("pref_in_team")) {
-            final Preference pref_team = fragment.findPreference("pref_team");
-            hideIfNotInTeam(sharedPreferences.getBoolean(key, false), pref_team);
-          } else if (key.equalsIgnoreCase("pref_use_map")) {
-            hideIfUsingMap(sharedPreferences.getBoolean(key, false));
-          } else if (key.equalsIgnoreCase("pref_battery")) {
-            final String pref_battery = sharedPreferences.getString(key, "");
-            ResourceManager.allowBattery = Integer.parseInt(pref_battery);
-          } else if (key.equalsIgnoreCase("pref_kill_ap_no_gps")) {
-            final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
-            ResourceManager.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
-          } else if (key.equalsIgnoreCase("pref_upload_mode")) {
-            final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
-            hideIfManual(pref_upload);
-          } else if (key.equalsIgnoreCase("pref_upload_entry")) {
-            ServiceController.numberOfApToUpload =
-                Integer.parseInt(
-                    sharedPreferences.getString(key, "5000"));
-          } else if (key.equalsIgnoreCase("pref_show_counter")) {
-            ServiceController.showCounterWrapper
-                .setShouldShow(sharedPreferences.getBoolean(key, false));
+          switch (key.toLowerCase()){
+            case "pref_privacy":
+              hideIfAnonym(sharedPreferences.getBoolean(key, false));
+              break;
+            case "pref_in_team":
+              final Preference pref_team = fragment.findPreference("pref_team");
+              hideIfNotInTeam(sharedPreferences.getBoolean(key, false), pref_team);
+              break;
+            case "pref_use_map":
+              hideIfUsingMap(sharedPreferences.getBoolean(key, false));
+              break;
+            case "pref_battery":
+              final String pref_battery = sharedPreferences.getString(key, "");
+              ResourceManager.allowBattery = Integer.parseInt(pref_battery);
+              break;
+            case "pref_kill_ap_no_gps":
+              final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
+              ResourceManager.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
+              break;
+            case "pref_upload_mode":
+              final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
+              hideIfManual(pref_upload);
+              break;
+            case "pref_upload_entry":
+              ServiceController.numberOfApToUpload =
+                  Integer.parseInt(
+                      sharedPreferences.getString(key, "5000"));
+              break;
+            case "pref_show_counter":
+              ServiceController.showCounterWrapper
+                  .setShouldShow(sharedPreferences.getBoolean(key, false));
+              break;
+            case "pref_team":
+              String teamBssid = sharedPreferences.getString(key, "");
+              if(Utils.checkBssid(teamBssid)){
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+                builder.setMessage(getString(R.string.wrong_id_format));
+                builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
+                  public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                  }
+                });
+                // Create and show the AlertDialog
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+              }
+              break;
+            default:
+              break;
           }
         }
       };

@@ -91,4 +91,8 @@
     <string name="autoconnect_info">WARNING! This option is dangerous and should only be chosen on device with high security.</string>
     <string name="map_info">A map of your data will be created and published next to your rank in openwifi.su</string>
     <string name="team_info">If you are a team member, be sure to set your team\'s identifier.</string>
+    <string name="wrong_id_format">ERROR! The identifier should contain 12 digits in hex like a mac address. A wrong identifier will prevent you from uploading your data.</string>
+    <string name="connect_error">ERROR! Connection might be broken!</string>
+    <string name="upload_error">ERROR! Uploading failed!</string>
+    <string name="wrong_id_msg">ERROR! You might set your team\'s identifier incorrectly!</string>
 </resources>

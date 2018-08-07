@@ -447,8 +447,8 @@ public class ServiceController extends Service implements Runnable, Observer {
     if (info != null && info.isConnected()) {
       final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
       if (pref_upload_mode.equalsIgnoreCase("1")
-          || (pref_upload_mode.equalsIgnoreCase("2")
-          && info.getType() == ConnectivityManager.TYPE_WIFI)
+          || (pref_upload_mode.equalsIgnoreCase("2") &&
+              info.getType() == ConnectivityManager.TYPE_WIFI)
           ) {
         return true;
       }

@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity
       SecureRandom sr = new SecureRandom();
       byte[] output = new byte[6];
       sr.nextBytes(output);
+      //from byte --> 2 Hexa character
       ownBssid = String.format("%2X%2X%2X%2X%2X%2X",
           output[0], output[1], output[2], output[3], output[4], output[5]);
       ownBssid = ownBssid.replace(" ", "");

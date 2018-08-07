@@ -7,6 +7,8 @@ import android.util.Log;
 import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.AccessPoint;
+import su.openwifi.openwlanmap.R;
+import su.openwifi.openwlanmap.Utils;
 import su.openwifi.openwlanmap.database.MyDatabase;
 import su.openwifi.openwlanmap.utils.RankingObject;
 import su.openwifi.openwlanmap.utils.UploadQueryUtils;
@@ -41,42 +43,47 @@ public class WifiUploader {
     //TODO read from preference and check project to upload
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
-    long count = MyDatabase.getInstance(context)
-        .getAccessPointDao()
-        .countEntries();
-    int counter = 0;
-    while (count > 0) {
-      Log.i(LOG_TAG, "READING DATABASE......................db=" + count);
-      List<AccessPoint> uploadEntries = MyDatabase.getInstance(context)
-          .getAccessPointDao()
-          .getAllDataEntriesToUpload();
-      Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
-      if (checkConnection()) {
-        //Upload
-        ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries, id, tag, mode);
-        if (ranking != null) {
-          //Delete
-          Log.e(LOG_TAG, "Getting back from upload response");
-          MyDatabase.getInstance(context)
-              .getAccessPointDao()
-              .delete(uploadEntries);
-        } else {
-          error = "Uploading failed!";
-          return false;
-        }
-      } else {
-        counter++;
-        if (counter > MAX_TRIAL) {
-          totalAps.setTotalAps(count);
-          error = "Connection might be broken!";
-          return false;
-        }
-      }
-      count = MyDatabase.getInstance(context)
+    if(Utils.checkBssid(id)){
+      long count = MyDatabase.getInstance(context)
           .getAccessPointDao()
           .countEntries();
+      int counter = 0;
+      while (count > 0) {
+        Log.i(LOG_TAG, "READING DATABASE......................db=" + count);
+        List<AccessPoint> uploadEntries = MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .getAllDataEntriesToUpload();
+        Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
+        if (checkConnection()) {
+          //Upload
+          ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries, id, tag, mode);
+          if (ranking != null) {
+            //Delete
+            Log.e(LOG_TAG, "Getting back from upload response");
+            MyDatabase.getInstance(context)
+                .getAccessPointDao()
+                .delete(uploadEntries);
+          } else {
+            error = context.getString(R.string.upload_error);
+            return false;
+          }
+        } else {
+          counter++;
+          if (counter > MAX_TRIAL) {
+            totalAps.setTotalAps(count);
+            error = context.getString(R.string.connect_error);
+            return false;
+          }
+        }
+        count = MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .countEntries();
+      }
+      totalAps.setTotalAps(count);
+    }else{
+      error = context.getString(R.string.wrong_id_msg);
+      return false;
     }
-    totalAps.setTotalAps(count);
     Log.i(LOG_TAG, "Done uploading......");
     return true;
   }
