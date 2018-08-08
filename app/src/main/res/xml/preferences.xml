@@ -2,10 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/setting_user">
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_privacy"
-            android:title="@string/setting_privacy"></CheckBoxPreference>
-        <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_in_team"
             android:summary="@string/team_info"
@@ -16,6 +12,7 @@
             android:title="@string/names"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
         <su.openwifi.openwlanmap.custom.CustomEditTextPreference
             android:key="pref_team_tag"
+            android:layout="@layout/custom_pref_layout"
             android:title="@string/team_tag"></su.openwifi.openwlanmap.custom.CustomEditTextPreference>
     </PreferenceCategory>
     <!-- to add in the future if supporting more projects

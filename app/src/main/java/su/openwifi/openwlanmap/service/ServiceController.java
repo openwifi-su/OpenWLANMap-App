@@ -200,15 +200,11 @@ public class ServiceController extends Service implements Runnable, Observer {
     Log.i(LOG_TAG, "Now uploading......");
     ownId = sharedPreferences.getString(PREF_OWN_BSSID, "");
     id ="";
-    tag = "";
-    final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
     final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
-    if (!pref_privacy) {
-      if (pref_in_team) {
+    if (pref_in_team) {
         id = sharedPreferences.getString("pref_team", "");
-      }
-      tag = sharedPreferences.getString("pref_team_tag", "");
     }
+    tag = sharedPreferences.getString("pref_team_tag", "");
     //final Set<String> pref_support_project = sharedPreferences
     //  .getStringSet("pref_support_project", new HashSet<String>());
     mode = 0;

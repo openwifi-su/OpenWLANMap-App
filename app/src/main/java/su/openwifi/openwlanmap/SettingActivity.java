@@ -36,13 +36,10 @@ public class SettingActivity extends AppCompatActivity {
           .commit();
       getFragmentManager().executePendingTransactions();
     }
-    final boolean pref_privacy = PreferenceManager
-        .getDefaultSharedPreferences(this).getBoolean("pref_privacy", false);
     final boolean pref_use_map = PreferenceManager
         .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
     final int pref_upload = Integer.parseInt(PreferenceManager
         .getDefaultSharedPreferences(this).getString("pref_upload_mode", "0"));
-    hideIfAnonym(pref_privacy);
     hideIfUsingMap(pref_use_map);
     hideIfManual(pref_upload);
     if (sharedPreferenceChangeListener == null) {
@@ -50,9 +47,6 @@ public class SettingActivity extends AppCompatActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
           switch (key.toLowerCase()){
-            case "pref_privacy":
-              hideIfAnonym(sharedPreferences.getBoolean(key, false));
-              break;
             case "pref_in_team":
               final Preference pref_team = fragment.findPreference("pref_team");
               hideIfNotInTeam(sharedPreferences.getBoolean(key, false), pref_team);
@@ -128,23 +122,6 @@ public class SettingActivity extends AppCompatActivity {
       pref_show_list.setEnabled(false);
     } else {
       pref_show_list.setEnabled(true);
-    }
-  }
-
-  private void hideIfAnonym(boolean isAnonym) {
-    final Preference pref_team = fragment.findPreference("pref_team");
-    final Preference pref_team_tag = fragment.findPreference("pref_team_tag");
-    final Preference pref_in_team = fragment.findPreference("pref_in_team");
-    if (isAnonym) {
-      pref_team.setEnabled(false);
-      pref_team_tag.setEnabled(false);
-      pref_in_team.setEnabled(false);
-    } else {
-      pref_team_tag.setEnabled(true);
-      pref_in_team.setEnabled(true);
-      final boolean pref_in_team_status = PreferenceManager
-          .getDefaultSharedPreferences(this).getBoolean("pref_in_team", false);
-      hideIfNotInTeam(pref_in_team_status, pref_team);
     }
   }
 

@@ -22,7 +22,6 @@
     <string name="kill_ap_no_gps">Kill application if there is no location defined after</string>
     <string name="setting_brightness">Reduce brightness</string>
     <string name="setting_user">ACCOUNT SETTINGS</string>
-    <string name="setting_privacy">Stay anonym</string>
     <string name="setting_autoconnect_freifunk">Autoconnect to freifunk and upload data</string>
     <string name="names">Your team\'s identifier (12 characters) </string>
     <string name="gps_pop_up">This app requires GPS to work! Please allow permission</string>
@@ -73,7 +72,7 @@
     <string name="setting_show_bssid">Show own identifier</string>
     <string name="ownbssid">This number identifies a team. In case you have other members in team, please follow them this. All team members have to set it up in settings!</string>
     <string name="error_ownbssid">Could not get your identifier!</string>
-    <string name="team_tag">Tag</string>
+    <string name="team_tag">Highscore tag(next to your rank in openwifi.su)</string>
     <string name="setting_team">Member of a team</string>
     <string name="setting_public_data">Public your data in openwifi.su</string>
     <string name="setting_map">Using map instead of access point list</string>
