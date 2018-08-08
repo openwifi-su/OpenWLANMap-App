@@ -71,7 +71,7 @@
     <string name="point">points</string>
     <string name="upload_under_limit">Upload can only be processed with at least 250 access points.</string>
     <string name="setting_show_bssid">Show own identifier</string>
-    <string name="ownbssid">This number identifies a team. In case you have other members in team, please follow them this. They have to set it up in settings!</string>
+    <string name="ownbssid">This number identifies a team. In case you have other members in team, please follow them this. All team members have to set it up in settings!</string>
     <string name="error_ownbssid">Could not get your identifier!</string>
     <string name="team_tag">Tag</string>
     <string name="setting_team">Member of a team</string>
@@ -91,7 +91,7 @@
     <string name="autoconnect_info">WARNING! This option is dangerous and should only be chosen on device with high security.</string>
     <string name="map_info">A map of your data will be created and published next to your rank in openwifi.su</string>
     <string name="team_info"><![CDATA[
-        If you are a team member, be sure to set your team\'s identifier.\nIf you are a team leader, please uncheck this option and give your teamate(s) your identifier in menu.
+        If you are a team member/leader, be sure to set your team\'s identifier. This team identifier should be the leader\'s own identifier, which can be found in menu.
     ]]></string>
     <string name="wrong_id_format">ERROR! The identifier should contain 12 digits in hex like a mac address. A wrong identifier will prevent you from uploading your data.</string>
     <string name="connect_error">ERROR! Connection might be broken!</string>

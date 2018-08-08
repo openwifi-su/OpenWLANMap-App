@@ -83,17 +83,8 @@ public class SettingActivity extends AppCompatActivity {
               break;
             case "pref_team":
               String teamBssid = sharedPreferences.getString(key, "");
-              if(Utils.checkBssid(teamBssid)){
-                AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
-                builder.setMessage(getString(R.string.wrong_id_format));
-                builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
-                  public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                  }
-                });
-                // Create and show the AlertDialog
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+              if(!Utils.checkBssid(teamBssid)){
+                showAlert(getString(R.string.wrong_id_format));
               }
               break;
             default:
@@ -102,6 +93,19 @@ public class SettingActivity extends AppCompatActivity {
         }
       };
     }
+  }
+
+  private void showAlert(String msg) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+    builder.setMessage(msg);
+    builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        dialog.dismiss();
+      }
+    });
+    // Create and show the AlertDialog
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
   }
 
   private void hideIfManual(int prefUpload) {

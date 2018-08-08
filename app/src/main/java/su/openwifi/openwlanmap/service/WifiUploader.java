@@ -32,18 +32,18 @@ public class WifiUploader {
 
   /**
    * This method upload all data in database to backend.
-   *
-   * @param id : identifier of user/team
+   * @param ownId: own generated bssid
+   * @param id : identifier of a team
    * @param tag : tag which will be shown in openwifi.su
    * @param mode : mode to publish data and map
    * @param prefSupportProject : support projects
    * @return true if successful otherwise false
    */
-  public boolean upload(String id, String tag, int mode, Set<String> prefSupportProject) {
+  public boolean upload(String ownId, String id, String tag, int mode, Set<String> prefSupportProject) {
     //TODO read from preference and check project to upload
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
-    if(Utils.checkBssid(id)){
+    if( (id.length() ==0) || Utils.checkBssid(id)){
       long count = MyDatabase.getInstance(context)
           .getAccessPointDao()
           .countEntries();
@@ -56,7 +56,7 @@ public class WifiUploader {
         Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
         if (checkConnection()) {
           //Upload
-          ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries, id, tag, mode);
+          ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries, ownId, id, tag, mode);
           if (ranking != null) {
             //Delete
             Log.e(LOG_TAG, "Getting back from upload response");

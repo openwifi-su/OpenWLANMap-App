@@ -19,10 +19,10 @@ public class UploadQueryUtils {
   }
 
   public static RankingObject uploadOpenWifi(List<AccessPoint> uploadEntries,
-                                             String mac,
+                                             String ownId, String teamId,
                                              String teamTag,
                                              int mode) {
-    return uploadData(uploadEntries, mac, teamTag, mode, URL_UPLOAD_OPEN_WIFI);
+    return uploadData(uploadEntries, ownId, teamId, teamTag, mode, URL_UPLOAD_OPEN_WIFI);
   }
 
   /*
@@ -38,28 +38,29 @@ public class UploadQueryUtils {
    * This method uploads a list of access point to backend.
    *
    * @param uploadEntries : a list of access point
-   * @param mac           : own generated bssid
+   * @param ownId         : own generated bssid
+   * @param teamId        : bssid of team leader
    * @param teamTag       : team tag as user defines
    * @param mode          : mode for public data, as well as map
    * @return a RankingObject
    */
   private static RankingObject uploadData(
       List<AccessPoint> uploadEntries,
-      String mac,
+      String ownId, String teamId,
       String teamTag,
       int mode,
       String urlString) {
     Log.e(LOG_TAG,
         String.format("Value to upload=%d mac=%s tag=%s mode =%d",
             uploadEntries.size(),
-            mac,
+            ownId,
             teamTag,
             mode));
     InputStream ins = QueryUtils
         .makeHttpRequest(
             urlString,
             "POST",
-            prepareUploading(uploadEntries, mac, teamTag, mode));
+            prepareUploading(uploadEntries, ownId, teamId, teamTag, mode));
     RankingObject rankingObject = streamToRankingObject(ins);
     Log.i(LOG_TAG, "Finish uploaded");
     if (ins != null) {
@@ -74,15 +75,17 @@ public class UploadQueryUtils {
 
   private static String prepareUploading(
       List<AccessPoint> uploadEntries,
-      String mac,
+      String ownId, String teamId,
       String tag,
       int mode) {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(mac + "\n");
+    stringBuilder.append(ownId + "\n");
     stringBuilder.append("T\t");
     stringBuilder.append(tag + "\n");
-    stringBuilder.append("E\t");
-    stringBuilder.append(mac + "\n");
+    if(teamId.length() > 0){
+      stringBuilder.append("E\t");
+      stringBuilder.append(teamId + "\n");
+    }
     stringBuilder.append("F\t");
     stringBuilder.append(mode + "\n");
     for (AccessPoint ap : uploadEntries) {

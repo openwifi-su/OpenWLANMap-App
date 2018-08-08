@@ -82,6 +82,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   public static int numberOfApToUpload;
   private HudView overlayView;
   private ConnectivityManager connectivityManager;
+  private String ownId;
   private String id;
   private String tag;
   private int mode;
@@ -99,7 +100,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           cleanUpData();
           notificationBuilder.setSmallIcon(R.drawable.upload_icon);
           startForeground(1, notificationBuilder.build());
-          boolean uploaded = uploader.upload(id, tag, mode, null);
+          boolean uploaded = uploader.upload(ownId, id, tag, mode, null);
           if (uploaded) {
             //update ranking
             RankingObject ranking = uploader.getRanking();
@@ -131,7 +132,7 @@ public class ServiceController extends Service implements Runnable, Observer {
               && (System.currentTimeMillis() - start) < 30 * 1000) {
             if (canTrigger()) {
               //do uploading
-              if (uploader.upload(id, tag, mode, null)) {
+              if (uploader.upload(ownId, id, tag, mode, null)) {
                 RankingObject ranking = uploader.getRanking();
                 Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
                 intent = new Intent();
@@ -197,7 +198,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
     }
     Log.i(LOG_TAG, "Now uploading......");
-    id = sharedPreferences.getString(PREF_OWN_BSSID, "");
+    ownId = sharedPreferences.getString(PREF_OWN_BSSID, "");
+    id ="";
     tag = "";
     final boolean pref_privacy = sharedPreferences.getBoolean("pref_privacy", false);
     final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
