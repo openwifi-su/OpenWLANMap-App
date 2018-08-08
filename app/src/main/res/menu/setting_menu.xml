@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
     <item
         android:id="@+id/setting_import"
@@ -13,5 +14,7 @@
         android:title="@string/setting_reset" />
     <item
         android:id="@+id/setting_ownbssid"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_perm_identity_black_24dp"
         android:title="@string/setting_show_bssid"/>
 </menu>

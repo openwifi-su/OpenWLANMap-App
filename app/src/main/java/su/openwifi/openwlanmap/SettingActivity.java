@@ -40,6 +40,8 @@ public class SettingActivity extends AppCompatActivity {
         .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
     final int pref_upload = Integer.parseInt(PreferenceManager
         .getDefaultSharedPreferences(this).getString("pref_upload_mode", "0"));
+    final boolean pref_in_team = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_in_team", false);
+    hideIfNotInTeam(pref_in_team);
     hideIfUsingMap(pref_use_map);
     hideIfManual(pref_upload);
     if (sharedPreferenceChangeListener == null) {
@@ -48,8 +50,7 @@ public class SettingActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
           switch (key.toLowerCase()){
             case "pref_in_team":
-              final Preference pref_team = fragment.findPreference("pref_team");
-              hideIfNotInTeam(sharedPreferences.getBoolean(key, false), pref_team);
+              hideIfNotInTeam(sharedPreferences.getBoolean(key, false));
               break;
             case "pref_use_map":
               hideIfUsingMap(sharedPreferences.getBoolean(key, false));
@@ -125,11 +126,12 @@ public class SettingActivity extends AppCompatActivity {
     }
   }
 
-  private void hideIfNotInTeam(boolean prefInTeamStatus, Preference prefTeam) {
+  private void hideIfNotInTeam(boolean prefInTeamStatus) {
+    final Preference pref_team = fragment.findPreference("pref_team");
     if (prefInTeamStatus) {
-      prefTeam.setEnabled(true);
+      pref_team.setEnabled(true);
     } else {
-      prefTeam.setEnabled(false);
+      pref_team.setEnabled(false);
     }
   }
 
