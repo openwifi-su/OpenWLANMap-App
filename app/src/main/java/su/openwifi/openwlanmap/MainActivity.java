@@ -422,18 +422,41 @@ public class MainActivity extends AppCompatActivity
         long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
         if (apInDb < MIN_UPLOAD_ALLOWED) {
           showAlertUpload(getString(R.string.upload_under_limit));
+        } else if (! ((ServiceController.teamId.length() == 0) || Utils.checkBssid(ServiceController.teamId))) {
+          AlertDialog.Builder builder = new AlertDialog.Builder(this);
+          builder.setMessage(getString(R.string.wrong_id_msg));
+          builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+              dialog.cancel();
+              upload();
+            }
+          });
+          builder.setNegativeButton(R.string.recheck, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+              if (dialog != null) {
+                dialog.dismiss();
+              }
+            }
+          });
+          // Create and show the AlertDialog
+          AlertDialog alertDialog = builder.create();
+          alertDialog.show();
         } else {
-          showToastInCenter(getString(R.string.uploading));
-          listView.setVisibility(View.GONE);
-          listHeader.setVisibility(View.GONE);
-          loading.setVisibility(View.VISIBLE);
-          Config.setMode(Config.MODE.UPLOAD_MODE);
+          upload();
         }
         break;
       default:
         break;
     }
     return true;
+  }
+
+  private void upload() {
+    showToastInCenter(getString(R.string.uploading));
+    listView.setVisibility(View.GONE);
+    listHeader.setVisibility(View.GONE);
+    loading.setVisibility(View.VISIBLE);
+    Config.setMode(Config.MODE.UPLOAD_MODE);
   }
 
   private void showToastInCenter(String msg) {
