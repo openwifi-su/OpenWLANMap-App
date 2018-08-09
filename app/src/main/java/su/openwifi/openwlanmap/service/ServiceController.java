@@ -59,41 +59,47 @@ import su.openwifi.openwlanmap.utils.RankingObject;
  */
 
 public class ServiceController extends Service implements Runnable, Observer {
+  //constant
   private static final String CHANNEL_ID = "1234";
   private static long SCAN_PERIOD = 2000;
   private static final String LOG_TAG = ServiceController.class.getSimpleName();
   private static final int BUFFER_ENTRY_MAX = 50;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
-  public static boolean running = false;
+  //variables
   private WifiLocator simpleWifiLocator;
-  private double lastLat = 190;
-  private double lastLon = 190;
-  private float lastSpeed = -1f;
-  private long lastTime = SystemClock.elapsedRealtime();
   private Thread controller = null;
   private ArrayList<AccessPoint> listAp = new ArrayList<>();
   private Intent intent;
-  private WifiStorer storer = null;
+  private WifiStorer storer;
   private DataQueue buffer = new DataQueue();
   private boolean getLocation = true;
   private WifiUploader uploader;
   private TotalApWrapper totalAps;
   private SharedPreferences sharedPreferences;
-  private ResourceManager resourceManager;
-  public static int numberOfApToUpload;
   private HudView overlayView;
   private ConnectivityManager connectivityManager;
+  private NotificationCompat.Builder notificationBuilder;
+  private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
+  private LocalBroadcastManager broadcaster;
+  //pref data and static data
+  public static ResourceManager resourceManager;
+  public static int allowBattery;
+  public static int allowNoLocation;
+  public static int numberOfApToUpload;
+  public static ShowCounterWrapper showCounterWrapper;
   public static String ownId;
   public static String ranking;
-  private String id;
-  private String tag;
-  private int mode;
-  private NotificationCompat.Builder notificationBuilder;
-  public static ShowCounterWrapper showCounterWrapper;
-  private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
-  private long totalApsCount;
-  private LocalBroadcastManager broadcaster;
+  public static String teamId;
+  public static String tag;
+  public static int mode;
+  public static long totalApsCount;
+  public static long lastTime = SystemClock.elapsedRealtime();
+  public static boolean running = false;
+  public static double lastLat = 190;
+  public static double lastLon = 190;
+  public static float lastSpeed = -1f;
+  public static int newest = 0;
 
   @Override
   public void run() {
@@ -208,28 +214,12 @@ public class ServiceController extends Service implements Runnable, Observer {
     while (!buffer.isEmpty()) {
       Log.i(LOG_TAG, "Waiting for storage to finish job");
       try {
-        Thread.sleep(100);
+        Thread.sleep(300);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
     }
     Log.i(LOG_TAG, "Now uploading......");
-    ownId = sharedPreferences.getString(PREF_OWN_BSSID, "");
-    id ="";
-    final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
-    if (pref_in_team) {
-        id = sharedPreferences.getString("pref_team", "");
-    }
-    tag = sharedPreferences.getString("pref_team_tag", "");
-    //final Set<String> pref_support_project = sharedPreferences
-    //  .getStringSet("pref_support_project", new HashSet<String>());
-    mode = 0;
-    if (sharedPreferences.getBoolean("pref_public_data", true)) {
-      mode = 1;
-    }
-    if (sharedPreferences.getBoolean("pref_publish_map", false)) {
-      mode |= 2;
-    }
   }
 
   @Override
@@ -241,6 +231,32 @@ public class ServiceController extends Service implements Runnable, Observer {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     connectivityManager = (ConnectivityManager)
         getSystemService(Context.CONNECTIVITY_SERVICE);
+    iniNotification();
+    //get from  pref
+    ownId = sharedPreferences.getString(PREF_OWN_BSSID, "");
+    totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
+    ranking = sharedPreferences.getString(PREF_RANKING, "");
+    teamId = "";
+    final boolean pref_in_team = sharedPreferences.getBoolean("pref_in_team", false);
+    if (pref_in_team) {
+      teamId = sharedPreferences.getString("pref_team", "");
+    }
+    tag = sharedPreferences.getString("pref_team_tag", "");
+    //final Set<String> pref_support_project = sharedPreferences
+    //  .getStringSet("pref_support_project", new HashSet<String>());
+    mode = 0;
+    if (sharedPreferences.getBoolean("pref_public_data", true)) {
+      mode = 1;
+    }
+    if (sharedPreferences.getBoolean("pref_publish_map", false)) {
+      mode |= 2;
+    }
+    allowBattery = Integer.parseInt(sharedPreferences.getString("pref_battery", ""));
+    allowNoLocation = Integer.parseInt(sharedPreferences.getString("pref_kill_ap_no_gps", ""));
+    final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
+    final boolean pref_show_counter = sharedPreferences.getBoolean("pref_show_counter", false);
+    final int pref_upload_entry = Integer.parseInt(
+        sharedPreferences.getString("pref_upload_entry", "5000"));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       while (!Settings.canDrawOverlays(this)) {
         Intent intent = new Intent();
@@ -253,35 +269,30 @@ public class ServiceController extends Service implements Runnable, Observer {
           e.printStackTrace();
         }
       }
-      iniOverlayView();
+      iniOverlayView(totalApsCount);
     } else {
-      iniOverlayView();
+      iniOverlayView(totalApsCount);
     }
-
-    iniNotification();
-    running = true;
-    totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
     totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
-    showCounterWrapper = new ShowCounterWrapper(
-        sharedPreferences.getBoolean("pref_show_counter", false));
+    showCounterWrapper = new ShowCounterWrapper(pref_show_counter);
     showCounterWrapper.addObserver(this);
     controller = new Thread(this);
-    controller.start();
     storer = new WifiStorer(this, buffer, totalAps);
-    storer.start();
     uploader = new WifiUploader(this, totalAps);
-    resourceManager = new ResourceManager(this);
-    ResourceManager.lastLocationTime = lastTime;
-    resourceManager.start();
-    final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
+    if (allowNoLocation != 0 || allowBattery != 0) {
+      resourceManager = new ResourceManager(this);
+      resourceManager.start();
+    }
     if (pref_upload != 0) {
-      numberOfApToUpload = Integer.parseInt(
-          sharedPreferences.getString("pref_upload_entry", "5000"));
+      numberOfApToUpload = pref_upload_entry;
     } else {
       numberOfApToUpload = -1;
     }
     broadcaster = LocalBroadcastManager.getInstance(this);
+    running = true;
+    controller.start();
+    storer.start();
   }
 
   private void iniNotification() {
@@ -297,10 +308,10 @@ public class ServiceController extends Service implements Runnable, Observer {
     startForeground(1, notificationBuilder.build());
   }
 
-  private void iniOverlayView() {
+  private void iniOverlayView(long value) {
     WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     overlayView = new HudView(this, sharedPreferences);
-    overlayView.setValue(sharedPreferences.getLong(PREF_TOTAL_AP, 0L));
+    overlayView.setValue(value);
     overlayView.invalidate();
 
     //TODO most of flags are deprecated --> find alternatives
@@ -423,7 +434,6 @@ public class ServiceController extends Service implements Runnable, Observer {
         lastLat = lat;
         lastLon = lon;
         lastTime = SystemClock.elapsedRealtime();
-        ResourceManager.lastLocationTime = lastTime;
         return true;
       case GPS:
         Log.e(LOG_TAG, "in gps");
@@ -433,7 +443,6 @@ public class ServiceController extends Service implements Runnable, Observer {
           lastSpeed = simpleWifiLocator.getLastSpeed();
           Log.e(LOG_TAG, "get last speed" + lastSpeed);
           lastTime = SystemClock.elapsedRealtime();
-          ResourceManager.lastLocationTime = lastTime;
           return true;
         }
         break;

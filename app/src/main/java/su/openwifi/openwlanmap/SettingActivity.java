@@ -72,11 +72,25 @@ public class SettingActivity extends AppCompatActivity {
               break;
             case "pref_battery":
               final String pref_battery = sharedPreferences.getString(key, "");
-              ResourceManager.allowBattery = Integer.parseInt(pref_battery);
+              ServiceController.allowBattery = Integer.parseInt(pref_battery);
+              if( (ServiceController.allowBattery !=0)
+                  && ((ServiceController.resourceManager ==null)
+                  || (!ServiceController.resourceManager.isAlive()))){
+                Log.e("SETT", "restart resource manger bat="+ServiceController.allowBattery);
+                ServiceController.resourceManager = new ResourceManager(SettingActivity.this);
+                ServiceController.resourceManager.start();
+              }
               break;
             case "pref_kill_ap_no_gps":
               final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
-              ResourceManager.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
+              ServiceController.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
+              if( (ServiceController.allowNoLocation !=0)
+                  && ((ServiceController.resourceManager ==null)
+                  || (!ServiceController.resourceManager.isAlive()))){
+                Log.e("SETT", "restart resource manger="+ServiceController.allowNoLocation);
+                ServiceController.resourceManager = new ResourceManager(SettingActivity.this);
+                ServiceController.resourceManager.start();
+              }
               break;
             case "pref_upload_mode":
               final int pref_upload = Integer.parseInt(sharedPreferences.getString(key, ""));
@@ -92,9 +106,26 @@ public class SettingActivity extends AppCompatActivity {
                   .setShouldShow(sharedPreferences.getBoolean(key, false));
               break;
             case "pref_team":
-              String teamBssid = sharedPreferences.getString(key, "");
-              if (!Utils.checkBssid(teamBssid)) {
+              ServiceController.teamId = sharedPreferences.getString(key, "");
+              if (!Utils.checkBssid(ServiceController.teamId)) {
                 showAlert(getString(R.string.wrong_id_format));
+              }
+              break;
+            case "pref_team_tag":
+              ServiceController.tag = sharedPreferences.getString(key, "");
+              break;
+            case "pref_public_data":
+              if(sharedPreferences.getBoolean(key, true)){
+                ServiceController.mode |= 1;
+              }else{
+                ServiceController.mode &= 2;
+              }
+              break;
+            case "pref_publish_map":
+              if(sharedPreferences.getBoolean(key, false)){
+                ServiceController.mode |= 2;
+              }else{
+                ServiceController.mode &= 1;
               }
               break;
             default:
@@ -144,8 +175,10 @@ public class SettingActivity extends AppCompatActivity {
     final Preference pref_team = fragment.findPreference("pref_team");
     if (prefInTeamStatus) {
       pref_team.setEnabled(true);
+      ServiceController.teamId = sharedP.getString("pref_team","");
     } else {
       pref_team.setEnabled(false);
+      ServiceController.teamId = "";
     }
   }
 
@@ -167,13 +200,15 @@ public class SettingActivity extends AppCompatActivity {
         //reset pref
         sharedP.edit().clear().commit();
         //reset programmatical prefs
-        addPreference(PREF_OWN_BSSID, ownBssid);
-        addPreference(PREF_RANKING, ranking);
-        addPreferenceLong(PREF_TOTAL_AP, totalAps);
-        addPreference(PREF_SORT_METHOD, sortMethod);
-        ResourceManager.allowNoLocation = 0;
-        ResourceManager.allowBattery = 0;
+        Utils.addPreference(sharedP,PREF_OWN_BSSID, ownBssid);
+        Utils.addPreference(sharedP,PREF_RANKING, ranking);
+        Utils.addPreferenceLong(sharedP,PREF_TOTAL_AP, totalAps);
+        Utils.addPreference(sharedP,PREF_SORT_METHOD, sortMethod);
+        ServiceController.allowNoLocation = 0;
+        ServiceController.allowBattery = 0;
         ServiceController.showCounterWrapper.setShouldShow(false);
+        ServiceController.mode = 0;
+        ServiceController.tag = "";
         Toast.makeText(this, getString(R.string.reset_alert), Toast.LENGTH_SHORT).show();
         finish();
         startActivity(getIntent());
