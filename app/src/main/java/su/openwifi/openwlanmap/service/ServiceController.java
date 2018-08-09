@@ -359,8 +359,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
     }
     Log.i(LOG_TAG, "Saving " + listAp.size() + " before destroying service");
-    storer.running = false;
     if (storer != null && storer.isAlive()) {
+      storer.running = false;
       storer.interrupt();
       try {
         storer.join();
@@ -372,8 +372,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       storer = null;
     }
     //clean up resource manager
-    resourceManager.running = false;
     if (resourceManager != null && resourceManager.isAlive()) {
+      resourceManager.running = false;
       resourceManager.interrupt();
       try {
         resourceManager.join();

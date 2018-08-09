@@ -50,8 +50,8 @@ public class WifiUploader {
       if (checkConnection()) {
         //Upload
         ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries,
-            ServiceController.ownId,
-            ServiceController.teamId,
+            ServiceController.ownId.toUpperCase(),
+            ServiceController.teamId.toUpperCase(),
             ServiceController.tag,
             ServiceController.mode);
         if (ranking != null) {
