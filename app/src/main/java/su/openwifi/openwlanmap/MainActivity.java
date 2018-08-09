@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity
   private DrawerLayout drawerLayout;
   private List<AccessPoint> listAp;
   private SharedPreferences sharedPreferences;
-  private boolean scanning = false;
   private Intent intent;
   private BroadcastReceiver serviceBroadcastReceiver = new ServiceBroadcastReceiver();
 
@@ -259,23 +258,10 @@ public class MainActivity extends AppCompatActivity
       ownBssid = String.format("%2X%2X%2X%2X%2X%2X",
           output[0], output[1], output[2], output[3], output[4], output[5]);
       ownBssid = ownBssid.replace(" ", "");
-    } while (ownBssid.length() < 12);
+    } while (ownBssid.length() != 12);
     return ownBssid;
   }
 
-  @Override
-  protected void onStop() {
-    Log.i(LOG_TAG, "Unregister receiver on Stop");
-    super.onStop();
-    LocalBroadcastManager.getInstance(this)
-    .unregisterReceiver(serviceBroadcastReceiver);
-  }
-
-  @Override
-  protected void onDestroy() {
-    Log.i(LOG_TAG, "on Destroy");
-    super.onDestroy();
-  }
 
   private void doRegister() {
     IntentFilter intentFilter = new IntentFilter();
@@ -297,43 +283,6 @@ public class MainActivity extends AppCompatActivity
         .registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
-
-  @Override
-  protected void onStart() {
-    Log.e(LOG_TAG, "Register receiver on start. Scan status = " + scanning);
-    doRegister();
-    super.onStart();
-    Utils.checkLocationPermission(this);
-    Utils.checkGpsSignal(this);
-    Utils.checkDrawOverlayPermission(this);
-    final Set<String> summarySet = sharedPreferences.getStringSet("pref_show_summary", null);
-    rankField.setVisibility(View.GONE);
-    gpsField.setVisibility(View.GONE);
-    speedField.setVisibility(View.GONE);
-    for (String item : summarySet) {
-      if (item.equalsIgnoreCase(getString(R.string.rank_sum))) {
-        rankField.setVisibility(View.VISIBLE);
-      } else if (item.equalsIgnoreCase(getString(R.string.gps_sum))) {
-        gpsField.setVisibility(View.VISIBLE);
-      } else if (item.equalsIgnoreCase(getString(R.string.speed_sum))) {
-        speedField.setVisibility(View.VISIBLE);
-      }
-    }
-    rank.setText(sharedPreferences.getString(PREF_RANKING, ""));
-    startServiceIfNotRunningYet();
-  }
-
-  private void addPreference(String key, String info) {
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putString(key, info);
-    editor.commit();
-  }
-
-  private void addPreference(String key, long totalAp) {
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putLong(key, totalAp);
-    editor.commit();
-  }
 
   @Override
   public void onRequestPermissionsResult(int requestCode,
@@ -556,15 +505,6 @@ public class MainActivity extends AppCompatActivity
     }
     drawerLayout.closeDrawer(START);
     return true;
-  }
-
-  @Override
-  public void onBackPressed() {
-    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-      drawerLayout.closeDrawer(GravityCompat.START);
-    } else {
-      showAlertExist();
-    }
   }
 
   private void showAlertExist() {

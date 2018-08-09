@@ -61,7 +61,7 @@ public class AccessPoint implements Parcelable {
   /**
    * Constructor of Access Point object.
    *
-   * @param bssid        : baisc service set id (12 characters mac address)
+   * @param bssid        : baisc service set teamId (12 characters mac address)
    * @param ssid         : service set indentifier (name of the wifi access point)
    * @param rssid        : receive signal strength indicator
    * @param timestamp    : first seen timestamp
@@ -88,7 +88,7 @@ public class AccessPoint implements Parcelable {
 
   /**
    * This constructor is for room db to use to recreate the object from db.
-   * @param bssid        : baisc service set id (12 characters mac address)
+   * @param bssid        : baisc service set teamId (12 characters mac address)
    * @param ssid         : service set indentifier (name of the wifi access point)
    * @param rssid        : receive signal strength indicator
    * @param frequency    : wifi frequency

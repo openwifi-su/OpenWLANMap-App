@@ -103,4 +103,6 @@
     <string name="export_ok">Your account is exported sucessfully.</string>
     <string name="export_error_code">ERROR! Request create exported file failed. Result code = </string>
     <string name="reset_alert">Settings is reseted sucessfully.</string>
+    <string name="recheck">RECHECK</string>
+    <string name="upload">UPLOAD</string>
 </resources>

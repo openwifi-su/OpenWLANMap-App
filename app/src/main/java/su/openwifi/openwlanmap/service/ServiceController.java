@@ -195,17 +195,11 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
   }
 
-  private void addPreference(String key, String info) {
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putString(key, info);
-    editor.commit();
-  }
-
   private void cleanUpData() {
     while (!getLocation) {
       Log.i(LOG_TAG, "Waiting for wlocator to finish job = " + getLocation);
       try {
-        Thread.sleep(100);
+        Thread.sleep(300);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -474,7 +468,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
       if (pref_upload_mode.equalsIgnoreCase("1")
           || (pref_upload_mode.equalsIgnoreCase("2") &&
-              info.getType() == ConnectivityManager.TYPE_WIFI)
+          info.getType() == ConnectivityManager.TYPE_WIFI)
           ) {
         return true;
       }
@@ -505,7 +499,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "-1000");
         double limit = Double.valueOf(pref_min_rssi);
-        Log.e(LOG_TAG, "rssid="+limit);
+        Log.e(LOG_TAG, "rssid=" + limit);
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
           if (result.level > limit) {
@@ -574,6 +568,9 @@ public class ServiceController extends Service implements Runnable, Observer {
       } else if (lastSpeed < 2) {
         // user seems to walk
         SCAN_PERIOD = 3000;
+      } else if(lastSpeed<0.5) {
+        //user seems to stay
+        SCAN_PERIOD = 5000;
       }
       //TODO detect not moving and extend scan period
       Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalApsCount);
@@ -582,13 +579,11 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
       getLocation = true;
       Log.i(LOG_TAG, "Getting result###################################");
-      //controller.interrupt();
     }
 
   }
 
   private void doAutoConnect(ScanResult result) {
-    //TODO test + ask mentor for more information
     ConnectivityManager manager = (ConnectivityManager)
         getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo info = manager.getActiveNetworkInfo();

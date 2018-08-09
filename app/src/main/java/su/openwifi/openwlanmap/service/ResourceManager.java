@@ -1,5 +1,8 @@
 package su.openwifi.openwlanmap.service;
 
+import static su.openwifi.openwlanmap.service.ServiceController.allowBattery;
+import static su.openwifi.openwlanmap.service.ServiceController.allowNoLocation;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
