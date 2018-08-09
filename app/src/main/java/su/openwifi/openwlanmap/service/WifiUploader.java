@@ -10,6 +10,7 @@ import su.openwifi.openwlanmap.AccessPoint;
 import su.openwifi.openwlanmap.R;
 import su.openwifi.openwlanmap.Utils;
 import su.openwifi.openwlanmap.database.MyDatabase;
+import su.openwifi.openwlanmap.utils.QueryUtils;
 import su.openwifi.openwlanmap.utils.RankingObject;
 import su.openwifi.openwlanmap.utils.UploadQueryUtils;
 
@@ -64,7 +65,7 @@ public class WifiUploader {
                 .getAccessPointDao()
                 .delete(uploadEntries);
           } else {
-            error = context.getString(R.string.upload_error);
+            error = context.getString(R.string.upload_error)+ "\n"+QueryUtils.requestDetail;
             return false;
           }
         } else {
