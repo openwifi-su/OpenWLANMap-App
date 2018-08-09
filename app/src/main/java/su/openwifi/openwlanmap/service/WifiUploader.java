@@ -71,6 +71,11 @@ public class WifiUploader {
           error = context.getString(R.string.connect_error);
           return false;
         }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
       count = MyDatabase.getInstance(context)
           .getAccessPointDao()
