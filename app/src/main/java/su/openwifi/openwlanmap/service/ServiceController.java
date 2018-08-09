@@ -41,6 +41,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
@@ -93,6 +94,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   public static ShowCounterWrapper showCounterWrapper;
   private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
   private long totalApsCount;
+  private LocalBroadcastManager broadcaster;
 
   @Override
   public void run() {
@@ -111,7 +113,7 @@ public class ServiceController extends Service implements Runnable, Observer {
             intent = new Intent();
             intent.setAction(ACTION_UPDATE_RANKING);
             intent.putExtra(R_RANK, ranking);
-            sendBroadcast(intent);
+            broadcaster.sendBroadcast(intent);
             String rankingString = ranking.uploadedRank
                 + "(" + ranking.uploadedCount + " "
                 + getString(R.string.point) + ")";
@@ -120,7 +122,7 @@ public class ServiceController extends Service implements Runnable, Observer {
             intent = new Intent();
             intent.setAction(ACTION_UPLOAD_ERROR);
             intent.putExtra(R_UPLOAD_MSG, uploader.getError());
-            sendBroadcast(intent);
+            broadcaster.sendBroadcast(intent);
           }
           Config.setMode(SCAN_MODE);
           notificationBuilder.setSmallIcon(R.drawable.scan_icon);
@@ -148,7 +150,7 @@ public class ServiceController extends Service implements Runnable, Observer {
                 intent = new Intent();
                 intent.setAction(ACTION_AUTO_RANK);
                 intent.putExtra(R_AUTO_RANK, autoRankingString);
-                sendBroadcast(intent);
+                broadcaster.sendBroadcast(intent);
                 addPreference(PREF_RANKING,autoRankingString);
               }
             }
@@ -180,7 +182,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           Log.e(LOG_TAG, "killing service because lack of resource....");
           intent = new Intent();
           intent.setAction(ACTION_KILL_APP);
-          sendBroadcast(intent);
+          broadcaster.sendBroadcast(intent);
           stopSelf();
           running = false;
           break;
@@ -247,7 +249,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         Intent intent = new Intent();
         intent.setAction(ACTION_ASK_PERMISSION);
         intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
-        sendBroadcast(intent);
+        broadcaster.sendBroadcast(intent);
         try {
           Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -282,6 +284,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     } else {
       numberOfApToUpload = -1;
     }
+    broadcaster = LocalBroadcastManager.getInstance(this);
   }
 
   private void iniNotification() {
@@ -450,7 +453,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       intent = new Intent();
       intent.setAction(ACTION_UPDATE_DB);
       intent.putExtra(R_TOTAL_LIST, totalApsCount);
-      sendBroadcast(intent);
+      broadcaster.sendBroadcast(intent);
     }
     overlayView.setValue(totalApsCount);
     overlayView.setMode(lastLocMethod);
@@ -548,7 +551,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         lastLon = 0.0;
         lastLon = 0.0;
       }
-      sendBroadcast(intent);
+      broadcaster.sendBroadcast(intent);
       //set up next scan period
       if (!sharedPreferences.getBoolean("pref_adaptive_scanning", true)) {
         SCAN_PERIOD = 2000;

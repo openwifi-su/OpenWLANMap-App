@@ -22,6 +22,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -208,7 +209,8 @@ public class MainActivity extends AppCompatActivity
   protected void onStop() {
     Log.i(LOG_TAG, "Unregister receiver on Stop");
     super.onStop();
-    unregisterReceiver(serviceBroadcastReceiver);
+    LocalBroadcastManager.getInstance(this)
+    .unregisterReceiver(serviceBroadcastReceiver);
   }
 
   @Override
@@ -233,7 +235,8 @@ public class MainActivity extends AppCompatActivity
     intentFilter.addAction(ACTION_AUTO_RANK);
     //Permission
     intentFilter.addAction(ACTION_ASK_PERMISSION);
-    registerReceiver(serviceBroadcastReceiver, intentFilter);
+    LocalBroadcastManager.getInstance(this)
+        .registerReceiver(serviceBroadcastReceiver, intentFilter);
   }
 
 
