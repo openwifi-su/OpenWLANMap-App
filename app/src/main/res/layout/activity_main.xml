@@ -114,6 +114,11 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/listAll">
     <TextView
         style="@style/Header"
         android:paddingTop="10dp"
@@ -136,6 +141,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="@string/no_ap" />
+    </LinearLayout>
     <ProgressBar
         android:id="@+id/loading"
         style="@style/Widget.AppCompat.ProgressBar"

@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity
   private SharedPreferences sharedPreferences;
   private Intent intent;
   private BroadcastReceiver serviceBroadcastReceiver = new ServiceBroadcastReceiver();
+  private LinearLayout listViewAll;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +159,7 @@ public class MainActivity extends AppCompatActivity
     listView = findViewById(R.id.list);
     listView.setEmptyView(emptyView);
     listAp = new ArrayList<>();
+    listViewAll = findViewById(R.id.listAll);
 
     adapter = new AccessPointAdapter(this, listAp);
     listView.setAdapter(adapter);
@@ -409,8 +411,7 @@ public class MainActivity extends AppCompatActivity
 
   private void upload() {
     showToastInCenter(getString(R.string.uploading));
-    listView.setVisibility(View.GONE);
-    listHeader.setVisibility(View.GONE);
+    listViewAll.setVisibility(View.GONE);
     loading.setVisibility(View.VISIBLE);
     Config.setMode(Config.MODE.UPLOAD_MODE);
   }
@@ -552,8 +553,7 @@ public class MainActivity extends AppCompatActivity
 
   private void resetListVisibility() {
     loading.setVisibility(View.GONE);
-    listView.setVisibility(View.VISIBLE);
-    listHeader.setVisibility(View.VISIBLE);
+    listViewAll.setVisibility(View.VISIBLE);
   }
 
   public class ServiceBroadcastReceiver extends BroadcastReceiver {
@@ -564,8 +564,7 @@ public class MainActivity extends AppCompatActivity
       switch (intent.getAction()) {
         case ACTION_UPDATE_UI:
           if (loading.getVisibility() == View.VISIBLE) {
-            listHeader.setVisibility(View.GONE);
-            listView.setVisibility(View.GONE);
+            listViewAll.setVisibility(View.GONE);
           } else {
             final String gpsString = intent.getStringExtra(R_GEO_INFO);
             final long newest = intent.getLongExtra(R_NEWEST_SCAN, 0);
