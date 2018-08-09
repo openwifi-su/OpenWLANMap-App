@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
   public static final String ACTION_UPDATE_DB = "database_status";
   public static final String ACTION_UPDATE_RANKING = "update_ranking";
   public static final String R_RANK = "rank_position";
+  public static final String R_AUTO_RANK = "rank_position_auto";
   public static final String ACTION_KILL_APP = "kill_app";
   public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    Log.i(LOG_TAG, "Creating main activity");
+    Log.e(LOG_TAG, "Creating main activity");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main_with_drawer_layout);
 
@@ -127,10 +128,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     if (!sharedPreferences.contains(PREF_RANKING)) {
-      addPreference(PREF_RANKING, "unknown");
+      addPreference(PREF_RANKING, "");
     } else {
-      rankingInfo = sharedPreferences.getString(PREF_RANKING, "unknown");
-      rank.setText(rankingInfo);
+      rank.setText(sharedPreferences.getString(PREF_RANKING, ""));
     }
 
     if (!sharedPreferences.contains(PREF_OWN_BSSID)) {
@@ -174,12 +174,19 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
+    startServiceIfNotRunningYet();
+  }
+
+  private void startServiceIfNotRunningYet() {
+    Log.e(LOG_TAG, "start service. Current running?="+ServiceController.running);
+    if(!ServiceController.running){
     intent = new Intent(this, ServiceController.class);
     if (ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-      Config.setMode(Config.MODE.SCAN_MODE);
-      startService(intent);
+        Config.setMode(Config.MODE.SCAN_MODE);
+        startService(intent);
+      }
     }
   }
 
@@ -251,6 +258,8 @@ public class MainActivity extends AppCompatActivity
         speedField.setVisibility(View.VISIBLE);
       }
     }
+    rank.setText(sharedPreferences.getString(PREF_RANKING, ""));
+    startServiceIfNotRunningYet();
   }
 
   private void addPreference(String key, String info) {
@@ -587,16 +596,10 @@ public class MainActivity extends AppCompatActivity
               + "\n" + getString(R.string.upDelAp) + r.delAps
               + "\n" + getString(R.string.upNewPoint) + r.newPoints);
           rank.setText(rp);
-          addPreference(PREF_RANKING, rp);
           resetListVisibility();
           break;
         case ACTION_AUTO_RANK:
-          RankingObject autoRank = intent.getParcelableExtra(R_RANK);
-          String autoRp = autoRank.uploadedRank
-              + "(" + autoRank.uploadedCount + " "
-              + getString(R.string.point) + ")";
-          rank.setText(autoRp);
-          addPreference(PREF_RANKING, autoRp);
+          rank.setText(intent.getStringExtra(R_AUTO_RANK));
           break;
         case ACTION_KILL_APP:
           finish();

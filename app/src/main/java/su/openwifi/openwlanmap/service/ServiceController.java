@@ -9,7 +9,9 @@ import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_UI;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
+import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
+import static su.openwifi.openwlanmap.MainActivity.R_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
@@ -63,7 +65,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   private static final int BUFFER_ENTRY_MAX = 50;
   private static final float MAX_RADIUS = 98;
   private static final double OVER = 180;
-  private boolean running = true;
+  public static boolean running = false;
   private WifiLocator simpleWifiLocator;
   private double lastLat = 190;
   private double lastLon = 190;
@@ -82,7 +84,8 @@ public class ServiceController extends Service implements Runnable, Observer {
   public static int numberOfApToUpload;
   private HudView overlayView;
   private ConnectivityManager connectivityManager;
-  private String ownId;
+  public static String ownId;
+  public static String ranking;
   private String id;
   private String tag;
   private int mode;
@@ -109,6 +112,10 @@ public class ServiceController extends Service implements Runnable, Observer {
             intent.setAction(ACTION_UPDATE_RANKING);
             intent.putExtra(R_RANK, ranking);
             sendBroadcast(intent);
+            String rankingString = ranking.uploadedRank
+                + "(" + ranking.uploadedCount + " "
+                + getString(R.string.point) + ")";
+            addPreference(PREF_RANKING,rankingString);
           } else {
             intent = new Intent();
             intent.setAction(ACTION_UPLOAD_ERROR);
@@ -135,10 +142,14 @@ public class ServiceController extends Service implements Runnable, Observer {
               if (uploader.upload(ownId, id, tag, mode, null)) {
                 RankingObject ranking = uploader.getRanking();
                 Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
+                String autoRankingString = ranking.uploadedRank
+                    + "(" + ranking.uploadedCount + " "
+                    + getString(R.string.point) + ")";
                 intent = new Intent();
                 intent.setAction(ACTION_AUTO_RANK);
-                intent.putExtra(R_RANK, ranking);
+                intent.putExtra(R_AUTO_RANK, autoRankingString);
                 sendBroadcast(intent);
+                addPreference(PREF_RANKING,autoRankingString);
               }
             }
             Log.e(LOG_TAG, "time=" + (System.currentTimeMillis() - start));
@@ -177,6 +188,12 @@ public class ServiceController extends Service implements Runnable, Observer {
           break;
       }
     }
+  }
+
+  private void addPreference(String key, String info) {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putString(key, info);
+    editor.commit();
   }
 
   private void cleanUpData() {
@@ -243,6 +260,28 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
 
     iniNotification();
+    running = true;
+    totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
+    totalAps = new TotalApWrapper();
+    totalAps.addObserver(this);
+    showCounterWrapper = new ShowCounterWrapper(
+        sharedPreferences.getBoolean("pref_show_counter", false));
+    showCounterWrapper.addObserver(this);
+    controller = new Thread(this);
+    controller.start();
+    storer = new WifiStorer(this, buffer, totalAps);
+    storer.start();
+    uploader = new WifiUploader(this, totalAps);
+    resourceManager = new ResourceManager(this);
+    ResourceManager.lastLocationTime = lastTime;
+    resourceManager.start();
+    final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
+    if (pref_upload != 0) {
+      numberOfApToUpload = Integer.parseInt(
+          sharedPreferences.getString("pref_upload_entry", "5000"));
+    } else {
+      numberOfApToUpload = -1;
+    }
   }
 
   private void iniNotification() {
@@ -283,28 +322,6 @@ public class ServiceController extends Service implements Runnable, Observer {
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.i(LOG_TAG, "on start command service");
-    running = true;
-    totalApsCount = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
-    totalAps = new TotalApWrapper();
-    totalAps.addObserver(this);
-    showCounterWrapper = new ShowCounterWrapper(
-        sharedPreferences.getBoolean("pref_show_counter", false));
-    showCounterWrapper.addObserver(this);
-    controller = new Thread(this);
-    controller.start();
-    storer = new WifiStorer(this, buffer, totalAps);
-    storer.start();
-    uploader = new WifiUploader(this, totalAps);
-    resourceManager = new ResourceManager(this);
-    ResourceManager.lastLocationTime = lastTime;
-    resourceManager.start();
-    final int pref_upload = Integer.parseInt(sharedPreferences.getString("pref_upload_mode", ""));
-    if (pref_upload != 0) {
-      numberOfApToUpload = Integer.parseInt(
-          sharedPreferences.getString("pref_upload_entry", "5000"));
-    } else {
-      numberOfApToUpload = -1;
-    }
     Log.i(LOG_TAG, "starting scan thread " + controller.isAlive());
     return START_STICKY;
   }
