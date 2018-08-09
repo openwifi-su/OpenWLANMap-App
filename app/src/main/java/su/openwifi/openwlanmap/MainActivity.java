@@ -371,7 +371,9 @@ public class MainActivity extends AppCompatActivity
         long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
         if (apInDb < MIN_UPLOAD_ALLOWED) {
           showAlertUpload(getString(R.string.upload_under_limit));
-        } else if (! ((ServiceController.teamId.length() == 0) || Utils.checkBssid(ServiceController.teamId))) {
+        }else if (Config.getMode() == Config.MODE.UPLOAD_MODE || Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE){
+          showAlertUpload(getString(R.string.upload_process));
+        }else if (! ((ServiceController.teamId.length() == 0) || Utils.checkBssid(ServiceController.teamId))) {
           AlertDialog.Builder builder = new AlertDialog.Builder(this);
           builder.setMessage(getString(R.string.wrong_id_msg));
           builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {
