@@ -260,14 +260,18 @@ public class SettingActivity extends AppCompatActivity {
                 String rankString = rank
                     + "(" + points + " "
                     + getString(R.string.point) + ")";
-                addPreference(PREF_RANKING, rankString);
-                addPreference(PREF_OWN_BSSID, ownBssid);
+                Utils.addPreference(sharedP,PREF_RANKING, rankString);
+                Utils.addPreference(sharedP,PREF_OWN_BSSID, ownBssid);
+                ServiceController.ownId = ownBssid;
+                ServiceController.ranking = rankString;
                 showAlert(getString(R.string.import_ok));
               } else if (version == 2) {
                 String ownID = dataInputStream.readUTF();
                 String r = dataInputStream.readUTF();
-                addPreference(PREF_RANKING, r);
-                addPreference(PREF_OWN_BSSID, ownID);
+                Utils.addPreference(sharedP,PREF_RANKING, r);
+                Utils.addPreference(sharedP,PREF_OWN_BSSID, ownID);
+                ServiceController.ownId = ownID;
+                ServiceController.ranking = r;
                 showAlert(getString(R.string.import_ok));
               }
             } catch (Exception e) {

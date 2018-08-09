@@ -11,7 +11,6 @@ import static su.openwifi.openwlanmap.MainActivity.ACTION_UPLOAD_ERROR;
 import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
 import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
 import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
-import static su.openwifi.openwlanmap.MainActivity.R_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
@@ -105,19 +104,19 @@ public class ServiceController extends Service implements Runnable, Observer {
           cleanUpData();
           notificationBuilder.setSmallIcon(R.drawable.upload_icon);
           startForeground(1, notificationBuilder.build());
-          boolean uploaded = uploader.upload(ownId, id, tag, mode, null);
+          Log.e(LOG_TAG, "upload data=" + ownId + "-team=" + teamId + "mode=" + mode + "tag=" + tag);
+          boolean uploaded = uploader.upload();
           if (uploaded) {
             //update ranking
-            RankingObject ranking = uploader.getRanking();
-            Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
+            RankingObject rankingObject = uploader.getRanking();
+            Log.e(LOG_TAG, "Getting ranking ob=" + rankingObject.toString());
             intent = new Intent();
             intent.setAction(ACTION_UPDATE_RANKING);
-            intent.putExtra(R_RANK, ranking);
+            intent.putExtra(R_RANK, rankingObject);
             broadcaster.sendBroadcast(intent);
-            String rankingString = ranking.uploadedRank
-                + "(" + ranking.uploadedCount + " "
+            ranking = rankingObject.uploadedRank
+                + "(" + rankingObject.uploadedCount + " "
                 + getString(R.string.point) + ")";
-            addPreference(PREF_RANKING,rankingString);
           } else {
             intent = new Intent();
             intent.setAction(ACTION_UPLOAD_ERROR);
@@ -141,17 +140,15 @@ public class ServiceController extends Service implements Runnable, Observer {
               && (System.currentTimeMillis() - start) < 30 * 1000) {
             if (canTrigger()) {
               //do uploading
-              if (uploader.upload(ownId, id, tag, mode, null)) {
-                RankingObject ranking = uploader.getRanking();
-                Log.e(LOG_TAG, "Getting ranking ob=" + ranking.toString());
-                String autoRankingString = ranking.uploadedRank
-                    + "(" + ranking.uploadedCount + " "
+              if (uploader.upload()) {
+                RankingObject rankingObject = uploader.getRanking();
+                Log.e(LOG_TAG, "Getting ranking ob=" + rankingObject.toString());
+                ranking = rankingObject.uploadedRank
+                    + "(" + rankingObject.uploadedCount + " "
                     + getString(R.string.point) + ")";
                 intent = new Intent();
                 intent.setAction(ACTION_AUTO_RANK);
-                intent.putExtra(R_AUTO_RANK, autoRankingString);
                 broadcaster.sendBroadcast(intent);
-                addPreference(PREF_RANKING,autoRankingString);
               }
             }
             Log.e(LOG_TAG, "time=" + (System.currentTimeMillis() - start));
@@ -398,6 +395,8 @@ public class ServiceController extends Service implements Runnable, Observer {
       ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(overlayView);
       overlayView = null;
     }
+    Utils.addPreference(sharedPreferences, PREF_RANKING, ranking);
+    Utils.addPreferenceLong(sharedPreferences, PREF_TOTAL_AP, totalApsCount);
     Log.e(LOG_TAG, "Finish clean up");
   }
 

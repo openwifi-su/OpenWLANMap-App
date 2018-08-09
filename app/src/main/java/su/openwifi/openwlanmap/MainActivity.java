@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity
   public static final String ACTION_UPDATE_DB = "database_status";
   public static final String ACTION_UPDATE_RANKING = "update_ranking";
   public static final String R_RANK = "rank_position";
-  public static final String R_AUTO_RANK = "rank_position_auto";
   public static final String ACTION_KILL_APP = "kill_app";
   public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
@@ -572,9 +571,7 @@ public class MainActivity extends AppCompatActivity
           }
           break;
         case ACTION_UPDATE_DB:
-          long total = intent.getLongExtra(R_TOTAL_LIST, 0L);
-          totalAp.setText(String.valueOf(total));
-          addPreference(PREF_TOTAL_AP, total);
+          totalAp.setText(String.valueOf(intent.getLongExtra(R_TOTAL_LIST, 0L)));
           break;
         case ACTION_UPDATE_ERROR:
           gps.setText(getString(R.string.c_gps));
@@ -587,9 +584,6 @@ public class MainActivity extends AppCompatActivity
           break;
         case ACTION_UPDATE_RANKING:
           RankingObject r = intent.getParcelableExtra(R_RANK);
-          String rp = r.uploadedRank
-              + "(" + r.uploadedCount + " "
-              + getString(R.string.point) + ")";
           showAlertUpload(getString(R.string.uploadOK)
               + "\n" + getString(R.string.upCount) + r.uploadedCount
               + "\n" + getString(R.string.upRank) + r.uploadedRank
@@ -597,11 +591,11 @@ public class MainActivity extends AppCompatActivity
               + "\n" + getString(R.string.upUpdAp) + r.updAps
               + "\n" + getString(R.string.upDelAp) + r.delAps
               + "\n" + getString(R.string.upNewPoint) + r.newPoints);
-          rank.setText(rp);
+          rank.setText(ServiceController.ranking);
           resetListVisibility();
           break;
         case ACTION_AUTO_RANK:
-          rank.setText(intent.getStringExtra(R_AUTO_RANK));
+          rank.setText(ServiceController.ranking);
           break;
         case ACTION_KILL_APP:
           finish();
