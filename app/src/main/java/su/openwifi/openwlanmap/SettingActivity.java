@@ -292,30 +292,43 @@ public class SettingActivity extends AppCompatActivity {
                 //read own bssid
                 final byte[] bytes = new byte[12];
                 dataInputStream.read(bytes);
-                String ownBssid = new String(bytes);
-                String rankString = rank
+                ServiceController.ownId = new String(bytes);
+                ServiceController.ranking = rank
                     + "(" + points + " "
                     + getString(R.string.point) + ")";
-                Utils.addPreference(sharedP,PREF_RANKING, rankString);
-                Utils.addPreference(sharedP,PREF_OWN_BSSID, ownBssid);
-                ServiceController.ownId = ownBssid;
-                ServiceController.ranking = rankString;
+                Utils.addPreference(sharedP,PREF_RANKING, ServiceController.ranking);
+                Utils.addPreference(sharedP,PREF_OWN_BSSID, ServiceController.ownId);
                 showAlert(getString(R.string.import_ok));
               } else if (version == 2) {
-                String ownID = dataInputStream.readUTF();
-                String r = dataInputStream.readUTF();
-                Utils.addPreference(sharedP,PREF_RANKING, r);
-                Utils.addPreference(sharedP,PREF_OWN_BSSID, ownID);
-                ServiceController.ownId = ownID;
-                ServiceController.ranking = r;
-                showAlert(getString(R.string.import_ok));
+                ServiceController.ownId = dataInputStream.readUTF();
+                ServiceController.ranking = dataInputStream.readUTF();
+                ServiceController.tag = dataInputStream.readUTF();
+                final boolean inTeam = dataInputStream.readBoolean();
+                if(inTeam){
+                  ServiceController.teamId = dataInputStream.readUTF();
+                  Utils.addPreference(sharedP, "pref_team", ServiceController.teamId);
+                }
+                Utils.addPreference(sharedP,PREF_RANKING, ServiceController.ranking);
+                Utils.addPreference(sharedP,PREF_OWN_BSSID, ServiceController.ownId);
+                Utils.addPreference(sharedP, "pref_team_tag", ServiceController.tag);
+                Utils.addPreferenceBoolean(sharedP, "pref_in_team", inTeam);
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+                builder.setMessage(getString(R.string.import_ok));
+                builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
+                  public void onClick(DialogInterface dialog, int id) {
+                    finish();
+                    startActivity(getIntent());
+                    dialog.dismiss();
+                  }
+                });
+                // Create and show the AlertDialog
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
               }
             } catch (Exception e) {
               showAlert(getString(R.string.import_error) + " " + e.toString());
             }
           }
-        } else {
-          showAlert(getString(R.string.import_error_code) + resultCode);
         }
         break;
       case REQUEST_CREATE_FILE:
@@ -329,8 +342,14 @@ public class SettingActivity extends AppCompatActivity {
                   new FileOutputStream(pfd.getFileDescriptor());
               DataOutputStream out = new DataOutputStream(fileOutputStream);
               out.writeByte(2);
-              out.writeUTF(sharedP.getString(PREF_OWN_BSSID, ""));
-              out.writeUTF(sharedP.getString(PREF_RANKING, ""));
+              out.writeUTF(ServiceController.ownId);
+              out.writeUTF(ServiceController.ranking);
+              out.writeUTF(ServiceController.tag);
+              final boolean pref_in_team = sharedP.getBoolean("pref_in_team", false);
+              out.writeBoolean(pref_in_team);
+              if(pref_in_team){
+                out.writeUTF(ServiceController.teamId);
+              }
               out.close();
               fileOutputStream.close();
               pfd.close();
@@ -339,8 +358,6 @@ public class SettingActivity extends AppCompatActivity {
               showAlert(getString(R.string.export_error) + " " + e.toString());
             }
           }
-        } else {
-          showAlert(getString(R.string.export_error_code));
         }
         break;
       default:

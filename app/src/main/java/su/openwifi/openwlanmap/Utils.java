@@ -97,4 +97,10 @@ public class Utils {
     editor.putLong(key, totalAp);
     editor.commit();
   }
+
+  public static void addPreferenceBoolean(SharedPreferences sharedPreferences, String key, boolean value) {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putBoolean(key, value);
+    editor.commit();
+  }
 }

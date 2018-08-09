@@ -98,10 +98,8 @@
     <string name="wrong_id_msg">ERROR! You might set your team\'s identifier incorrectly!</string>
     <string name="import_error">ERROR! Something wrong happened while importing account data.</string>
     <string name="import_ok">Your account is imported sucessfully.</string>
-    <string name="import_error_code">ERROR! Request search for file to import failed. Result code = </string>
     <string name="export_error">ERROR! Something wrong happened while exporting account data.</string>
     <string name="export_ok">Your account is exported sucessfully.</string>
-    <string name="export_error_code">ERROR! Request create exported file failed. Result code = </string>
     <string name="reset_alert">Settings is reseted sucessfully.</string>
     <string name="recheck">RECHECK</string>
     <string name="upload">UPLOAD</string>
