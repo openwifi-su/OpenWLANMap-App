@@ -137,6 +137,7 @@
 
             <TextView
                 style="@style/Header"
+                android:id="@+id/ap_list_h"
                 android:paddingTop="10dp"
                 android:text="Access Point List" />
 

@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
   public static final String SORT_BY_RSSID = "sort_by_rssid";
   public static final String SORT_BY_FREQ = "sort_by_freq";
   public static final String PREF_TOTAL_AP = "p_total_ap";
-  private static final long MIN_UPLOAD_ALLOWED = 250;
+  private static final long MIN_UPLOAD_ALLOWED = 20;
   private TextView gps;
   private TextView totalAp;
   private TextView newestScan;
@@ -171,6 +171,9 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
+    if(intent == null){
+      intent = new Intent(this, ServiceController.class);
+    }
     startServiceIfNotRunningYet();
   }
 
@@ -224,8 +227,10 @@ public class MainActivity extends AppCompatActivity
 
   private void startServiceIfNotRunningYet() {
     Log.e(LOG_TAG, "start service. Current running?=" + ServiceController.running);
-    if (!ServiceController.running) {
+    if(intent == null){
       intent = new Intent(this, ServiceController.class);
+    }
+    if (!ServiceController.running) {
       if (ActivityCompat.checkSelfPermission(
           this,
           Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
