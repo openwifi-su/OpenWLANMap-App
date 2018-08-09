@@ -82,6 +82,18 @@ public class Utils {
 
   public static boolean checkBssid(String teamBssid) {
     teamBssid = teamBssid.trim();
-    return teamBssid.length() ==12 && teamBssid.matches("^[0-9a-fA-F]+$");
+    return teamBssid.length() == 12 && teamBssid.matches("^[0-9a-fA-F]+$");
+  }
+
+  public static void addPreference(SharedPreferences sharedPreferences, String key, String info) {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putString(key, info);
+    editor.commit();
+  }
+
+  public static void addPreferenceLong(SharedPreferences sharedPreferences, String key, long totalAp) {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putLong(key, totalAp);
+    editor.commit();
   }
 }

@@ -311,16 +311,4 @@ public class SettingActivity extends AppCompatActivity {
         break;
     }
   }
-
-  private void addPreference(String key, String info) {
-    SharedPreferences.Editor editor = sharedP.edit();
-    editor.putString(key, info);
-    editor.commit();
-  }
-
-  private void addPreferenceLong(String key, long totalAp) {
-    SharedPreferences.Editor editor = sharedP.edit();
-    editor.putLong(key, totalAp);
-    editor.commit();
-  }
 }

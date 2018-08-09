@@ -116,24 +116,23 @@ public class MainActivity extends AppCompatActivity
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     if (!sharedPreferences.contains(PREF_SORT_METHOD)) {
-      addPreference(PREF_SORT_METHOD, SORT_BY_TIME);
+      Utils.addPreference(sharedPreferences, PREF_SORT_METHOD, SORT_BY_TIME);
     }
 
     if (!sharedPreferences.contains(PREF_TOTAL_AP)) {
-      addPreference(PREF_TOTAL_AP, 0);
+      Utils.addPreferenceLong(sharedPreferences, PREF_TOTAL_AP, 0);
     } else {
-      long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
-      totalAp.setText(String.valueOf(apInDb));
+      totalAp.setText(String.valueOf(sharedPreferences.getLong(PREF_TOTAL_AP, 0L)));
     }
 
     if (!sharedPreferences.contains(PREF_RANKING)) {
-      addPreference(PREF_RANKING, "");
+      Utils.addPreference(sharedPreferences, PREF_RANKING, "");
     } else {
       rank.setText(sharedPreferences.getString(PREF_RANKING, ""));
     }
 
     if (!sharedPreferences.contains(PREF_OWN_BSSID)) {
-      addPreference(PREF_OWN_BSSID, generateOwnBssid());
+      Utils.addPreference(sharedPreferences, PREF_OWN_BSSID, generateOwnBssid());
     }
 
     //set up drawer nav and toolbar
@@ -344,17 +343,17 @@ public class MainActivity extends AppCompatActivity
         Config.setMode(Config.MODE.KILL_MODE);
         break;
       case R.id.sort_signal:
-        addPreference(PREF_SORT_METHOD, SORT_BY_RSSID);
+        Utils.addPreference(sharedPreferences, PREF_SORT_METHOD, SORT_BY_RSSID);
         sortBySignal();
         adapter.notifyDataSetChanged();
         break;
       case R.id.sort_frequency:
-        addPreference(PREF_SORT_METHOD, SORT_BY_FREQ);
+        Utils.addPreference(sharedPreferences, PREF_SORT_METHOD, SORT_BY_FREQ);
         sortByFreq();
         adapter.notifyDataSetChanged();
         break;
       case R.id.sort_timestamp:
-        addPreference(PREF_SORT_METHOD, SORT_BY_TIME);
+        Utils.addPreference(sharedPreferences, PREF_SORT_METHOD, SORT_BY_TIME);
         sortByTimestamp();
         adapter.notifyDataSetChanged();
         break;
