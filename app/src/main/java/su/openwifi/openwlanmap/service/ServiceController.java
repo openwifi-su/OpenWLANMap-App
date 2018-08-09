@@ -540,6 +540,7 @@ public class ServiceController extends Service implements Runnable, Observer {
           }
 
         }
+        newest = resultList.size();
         intent.setAction(ACTION_UPDATE_UI);
         intent.putExtra(R_GEO_INFO, lastLat + "-" + lastLon);
         intent.putExtra(R_NEWEST_SCAN, (long) resultList.size());

@@ -175,15 +175,76 @@ public class MainActivity extends AppCompatActivity
     startServiceIfNotRunningYet();
   }
 
+  @Override
+  protected void onStart() {
+    Log.e(LOG_TAG, "Register receiver on start. Scan status = " + ServiceController.running);
+    doRegister();
+    super.onStart();
+    Utils.checkLocationPermission(this);
+    Utils.checkGpsSignal(this);
+    Utils.checkDrawOverlayPermission(this);
+    final Set<String> summarySet = sharedPreferences.getStringSet("pref_show_summary", null);
+    rankField.setVisibility(View.GONE);
+    gpsField.setVisibility(View.GONE);
+    speedField.setVisibility(View.GONE);
+    for (String item : summarySet) {
+      if (item.equalsIgnoreCase(getString(R.string.rank_sum))) {
+        rankField.setVisibility(View.VISIBLE);
+      } else if (item.equalsIgnoreCase(getString(R.string.gps_sum))) {
+        gpsField.setVisibility(View.VISIBLE);
+      } else if (item.equalsIgnoreCase(getString(R.string.speed_sum))) {
+        speedField.setVisibility(View.VISIBLE);
+      }
+    }
+    startServiceIfNotRunningYet();
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+      drawerLayout.closeDrawer(GravityCompat.START);
+    } else {
+      showAlertExist();
+    }
+  }
+
+  @Override
+  protected void onStop() {
+    Log.i(LOG_TAG, "Unregister receiver on Stop");
+    super.onStop();
+    LocalBroadcastManager.getInstance(this)
+        .unregisterReceiver(serviceBroadcastReceiver);
+  }
+
+  @Override
+  protected void onDestroy() {
+    Log.i(LOG_TAG, "on Destroy");
+    super.onDestroy();
+  }
+
+
   private void startServiceIfNotRunningYet() {
-    Log.e(LOG_TAG, "start service. Current running?="+ServiceController.running);
-    if(!ServiceController.running){
-    intent = new Intent(this, ServiceController.class);
-    if (ActivityCompat.checkSelfPermission(
-        this,
-        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    Log.e(LOG_TAG, "start service. Current running?=" + ServiceController.running);
+    if (!ServiceController.running) {
+      intent = new Intent(this, ServiceController.class);
+      if (ActivityCompat.checkSelfPermission(
+          this,
+          Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
         Config.setMode(Config.MODE.SCAN_MODE);
         startService(intent);
+      }
+    } else {
+      // onStop, UI receives no update on ap count and rank from autoupload
+      rank.setText(ServiceController.ranking);
+      totalAp.setText(String.valueOf(ServiceController.totalApsCount));
+      gps.setText(ServiceController.lastLat+"-"+ServiceController.lastLon);
+      newestScan.setText(String.valueOf(ServiceController.newest));
+      if (ServiceController.lastSpeed > 0) {
+        speed.setText(String
+            .format("%.2f m/s (%.2f km/h)", ServiceController.lastSpeed,
+                ServiceController.lastSpeed * 60 * 60 / 1000.0));
+      } else {
+        speed.setText("?");
       }
     }
   }
