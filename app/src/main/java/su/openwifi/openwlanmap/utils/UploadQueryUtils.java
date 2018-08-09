@@ -14,6 +14,7 @@ public class UploadQueryUtils {
   private static final String LOG_TAG = UploadQueryUtils.class.getName();
   private static final String URL_UPLOAD_OPEN_WIFI = "http://www.openwifi.su/android/upload.php";
   private static final String URL_UPLOAD_VIRTUAL_WORLD = "http://tracker.virtualworlds.de/android/upload.php";
+  public static String parseMsg;
 
   private UploadQueryUtils() {
   }
@@ -120,7 +121,10 @@ public class UploadQueryUtils {
         return rankingObject;
       } catch (Exception e) {
         Log.e(LOG_TAG, "Error reading inputstream");
+        parseMsg=e.toString();
       }
+    }else{
+      parseMsg="Response inputstream = null";
     }
     return null;
   }
