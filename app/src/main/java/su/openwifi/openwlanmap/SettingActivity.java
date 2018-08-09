@@ -1,11 +1,16 @@
 package su.openwifi.openwlanmap;
 
 import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
+import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -14,12 +19,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import su.openwifi.openwlanmap.service.ResourceManager;
 import su.openwifi.openwlanmap.service.ServiceController;
 
 public class SettingActivity extends AppCompatActivity {
   private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
   private PreferenceFragment fragment;
+  private SharedPreferences sharedP;
+  private static final int REQUEST_SEARCH_FILE = 103;
+  private static final int REQUEST_CREATE_FILE = 104;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +48,11 @@ public class SettingActivity extends AppCompatActivity {
           .commit();
       getFragmentManager().executePendingTransactions();
     }
-    final boolean pref_use_map = PreferenceManager
-        .getDefaultSharedPreferences(SettingActivity.this).getBoolean("pref_use_map", false);
-    final int pref_upload = Integer.parseInt(PreferenceManager
-        .getDefaultSharedPreferences(this).getString("pref_upload_mode", "0"));
-    final boolean pref_in_team = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_in_team", false);
+    sharedP = PreferenceManager
+        .getDefaultSharedPreferences(SettingActivity.this);
+    final boolean pref_use_map = sharedP.getBoolean("pref_use_map", false);
+    final int pref_upload = Integer.parseInt(sharedP.getString("pref_upload_mode", "0"));
+    final boolean pref_in_team = sharedP.getBoolean("pref_in_team", false);
     hideIfNotInTeam(pref_in_team);
     hideIfUsingMap(pref_use_map);
     hideIfManual(pref_upload);
@@ -48,7 +60,7 @@ public class SettingActivity extends AppCompatActivity {
       sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-          switch (key.toLowerCase()){
+          switch (key.toLowerCase()) {
             case "pref_in_team":
               hideIfNotInTeam(sharedPreferences.getBoolean(key, false));
               break;
@@ -78,7 +90,7 @@ public class SettingActivity extends AppCompatActivity {
               break;
             case "pref_team":
               String teamBssid = sharedPreferences.getString(key, "");
-              if(!Utils.checkBssid(teamBssid)){
+              if (!Utils.checkBssid(teamBssid)) {
                 showAlert(getString(R.string.wrong_id_format));
               }
               break;
@@ -106,8 +118,7 @@ public class SettingActivity extends AppCompatActivity {
   private void hideIfManual(int prefUpload) {
     final ListPreference pref_upload_count =
         (ListPreference) fragment.findPreference("pref_upload_entry");
-    final int pref_upload_entry = Integer.parseInt(PreferenceManager
-        .getDefaultSharedPreferences(this).getString("pref_upload_entry", "5000"));
+    final int pref_upload_entry = Integer.parseInt(sharedP.getString("pref_upload_entry", "5000"));
     if (prefUpload == 0) {
       pref_upload_count.setEnabled(false);
       ServiceController.numberOfApToUpload = -1;
@@ -148,16 +159,21 @@ public class SettingActivity extends AppCompatActivity {
         Toast.makeText(this, "Settings is reseted sucessfully", Toast.LENGTH_LONG).show();
         break;
       case R.id.setting_export:
-        Toast.makeText(this, "Settings is exported sucessfully", Toast.LENGTH_LONG).show();
+        Intent intentExport = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intentExport.setType("*/*");
+        intentExport.putExtra(Intent.EXTRA_TITLE, "OWMAP_V2.export");
+        startActivityForResult(intentExport, REQUEST_CREATE_FILE);
         break;
       case R.id.setting_import:
-        Toast.makeText(this, "Settings is imported sucessfully", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        //require getType, otherwise ActivityNotFoundException
+        intent.setType("*/*");
+        startActivityForResult(intent, REQUEST_SEARCH_FILE);
         break;
       case R.id.setting_ownbssid:
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.ownbssid) + "\n"
-            + PreferenceManager.getDefaultSharedPreferences(this)
-            .getString(PREF_OWN_BSSID, getString(R.string.error_ownbssid)));
+            + sharedP.getString(PREF_OWN_BSSID, getString(R.string.error_ownbssid)));
         builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
             dialog.dismiss();
@@ -188,5 +204,93 @@ public class SettingActivity extends AppCompatActivity {
     super.onResume();
     PreferenceManager.getDefaultSharedPreferences(this)
         .registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    switch (requestCode) {
+      case REQUEST_SEARCH_FILE:
+        if (resultCode == Activity.RESULT_OK) {
+          if (data != null) {
+            Uri uri = data.getData();
+            try {
+              InputStream ins = getContentResolver().openInputStream(uri);
+              DataInputStream dataInputStream = new DataInputStream(ins);
+              final int version = dataInputStream.readByte();
+              if (version == 1) {
+                //no need scan flag and stored values
+                dataInputStream.readInt();
+                dataInputStream.readInt();
+                //read rank and point
+                int points = dataInputStream.readInt();
+                int rank = dataInputStream.readInt();
+                //no need openwlan and free hotspot data
+                dataInputStream.readInt();
+                dataInputStream.readInt();
+                //no need telemetry data
+                int i = 0;
+                while (i < 6) {
+                  dataInputStream.readFloat();
+                  i++;
+                }
+                //read own bssid
+                final byte[] bytes = new byte[12];
+                dataInputStream.read(bytes);
+                String ownBssid = new String(bytes);
+                String rankString = rank
+                    + "(" + points + " "
+                    + getString(R.string.point) + ")";
+                addPreference(PREF_RANKING, rankString);
+                addPreference(PREF_OWN_BSSID, ownBssid);
+                showAlert(getString(R.string.import_ok));
+              } else if (version == 2) {
+                String ownID = dataInputStream.readUTF();
+                String r = dataInputStream.readUTF();
+                addPreference(PREF_RANKING, r);
+                addPreference(PREF_OWN_BSSID, ownID);
+                showAlert(getString(R.string.import_ok));
+              }
+            } catch (Exception e) {
+              showAlert(getString(R.string.import_error) + " " + e.toString());
+            }
+          }
+        } else {
+          showAlert(getString(R.string.import_error_code) + resultCode);
+        }
+        break;
+      case REQUEST_CREATE_FILE:
+        if (resultCode == Activity.RESULT_OK) {
+          if (data != null) {
+            ParcelFileDescriptor pfd = null;
+            try {
+              pfd = getContentResolver().
+                  openFileDescriptor(data.getData(), "w");
+              FileOutputStream fileOutputStream =
+                  new FileOutputStream(pfd.getFileDescriptor());
+              DataOutputStream out = new DataOutputStream(fileOutputStream);
+              out.writeByte(2);
+              out.writeUTF(sharedP.getString(PREF_OWN_BSSID, ""));
+              out.writeUTF(sharedP.getString(PREF_RANKING, ""));
+              out.close();
+              fileOutputStream.close();
+              pfd.close();
+              showAlert(getString(R.string.export_ok));
+            } catch (Exception e) {
+              showAlert(getString(R.string.export_error) + " " + e.toString());
+            }
+          }
+        } else {
+          showAlert(getString(R.string.export_error_code));
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void addPreference(String key, String info) {
+    SharedPreferences.Editor editor = sharedP.edit();
+    editor.putString(key, info);
+    editor.commit();
   }
 }

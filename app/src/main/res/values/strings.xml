@@ -27,8 +27,8 @@
     <string name="gps_pop_up">This app requires GPS to work! Please allow permission</string>
     <string name="enable_gps">Please enable GPS!</string>
     <string name="gps_pop_up_ok">You allowed GPS permission</string>
-    <string name="setting_import">Import settings</string>
-    <string name="setting_export">Export settings</string>
+    <string name="setting_import">Import account</string>
+    <string name="setting_export">Export account</string>
     <string name="setting_reset">Reset</string>
     <string name="bssid">bssid</string>
     <string name="ssid">ssid</string>
@@ -92,8 +92,14 @@
     <string name="team_info"><![CDATA[
         If you are a team member/leader, be sure to set your team\'s identifier. This team identifier should be the leader\'s own identifier, which can be found in menu.
     ]]></string>
-    <string name="wrong_id_format">ERROR! The identifier should contain 12 digits in hex like a mac address. A wrong identifier will prevent you from uploading your data.</string>
+    <string name="wrong_id_format">ERROR! The identifier should contain 12 digits in hex like a mac address. A wrong identifier will prevent you from uploading your data to your team.</string>
     <string name="connect_error">ERROR! Connection might be broken!</string>
     <string name="upload_error">ERROR! Uploading failed!</string>
     <string name="wrong_id_msg">ERROR! You might set your team\'s identifier incorrectly!</string>
+    <string name="import_error">ERROR! Something wrong happened while importing account data.</string>
+    <string name="import_ok">Your account is imported sucessfully.</string>
+    <string name="import_error_code">ERROR! Request search for file to import failed. Result code = </string>
+    <string name="export_error">ERROR! Something wrong happened while exporting account data.</string>
+    <string name="export_ok">Your account is exported sucessfully.</string>
+    <string name="export_error_code">ERROR! Request create exported file failed. Result code = </string>
 </resources>
