@@ -72,10 +72,10 @@ public class MainActivity extends AppCompatActivity
   public static final String ACTION_ASK_PERMISSION = "ask_for_permission";
   public static final String R_PERMISSION = "permission_code";
   private static final String LOG_TAG = MainActivity.class.getSimpleName();
-  private static final String PREF_SORT_METHOD = "sort_method";
-  private static final String SORT_BY_TIME = "sort_by_time";
-  private static final String SORT_BY_RSSID = "sort_by_rssid";
-  private static final String SORT_BY_FREQ = "sort_by_freq";
+  public static final String PREF_SORT_METHOD = "sort_method";
+  public static final String SORT_BY_TIME = "sort_by_time";
+  public static final String SORT_BY_RSSID = "sort_by_rssid";
+  public static final String SORT_BY_FREQ = "sort_by_freq";
   public static final String PREF_TOTAL_AP = "p_total_ap";
   private static final long MIN_UPLOAD_ALLOWED = 250;
   private TextView gps;
@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity
   private SharedPreferences sharedPreferences;
   private boolean scanning = false;
   private Intent intent;
-  private String rankingInfo;
   private BroadcastReceiver serviceBroadcastReceiver = new ServiceBroadcastReceiver();
 
   @Override

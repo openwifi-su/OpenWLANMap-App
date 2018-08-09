@@ -2,6 +2,9 @@ package su.openwifi.openwlanmap;
 
 import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
 import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
+import static su.openwifi.openwlanmap.MainActivity.PREF_SORT_METHOD;
+import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
+import static su.openwifi.openwlanmap.MainActivity.SORT_BY_TIME;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -156,7 +159,24 @@ public class SettingActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.setting_reset:
-        Toast.makeText(this, "Settings is reseted sucessfully", Toast.LENGTH_LONG).show();
+        //save programmatical prefs
+        final String ownBssid = sharedP.getString(PREF_OWN_BSSID, "");
+        final String ranking = sharedP.getString(PREF_RANKING, "");
+        final long totalAps = sharedP.getLong(PREF_TOTAL_AP, 0L);
+        final String sortMethod = sharedP.getString(PREF_SORT_METHOD, SORT_BY_TIME);
+        //reset pref
+        sharedP.edit().clear().commit();
+        //reset programmatical prefs
+        addPreference(PREF_OWN_BSSID, ownBssid);
+        addPreference(PREF_RANKING, ranking);
+        addPreferenceLong(PREF_TOTAL_AP, totalAps);
+        addPreference(PREF_SORT_METHOD, sortMethod);
+        ResourceManager.allowNoLocation = 0;
+        ResourceManager.allowBattery = 0;
+        ServiceController.showCounterWrapper.setShouldShow(false);
+        Toast.makeText(this, getString(R.string.reset_alert), Toast.LENGTH_SHORT).show();
+        finish();
+        startActivity(getIntent());
         break;
       case R.id.setting_export:
         Intent intentExport = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -291,6 +311,12 @@ public class SettingActivity extends AppCompatActivity {
   private void addPreference(String key, String info) {
     SharedPreferences.Editor editor = sharedP.edit();
     editor.putString(key, info);
+    editor.commit();
+  }
+
+  private void addPreferenceLong(String key, long totalAp) {
+    SharedPreferences.Editor editor = sharedP.edit();
+    editor.putLong(key, totalAp);
     editor.commit();
   }
 }

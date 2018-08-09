@@ -81,7 +81,7 @@
             android:title="@string/setting_public_data"
             android:summary="@string/setting_public_data_info"></CheckBoxPreference>
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="pref_publish_map"
             android:layout="@layout/custom_pref_layout"
             android:summary="@string/map_info"

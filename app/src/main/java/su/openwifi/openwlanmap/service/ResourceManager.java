@@ -35,6 +35,7 @@ public class ResourceManager extends Thread {
   @Override
   public void run() {
     while (running) {
+      Log.e(LOG_TAG, "allowBattery="+allowBattery+"allowLocation="+allowNoLocation);
       IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
       Intent batteryStatus = context.registerReceiver(null, ifilter);
       int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);

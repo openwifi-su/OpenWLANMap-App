@@ -29,7 +29,7 @@
     <string name="gps_pop_up_ok">You allowed GPS permission</string>
     <string name="setting_import">Import account</string>
     <string name="setting_export">Export account</string>
-    <string name="setting_reset">Reset</string>
+    <string name="setting_reset">Reset settings</string>
     <string name="bssid">bssid</string>
     <string name="ssid">ssid</string>
     <string name="rssid">rssid</string>
@@ -102,4 +102,5 @@
     <string name="export_error">ERROR! Something wrong happened while exporting account data.</string>
     <string name="export_ok">Your account is exported sucessfully.</string>
     <string name="export_error_code">ERROR! Request create exported file failed. Result code = </string>
+    <string name="reset_alert">Settings is reseted sucessfully.</string>
 </resources>

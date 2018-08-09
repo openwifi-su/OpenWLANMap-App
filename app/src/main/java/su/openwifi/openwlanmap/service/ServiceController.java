@@ -495,8 +495,9 @@ public class ServiceController extends Service implements Runnable, Observer {
       }
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
-        final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "");
+        final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "-1000");
         double limit = Double.valueOf(pref_min_rssi);
+        Log.e(LOG_TAG, "rssid="+limit);
         List<ScanResult> resultList = simpleWifiLocator.getWifiScanResult();
         for (ScanResult result : resultList) {
           if (result.level > limit) {
