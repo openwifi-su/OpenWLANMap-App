@@ -61,7 +61,7 @@ public class WifiUploader {
               .getAccessPointDao()
               .delete(uploadEntries);
         } else {
-          error = context.getString(R.string.upload_error) + "\n" + QueryUtils.requestDetail + "\n" + UploadQueryUtils.parseMsg;
+          error = context.getString(R.string.upload_error) + "\nHttp code = " + QueryUtils.requestDetail + "\n" + UploadQueryUtils.parseMsg;
           return false;
         }
       } else {
