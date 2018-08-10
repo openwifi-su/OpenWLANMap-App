@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity
   public static final String R_UPLOAD_MSG = "upload_msg";
   public static final String ACTION_UPDATE_DB = "database_status";
   public static final String ACTION_UPDATE_RANKING = "update_ranking";
-  public static final String R_RANK = "rank_position";
   public static final String ACTION_KILL_APP = "kill_app";
   public static final String ACTION_AUTO_RANK = "auto_rank";
   public static final String PREF_RANKING = "p_ranking";
@@ -562,7 +561,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onReceive(Context context, Intent intent) {
-      Log.i(LOG_TAG, "Receiving smt from service");
+      Log.i(LOG_TAG, "Receiving smt from service = "+intent.getAction());
       switch (intent.getAction()) {
         case ACTION_UPDATE_UI:
           if (loading.getVisibility() == View.VISIBLE) {
@@ -609,19 +608,11 @@ public class MainActivity extends AppCompatActivity
           newestScan.setText("0");
           break;
         case ACTION_UPLOAD_ERROR:
-          String msg = intent.getStringExtra(R_UPLOAD_MSG);
-          showAlertUpload(msg);
+          showAlertUpload(intent.getStringExtra(R_UPLOAD_MSG));
           resetListVisibility();
           break;
         case ACTION_UPDATE_RANKING:
-          RankingObject r = intent.getParcelableExtra(R_RANK);
-          showAlertUpload(getString(R.string.uploadOK)
-              + "\n" + getString(R.string.upCount) + r.uploadedCount
-              + "\n" + getString(R.string.upRank) + r.uploadedRank
-              + "\n" + getString(R.string.upNewAp) + r.newAps
-              + "\n" + getString(R.string.upUpdAp) + r.updAps
-              + "\n" + getString(R.string.upDelAp) + r.delAps
-              + "\n" + getString(R.string.upNewPoint) + r.newPoints);
+          showAlertUpload(intent.getStringExtra(R_UPLOAD_MSG));
           rank.setText(ServiceController.ranking);
           resetListVisibility();
           break;

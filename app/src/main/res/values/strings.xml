@@ -60,7 +60,6 @@
     <string name="stopped">Stopped</string>
     <string name="closeDialog">CLOSE</string>
     <string name="uploading">Uploading...</string>
-    <string name="uploadOK">Uploaded successfully!</string>
     <string name="upCount">Uploaded count =</string>
     <string name="upRank">Uploaded rank =</string>
     <string name="upNewAp">New aps =</string>
@@ -94,7 +93,7 @@
     ]]></string>
     <string name="wrong_id_format">ERROR! The identifier should contain 12 digits in hex like a mac address. A wrong identifier will prevent you from uploading your data to your team.</string>
     <string name="connect_error">ERROR! Connection might be broken!</string>
-    <string name="upload_error">ERROR! Uploading failed!</string>
+    <string name="upload_error">Failed with</string>
     <string name="wrong_id_msg">ERROR! You might set your team\'s identifier incorrectly!</string>
     <string name="import_error">ERROR! Something wrong happened while importing account data.</string>
     <string name="import_ok">Your account is imported sucessfully.</string>
@@ -104,4 +103,8 @@
     <string name="recheck">RECHECK</string>
     <string name="upload">UPLOAD</string>
     <string name="upload_process">Upload in process...</string>
+    <string name="upload_sum">UPLOAD SUMMARY</string>
+    <string name="upload_m">Uploading</string>
+    <string name="ok">OK</string>
+    <string name="newRank">NEW RANK</string>
 </resources>

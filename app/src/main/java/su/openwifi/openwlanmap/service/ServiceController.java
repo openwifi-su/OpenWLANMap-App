@@ -1,6 +1,5 @@
 package su.openwifi.openwlanmap.service;
 
-import static su.openwifi.openwlanmap.MainActivity.ACTION_ASK_PERMISSION;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
@@ -14,8 +13,6 @@ import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
-import static su.openwifi.openwlanmap.MainActivity.R_PERMISSION;
-import static su.openwifi.openwlanmap.MainActivity.R_RANK;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
@@ -33,11 +30,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -112,23 +107,38 @@ public class ServiceController extends Service implements Runnable, Observer {
           startForeground(1, notificationBuilder.build());
           Log.e(LOG_TAG, "upload data="
               + ownId + "-team=" + teamId + "mode=" + mode + "tag=" + tag);
-          boolean uploaded = uploader.upload();
-          if (uploaded) {
-            //update ranking
-            RankingObject rankingObject = uploader.getRanking();
-            Log.e(LOG_TAG, "Getting ranking ob=" + rankingObject.toString());
-            intent = new Intent();
-            intent.setAction(ACTION_UPDATE_RANKING);
-            intent.putExtra(R_RANK, rankingObject);
-            broadcaster.sendBroadcast(intent);
-            ranking = rankingObject.uploadedRank
-                + "(" + rankingObject.uploadedCount + " "
-                + getString(R.string.point) + ")";
-          } else {
+          if(!checkConnection()){
             intent = new Intent();
             intent.setAction(ACTION_UPLOAD_ERROR);
-            intent.putExtra(R_UPLOAD_MSG, uploader.getError());
+            intent.putExtra(R_UPLOAD_MSG, getString(R.string.connect_error));
             broadcaster.sendBroadcast(intent);
+          }else{
+            boolean uploaded = uploader.upload();
+            if (uploaded) {
+              //update ranking
+              RankingObject rankingObject = uploader.getRanking();
+              Log.e(LOG_TAG, "Getting ranking ob=" + rankingObject.toString());
+              ranking = rankingObject.uploadedRank
+                  + "(" + rankingObject.uploadedCount + " "
+                  + getString(R.string.point) + ")";
+              intent = new Intent();
+              intent.setAction(ACTION_UPDATE_RANKING);
+              String msg = uploader.getMsg()
+                  + "\n" + getString(R.string.newRank)
+                  + "\n" + getString(R.string.upCount) + rankingObject.uploadedCount
+                  + "\n" + getString(R.string.upRank) + rankingObject.uploadedRank
+                  + "\n" + getString(R.string.upNewAp) + rankingObject.newAps
+                  + "\n" + getString(R.string.upUpdAp) + rankingObject.updAps
+                  + "\n" + getString(R.string.upDelAp) + rankingObject.delAps
+                  + "\n" + getString(R.string.upNewPoint) + rankingObject.newPoints;
+              intent.putExtra(R_UPLOAD_MSG, msg);
+              broadcaster.sendBroadcast(intent);
+            } else {
+              intent = new Intent();
+              intent.setAction(ACTION_UPLOAD_ERROR);
+              intent.putExtra(R_UPLOAD_MSG, uploader.getMsg());
+              broadcaster.sendBroadcast(intent);
+            }
           }
           Config.setMode(SCAN_MODE);
           notificationBuilder.setSmallIcon(R.drawable.scan_icon);
@@ -196,6 +206,13 @@ public class ServiceController extends Service implements Runnable, Observer {
     }
   }
 
+  private boolean checkConnection() {
+    ConnectivityManager manager = (ConnectivityManager)
+        getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo info = manager.getActiveNetworkInfo();
+    return (info != null && info.isConnected());
+  }
+
   private void cleanUpData() {
     while (!getLocation) {
       Log.i(LOG_TAG, "Waiting for wlocator to finish job = " + getLocation);
@@ -252,6 +269,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     final boolean pref_show_counter = sharedPreferences.getBoolean("pref_show_counter", false);
     final int pref_upload_entry = Integer.parseInt(
         sharedPreferences.getString("pref_upload_entry", "5000"));
+    /*
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       while (!Settings.canDrawOverlays(this)) {
         Intent intent = new Intent();
@@ -268,6 +286,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     } else {
       iniOverlayView(totalApsCount);
     }
+    */
     totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
     showCounterWrapper = new ShowCounterWrapper(pref_show_counter);
@@ -451,16 +470,18 @@ public class ServiceController extends Service implements Runnable, Observer {
   public void update(Observable o, Object arg) {
     Log.e(LOG_TAG, "update");
     if (arg == null) {
-      Log.e(LOG_TAG, "update not null means overlay update");
+      Log.e(LOG_TAG, "update ap count");
       totalApsCount = totalAps.getTotalAps();
       intent = new Intent();
       intent.setAction(ACTION_UPDATE_DB);
       intent.putExtra(R_TOTAL_LIST, totalApsCount);
       broadcaster.sendBroadcast(intent);
     }
+    /*
     overlayView.setValue(totalApsCount);
     overlayView.setMode(lastLocMethod);
     overlayView.postInvalidate();
+    */
   }
 
   private boolean canTrigger() {
@@ -490,12 +511,14 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       float radius,
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
+      /*
       if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
         //change color of overlay if loc method changes
         lastLocMethod = simpleWifiLocator.getLastLocMethod();
         overlayView.setMode(lastLocMethod);
         overlayView.postInvalidate();
       }
+      */
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "-1000");

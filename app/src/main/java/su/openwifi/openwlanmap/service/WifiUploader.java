@@ -1,8 +1,6 @@
 package su.openwifi.openwlanmap.service;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 import java.util.List;
 import su.openwifi.openwlanmap.AccessPoint;
@@ -17,12 +15,11 @@ import su.openwifi.openwlanmap.utils.UploadQueryUtils;
  */
 
 public class WifiUploader {
-  private static final int MAX_TRIAL = 5;
   private static final String LOG_TAG = WifiUploader.class.getName();
   private Context context;
   private TotalApWrapper totalAps;
   private RankingObject ranking;
-  private String error;
+  private String msg;
 
   public WifiUploader(Context context, TotalApWrapper totalAps) {
     this.context = context;
@@ -37,69 +34,70 @@ public class WifiUploader {
   public boolean upload() {
     //String testOwnBssid = "8911CDEE5A14";
     //String testTeam = "Team42";
+    ranking = null;
+    long total = totalAps.getTotalAps();
+    msg = context.getString(R.string.upload_sum) + "\n";
     long count = MyDatabase.getInstance(context)
         .getAccessPointDao()
         .countEntries();
-    int counter = 0;
     while (count > 0) {
       Log.i(LOG_TAG, "READING DATABASE......................db=" + count);
       List<AccessPoint> uploadEntries = MyDatabase.getInstance(context)
           .getAccessPointDao()
           .getAllDataEntriesToUpload();
       Log.i(LOG_TAG, "Uploading now = " + uploadEntries.size());
-      if (checkConnection()) {
-        //Upload
-        ranking = UploadQueryUtils.uploadOpenWifi(uploadEntries,
-            ServiceController.ownId.toUpperCase(),
-            ServiceController.teamId.toUpperCase(),
-            ServiceController.tag,
-            ServiceController.mode);
-        if (ranking != null) {
-          //Delete
-          Log.e(LOG_TAG, "Getting back from upload response");
-          MyDatabase.getInstance(context)
-              .getAccessPointDao()
-              .delete(uploadEntries);
+      //Upload
+      RankingObject response = UploadQueryUtils.uploadOpenWifi(uploadEntries,
+          ServiceController.ownId.toUpperCase(),
+          ServiceController.teamId.toUpperCase(),
+          ServiceController.tag,
+          ServiceController.mode);
+      msg += String.format("%s %d / %d : ", context.getString(R.string.upload_m),
+          uploadEntries.size(),
+          total);
+      if (response != null) {
+        //Delete
+        Log.e(LOG_TAG, "Getting back from upload response");
+        msg += context.getString(R.string.ok) + "\n";
+        if (ranking == null) {
+          ranking = response;
         } else {
-          error = context.getString(R.string.upload_error)
-              + "\nHttp code = " + QueryUtils.requestDetail
-              + "\n" + UploadQueryUtils.parseMsg;
-          return false;
+          ranking.uploadedRank = response.uploadedRank;
+          ranking.uploadedCount = response.uploadedCount;
+          ranking.delAps += response.delAps;
+          ranking.newAps += response.newAps;
+          ranking.updAps += response.updAps;
+          ranking.newPoints += response.newPoints;
         }
+        MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .delete(uploadEntries);
+        count = MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .countEntries();
       } else {
-        counter++;
-        if (counter > MAX_TRIAL) {
-          totalAps.setTotalAps(count);
-          error = context.getString(R.string.connect_error);
-          return false;
-        }
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        msg += context.getString(R.string.upload_error)
+            + " Http code = " + QueryUtils.requestDetail
+            + "," + UploadQueryUtils.parseMsg
+            + "\n";
+        count = MyDatabase.getInstance(context)
+            .getAccessPointDao()
+            .countEntries();
+        break;
       }
-      count = MyDatabase.getInstance(context)
-          .getAccessPointDao()
-          .countEntries();
     }
-    totalAps.setTotalAps(count);
+    if(count < total){
+      totalAps.setTotalAps(count);
+    }
     Log.i(LOG_TAG, "Done uploading......");
-    return true;
-  }
-
-  private boolean checkConnection() {
-    ConnectivityManager manager = (ConnectivityManager)
-        context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo info = manager.getActiveNetworkInfo();
-    return (info != null && info.isConnected());
+    return ranking != null;
   }
 
   public RankingObject getRanking() {
     return ranking;
   }
 
-  public String getError() {
-    return error;
+  public String getMsg() {
+    return msg;
   }
 }

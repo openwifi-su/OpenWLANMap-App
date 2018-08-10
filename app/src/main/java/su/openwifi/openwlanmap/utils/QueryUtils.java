@@ -53,7 +53,7 @@ public class QueryUtils {
       }
       httpUrlConnection.connect();
       int code = httpUrlConnection.getResponseCode();
-      requestDetail = code + " : " + httpUrlConnection.getResponseMessage();
+      requestDetail = code + " (" + httpUrlConnection.getResponseMessage()+")";
       Log.e(LOG_TAG, "response code= " + code);
       if (code == HttpURLConnection.HTTP_OK) {
         ins = httpUrlConnection.getInputStream();

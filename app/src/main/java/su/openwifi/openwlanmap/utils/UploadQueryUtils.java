@@ -12,7 +12,7 @@ import su.openwifi.openwlanmap.AccessPoint;
 public class UploadQueryUtils {
   private static final String LOG_TAG = UploadQueryUtils.class.getName();
   private static final String URL_UPLOAD_OPEN_WIFI = "http://www.openwifi.su/android/upload.php";
-  private static final String URL_UPLOAD_VIRTUAL_WORLD = "http://tracker.virtualworlds.de/android/upload.php";
+  //private static final String URL_UPLOAD_VIRTUAL_WORLD = "http://tracker.virtualworlds.de/android/upload.php";
   public static String parseMsg;
 
   private UploadQueryUtils() {
@@ -110,13 +110,13 @@ public class UploadQueryUtils {
       InputStreamReader inputStreamReader = new InputStreamReader(ins, Charset.forName("UTF-8"));
       BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
       try {
-        rankingObject.remoteVersion = Integer.parseInt(bufferedReader.readLine());
-        rankingObject.uploadedCount = Integer.parseInt(bufferedReader.readLine());
+        bufferedReader.readLine(); //remote version
+        rankingObject.uploadedCount = Long.parseLong(bufferedReader.readLine());
         rankingObject.uploadedRank = Integer.parseInt(bufferedReader.readLine());
-        rankingObject.newAps = Integer.parseInt(bufferedReader.readLine());
-        rankingObject.updAps = Integer.parseInt(bufferedReader.readLine());
-        rankingObject.delAps = Integer.parseInt(bufferedReader.readLine());
-        rankingObject.newPoints = Integer.parseInt(bufferedReader.readLine());
+        rankingObject.newAps = Long.parseLong(bufferedReader.readLine());
+        rankingObject.updAps = Long.parseLong(bufferedReader.readLine());
+        rankingObject.delAps = Long.parseLong(bufferedReader.readLine());
+        rankingObject.newPoints = Long.parseLong(bufferedReader.readLine());
         return rankingObject;
       } catch (Exception e) {
         Log.e(LOG_TAG, "Error reading inputstream");
