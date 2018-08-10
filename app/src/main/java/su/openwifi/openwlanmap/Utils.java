@@ -68,14 +68,18 @@ public class Utils {
     }
   }
 
+  /**
+   * Check overlay permission.
+   * @param activity : activity for get result
+   */
   public static void checkDrawOverlayPermission(Activity activity) {
     /** check if we already  have permission to draw over other apps */
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (!Settings.canDrawOverlays(activity)) {
-        /** if not construct intent to request permission */
+        // if not construct intent to request permission
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
             Uri.parse("package:" + activity.getPackageName()));
-        /** request permission via start activity for result */
+        //request permission via start activity for result
         activity.startActivityForResult(intent, REQUEST_OVERLAY);
       }
     }
@@ -86,19 +90,43 @@ public class Utils {
     return teamBssid.length() == 12 && teamBssid.matches("^[0-9a-fA-F]+$");
   }
 
+  /**
+   * Edit preference.
+   * @param sharedPreferences : shared preference
+   * @param key : key
+   * @param info : value
+   */
   public static void addPreference(SharedPreferences sharedPreferences, String key, String info) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putString(key, info);
     editor.commit();
   }
 
-  public static void addPreferenceLong(SharedPreferences sharedPreferences, String key, long totalAp) {
+  /**
+   * Edit preference.
+   * @param sharedPreferences : shared preference
+   * @param key : key
+   * @param totalAp : value
+   */
+  public static void addPreferenceLong(
+      SharedPreferences sharedPreferences,
+      String key,
+      long totalAp) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putLong(key, totalAp);
     editor.commit();
   }
 
-  public static void addPreferenceBoolean(SharedPreferences sharedPreferences, String key, boolean value) {
+  /**
+   * Edit preference.
+   * @param sharedPreferences : shared preference
+   * @param key : key
+   * @param value : value
+   */
+  public static void addPreferenceBoolean(
+      SharedPreferences sharedPreferences,
+      String key,
+      boolean value) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(key, value);
     editor.commit();

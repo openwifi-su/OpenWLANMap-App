@@ -110,7 +110,8 @@ public class ServiceController extends Service implements Runnable, Observer {
           cleanUpData();
           notificationBuilder.setSmallIcon(R.drawable.upload_icon);
           startForeground(1, notificationBuilder.build());
-          Log.e(LOG_TAG, "upload data=" + ownId + "-team=" + teamId + "mode=" + mode + "tag=" + tag);
+          Log.e(LOG_TAG, "upload data="
+              + ownId + "-team=" + teamId + "mode=" + mode + "tag=" + tag);
           boolean uploaded = uploader.upload();
           if (uploaded) {
             //update ranking
@@ -467,8 +468,8 @@ public class ServiceController extends Service implements Runnable, Observer {
     if (info != null && info.isConnected()) {
       final String pref_upload_mode = sharedPreferences.getString("pref_upload_mode", "0");
       if (pref_upload_mode.equalsIgnoreCase("1")
-          || (pref_upload_mode.equalsIgnoreCase("2") &&
-          info.getType() == ConnectivityManager.TYPE_WIFI)
+          || (pref_upload_mode.equalsIgnoreCase("2")
+          && info.getType() == ConnectivityManager.TYPE_WIFI)
           ) {
         return true;
       }
@@ -568,7 +569,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       } else if (lastSpeed < 2) {
         // user seems to walk
         SCAN_PERIOD = 3000;
-      } else if(lastSpeed<0.5) {
+      } else if (lastSpeed < 0.5) {
         //user seems to stay
         SCAN_PERIOD = 5000;
       }

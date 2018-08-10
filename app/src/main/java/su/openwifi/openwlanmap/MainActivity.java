@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
-    if(intent == null){
+    if (intent == null) {
       intent = new Intent(this, ServiceController.class);
     }
     startServiceIfNotRunningYet();
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity
 
   private void startServiceIfNotRunningYet() {
     Log.e(LOG_TAG, "start service. Current running?=" + ServiceController.running);
-    if(intent == null){
+    if (intent == null) {
       intent = new Intent(this, ServiceController.class);
     }
     if (!ServiceController.running) {
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity
       // onStop, UI receives no update on ap count and rank from autoupload
       rank.setText(ServiceController.ranking);
       totalAp.setText(String.valueOf(ServiceController.totalApsCount));
-      gps.setText(ServiceController.lastLat+"-"+ServiceController.lastLon);
+      gps.setText(ServiceController.lastLat + "-" + ServiceController.lastLon);
       newestScan.setText(String.valueOf(ServiceController.newest));
       if (ServiceController.lastSpeed > 0) {
         speed.setText(String
@@ -378,9 +378,11 @@ public class MainActivity extends AppCompatActivity
         long apInDb = sharedPreferences.getLong(PREF_TOTAL_AP, 0L);
         if (apInDb < MIN_UPLOAD_ALLOWED) {
           showAlertUpload(getString(R.string.upload_under_limit));
-        }else if (Config.getMode() == Config.MODE.UPLOAD_MODE || Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE){
+        } else if (Config.getMode() == Config.MODE.UPLOAD_MODE
+            || Config.getMode() == Config.MODE.AUTO_UPLOAD_MODE) {
           showAlertUpload(getString(R.string.upload_process));
-        }else if (! ((ServiceController.teamId.length() == 0) || Utils.checkBssid(ServiceController.teamId))) {
+        } else if (!((ServiceController.teamId.length() == 0)
+            || Utils.checkBssid(ServiceController.teamId))) {
           AlertDialog.Builder builder = new AlertDialog.Builder(this);
           builder.setMessage(getString(R.string.wrong_id_msg));
           builder.setPositiveButton(R.string.upload, new DialogInterface.OnClickListener() {

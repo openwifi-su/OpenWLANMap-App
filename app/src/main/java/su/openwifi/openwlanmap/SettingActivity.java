@@ -74,10 +74,10 @@ public class SettingActivity extends AppCompatActivity {
             case "pref_battery":
               final String pref_battery = sharedPreferences.getString(key, "");
               ServiceController.allowBattery = Integer.parseInt(pref_battery);
-              if( (ServiceController.allowBattery !=0)
-                  && ((ServiceController.resourceManager ==null)
-                  || (!ServiceController.resourceManager.isAlive()))){
-                Log.e("SETT", "restart resource manger bat="+ServiceController.allowBattery);
+              if ((ServiceController.allowBattery != 0)
+                  && ((ServiceController.resourceManager == null)
+                  || (!ServiceController.resourceManager.isAlive()))) {
+                Log.e("SETT", "restart resource manger bat=" + ServiceController.allowBattery);
                 ServiceController.resourceManager = new ResourceManager(SettingActivity.this);
                 ServiceController.resourceManager.start();
               }
@@ -85,10 +85,10 @@ public class SettingActivity extends AppCompatActivity {
             case "pref_kill_ap_no_gps":
               final String pref_kill_ap_no_gps = sharedPreferences.getString(key, "");
               ServiceController.allowNoLocation = Integer.parseInt(pref_kill_ap_no_gps);
-              if( (ServiceController.allowNoLocation !=0)
-                  && ((ServiceController.resourceManager ==null)
-                  || (!ServiceController.resourceManager.isAlive()))){
-                Log.e("SETT", "restart resource manger="+ServiceController.allowNoLocation);
+              if ((ServiceController.allowNoLocation != 0)
+                  && ((ServiceController.resourceManager == null)
+                  || (!ServiceController.resourceManager.isAlive()))) {
+                Log.e("SETT", "restart resource manger=" + ServiceController.allowNoLocation);
                 ServiceController.resourceManager = new ResourceManager(SettingActivity.this);
                 ServiceController.resourceManager.start();
               }
@@ -116,16 +116,16 @@ public class SettingActivity extends AppCompatActivity {
               ServiceController.tag = sharedPreferences.getString(key, "");
               break;
             case "pref_public_data":
-              if(sharedPreferences.getBoolean(key, true)){
+              if (sharedPreferences.getBoolean(key, true)) {
                 ServiceController.mode |= 1;
-              }else{
+              } else {
                 ServiceController.mode &= 2;
               }
               break;
             case "pref_publish_map":
-              if(sharedPreferences.getBoolean(key, false)){
+              if (sharedPreferences.getBoolean(key, false)) {
                 ServiceController.mode |= 2;
-              }else{
+              } else {
                 ServiceController.mode &= 1;
               }
               break;
@@ -176,7 +176,7 @@ public class SettingActivity extends AppCompatActivity {
     final Preference pref_team = fragment.findPreference("pref_team");
     if (prefInTeamStatus) {
       pref_team.setEnabled(true);
-      ServiceController.teamId = sharedP.getString("pref_team","");
+      ServiceController.teamId = sharedP.getString("pref_team", "");
     } else {
       pref_team.setEnabled(false);
       ServiceController.teamId = "";
@@ -201,10 +201,10 @@ public class SettingActivity extends AppCompatActivity {
         //reset pref
         sharedP.edit().clear().commit();
         //reset programmatical prefs
-        Utils.addPreference(sharedP,PREF_OWN_BSSID, ownBssid);
-        Utils.addPreference(sharedP,PREF_RANKING, ranking);
-        Utils.addPreferenceLong(sharedP,PREF_TOTAL_AP, totalAps);
-        Utils.addPreference(sharedP,PREF_SORT_METHOD, sortMethod);
+        Utils.addPreference(sharedP, PREF_OWN_BSSID, ownBssid);
+        Utils.addPreference(sharedP, PREF_RANKING, ranking);
+        Utils.addPreferenceLong(sharedP, PREF_TOTAL_AP, totalAps);
+        Utils.addPreference(sharedP, PREF_SORT_METHOD, sortMethod);
         ServiceController.allowNoLocation = 0;
         ServiceController.allowBattery = 0;
         ServiceController.showCounterWrapper.setShouldShow(false);
@@ -296,31 +296,32 @@ public class SettingActivity extends AppCompatActivity {
                 ServiceController.ranking = rank
                     + "(" + points + " "
                     + getString(R.string.point) + ")";
-                Utils.addPreference(sharedP,PREF_RANKING, ServiceController.ranking);
-                Utils.addPreference(sharedP,PREF_OWN_BSSID, ServiceController.ownId);
+                Utils.addPreference(sharedP, PREF_RANKING, ServiceController.ranking);
+                Utils.addPreference(sharedP, PREF_OWN_BSSID, ServiceController.ownId);
                 showAlert(getString(R.string.import_ok));
               } else if (version == 2) {
                 ServiceController.ownId = dataInputStream.readUTF();
                 ServiceController.ranking = dataInputStream.readUTF();
                 ServiceController.tag = dataInputStream.readUTF();
                 final boolean inTeam = dataInputStream.readBoolean();
-                if(inTeam){
+                if (inTeam) {
                   ServiceController.teamId = dataInputStream.readUTF();
                   Utils.addPreference(sharedP, "pref_team", ServiceController.teamId);
                 }
-                Utils.addPreference(sharedP,PREF_RANKING, ServiceController.ranking);
-                Utils.addPreference(sharedP,PREF_OWN_BSSID, ServiceController.ownId);
+                Utils.addPreference(sharedP, PREF_RANKING, ServiceController.ranking);
+                Utils.addPreference(sharedP, PREF_OWN_BSSID, ServiceController.ownId);
                 Utils.addPreference(sharedP, "pref_team_tag", ServiceController.tag);
                 Utils.addPreferenceBoolean(sharedP, "pref_in_team", inTeam);
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
                 builder.setMessage(getString(R.string.import_ok));
-                builder.setPositiveButton(R.string.closeDialog, new DialogInterface.OnClickListener() {
-                  public void onClick(DialogInterface dialog, int id) {
-                    finish();
-                    startActivity(getIntent());
-                    dialog.dismiss();
-                  }
-                });
+                builder.setPositiveButton(R.string.closeDialog,
+                    new DialogInterface.OnClickListener() {
+                      public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                        startActivity(getIntent());
+                        dialog.dismiss();
+                      }
+                    });
                 // Create and show the AlertDialog
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
@@ -336,8 +337,8 @@ public class SettingActivity extends AppCompatActivity {
           if (data != null) {
             ParcelFileDescriptor pfd = null;
             try {
-              pfd = getContentResolver().
-                  openFileDescriptor(data.getData(), "w");
+              pfd = getContentResolver()
+                  .openFileDescriptor(data.getData(), "w");
               FileOutputStream fileOutputStream =
                   new FileOutputStream(pfd.getFileDescriptor());
               DataOutputStream out = new DataOutputStream(fileOutputStream);
@@ -347,7 +348,7 @@ public class SettingActivity extends AppCompatActivity {
               out.writeUTF(ServiceController.tag);
               final boolean pref_in_team = sharedP.getBoolean("pref_in_team", false);
               out.writeBoolean(pref_in_team);
-              if(pref_in_team){
+              if (pref_in_team) {
                 out.writeUTF(ServiceController.teamId);
               }
               out.close();

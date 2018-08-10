@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import su.openwifi.openwlanmap.AccessPoint;
@@ -83,7 +82,7 @@ public class UploadQueryUtils {
     stringBuilder.append(ownId + "\n");
     stringBuilder.append("T\t");
     stringBuilder.append(tag + "\n");
-    if(teamId.length() > 0){
+    if (teamId.length() > 0) {
       stringBuilder.append("E\t");
       stringBuilder.append(teamId + "\n");
     }
@@ -121,10 +120,10 @@ public class UploadQueryUtils {
         return rankingObject;
       } catch (Exception e) {
         Log.e(LOG_TAG, "Error reading inputstream");
-        parseMsg=e.toString();
+        parseMsg = e.toString();
       }
-    }else{
-      parseMsg="Response inputstream = null";
+    } else {
+      parseMsg = "Response inputstream = null";
     }
     return null;
   }

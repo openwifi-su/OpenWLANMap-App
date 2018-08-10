@@ -22,9 +22,10 @@ public class QueryUtils {
 
   /**
    * This method does a http unsecure connection.
+   *
    * @param urlString : url to connect
-   * @param method : http method
-   * @param content : payload
+   * @param method    : http method
+   * @param content   : payload
    * @return an inputstream
    */
   public static InputStream makeHttpRequest(String urlString, String method, String content) {
@@ -52,7 +53,7 @@ public class QueryUtils {
       }
       httpUrlConnection.connect();
       int code = httpUrlConnection.getResponseCode();
-      requestDetail=code+" : "+httpUrlConnection.getResponseMessage();
+      requestDetail = code + " : " + httpUrlConnection.getResponseMessage();
       Log.e(LOG_TAG, "response code= " + code);
       if (code == HttpURLConnection.HTTP_OK) {
         ins = httpUrlConnection.getInputStream();
@@ -70,6 +71,7 @@ public class QueryUtils {
 
   /**
    * This method helps create an URL object out of an url String.
+   *
    * @param urlString : url in String
    * @return URL object
    */
