@@ -32,6 +32,7 @@
             android:name=".SettingActivity"
             android:label="Settings"
             android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MapActivity"
