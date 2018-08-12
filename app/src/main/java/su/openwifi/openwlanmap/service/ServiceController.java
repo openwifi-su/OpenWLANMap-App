@@ -1,5 +1,6 @@
 package su.openwifi.openwlanmap.service;
 
+import static su.openwifi.openwlanmap.MainActivity.ACTION_ASK_PERMISSION;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_AUTO_RANK;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_KILL_APP;
 import static su.openwifi.openwlanmap.MainActivity.ACTION_UPDATE_DB;
@@ -13,6 +14,7 @@ import static su.openwifi.openwlanmap.MainActivity.PREF_TOTAL_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_GEO_INFO;
 import static su.openwifi.openwlanmap.MainActivity.R_LIST_AP;
 import static su.openwifi.openwlanmap.MainActivity.R_NEWEST_SCAN;
+import static su.openwifi.openwlanmap.MainActivity.R_PERMISSION;
 import static su.openwifi.openwlanmap.MainActivity.R_SPEED;
 import static su.openwifi.openwlanmap.MainActivity.R_TOTAL_LIST;
 import static su.openwifi.openwlanmap.MainActivity.R_UPLOAD_MSG;
@@ -30,9 +32,11 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -269,7 +273,6 @@ public class ServiceController extends Service implements Runnable, Observer {
     final boolean pref_show_counter = sharedPreferences.getBoolean("pref_show_counter", false);
     final int pref_upload_entry = Integer.parseInt(
         sharedPreferences.getString("pref_upload_entry", "5000"));
-    /*
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       while (!Settings.canDrawOverlays(this)) {
         Intent intent = new Intent();
@@ -286,7 +289,6 @@ public class ServiceController extends Service implements Runnable, Observer {
     } else {
       iniOverlayView(totalApsCount);
     }
-    */
     totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
     showCounterWrapper = new ShowCounterWrapper(pref_show_counter);
@@ -337,7 +339,6 @@ public class ServiceController extends Service implements Runnable, Observer {
             | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
             | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
         PixelFormat.TRANSLUCENT);
     params.gravity = Gravity.LEFT | Gravity.TOP;
@@ -477,11 +478,9 @@ public class ServiceController extends Service implements Runnable, Observer {
       intent.putExtra(R_TOTAL_LIST, totalApsCount);
       broadcaster.sendBroadcast(intent);
     }
-    /*
     overlayView.setValue(totalApsCount);
     overlayView.setMode(lastLocMethod);
     overlayView.postInvalidate();
-    */
   }
 
   private boolean canTrigger() {
@@ -511,14 +510,12 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       float radius,
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
-      /*
       if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
         //change color of overlay if loc method changes
         lastLocMethod = simpleWifiLocator.getLastLocMethod();
         overlayView.setMode(lastLocMethod);
         overlayView.postInvalidate();
       }
-      */
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
         final String pref_min_rssi = sharedPreferences.getString("pref_min_rssi", "-1000");
