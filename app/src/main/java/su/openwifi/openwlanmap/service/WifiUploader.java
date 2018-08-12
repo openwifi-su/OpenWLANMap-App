@@ -86,7 +86,7 @@ public class WifiUploader {
         break;
       }
     }
-    if(count < total){
+    if (count < total) {
       totalAps.setTotalAps(count);
     }
     Log.i(LOG_TAG, "Done uploading......");

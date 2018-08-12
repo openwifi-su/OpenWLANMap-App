@@ -111,12 +111,12 @@ public class ServiceController extends Service implements Runnable, Observer {
           startForeground(1, notificationBuilder.build());
           Log.e(LOG_TAG, "upload data="
               + ownId + "-team=" + teamId + "mode=" + mode + "tag=" + tag);
-          if(!checkConnection()){
+          if (!checkConnection()) {
             intent = new Intent();
             intent.setAction(ACTION_UPLOAD_ERROR);
             intent.putExtra(R_UPLOAD_MSG, getString(R.string.connect_error));
             broadcaster.sendBroadcast(intent);
-          }else{
+          } else {
             boolean uploaded = uploader.upload();
             if (uploaded) {
               //update ranking

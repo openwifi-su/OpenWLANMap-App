@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.service.Config;
 import su.openwifi.openwlanmap.service.ServiceController;
-import su.openwifi.openwlanmap.utils.RankingObject;
 
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
@@ -561,7 +560,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onReceive(Context context, Intent intent) {
-      Log.i(LOG_TAG, "Receiving smt from service = "+intent.getAction());
+      Log.i(LOG_TAG, "Receiving smt from service = " + intent.getAction());
       switch (intent.getAction()) {
         case ACTION_UPDATE_UI:
           if (loading.getVisibility() == View.VISIBLE) {
