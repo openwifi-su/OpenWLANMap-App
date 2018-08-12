@@ -2,6 +2,7 @@ package su.openwifi.openwlanmap;
 
 import static su.openwifi.openwlanmap.MainActivity.PREF_OWN_BSSID;
 import static su.openwifi.openwlanmap.MainActivity.PREF_RANKING;
+import static su.openwifi.openwlanmap.Utils.OPEN_WIFI_MAP_URL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,12 +26,33 @@ import java.util.List;
 public class RankingActivity extends AppCompatActivity {
 
 
+  private static final String OPEN_WIFI_RANKING_URL = "http://openwifi.su/owlmapatandroid.php?lang=";
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_ranking);
 
+
     //get view
+    //load website currently for ranking
+    WebView webView = findViewById(R.id.ranking_web_view);
+    TextView userRank = findViewById(R.id.user_ranking);
+
+    //get content
+    userRank.setText(PreferenceManager.getDefaultSharedPreferences(this)
+        .getString(PREF_RANKING, ""));
+
+    WebSettings webSettings = webView.getSettings();
+    webSettings.setJavaScriptEnabled(true);
+    //Make it like a normal viewport as browser
+    webSettings.setUseWideViewPort(true);
+    webSettings.setSupportZoom(true);
+    //open page inside of my Webview
+    webView.setWebViewClient(new WebViewClient());
+    webView.loadUrl(OPEN_WIFI_RANKING_URL);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    /*
     ListView listRank = findViewById(R.id.list_ranking);
     TextView userRank = findViewById(R.id.user_ranking);
 
@@ -45,6 +70,7 @@ public class RankingActivity extends AppCompatActivity {
     list.add(new Rank("test team 8", 2800, 8));
     RankAdapter adapter = new RankAdapter(this, list);
     listRank.setAdapter(adapter);
+    */
   }
 
   @Override
@@ -54,6 +80,7 @@ public class RankingActivity extends AppCompatActivity {
     }
     return true;
   }
+
 
   public class Rank {
     protected String name;

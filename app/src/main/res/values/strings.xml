@@ -107,4 +107,5 @@
     <string name="upload_m">Uploading</string>
     <string name="ok">OK</string>
     <string name="newRank">NEW RANK</string>
+    <string name="your_rank_header">Your\'s rank:</string>
 </resources>

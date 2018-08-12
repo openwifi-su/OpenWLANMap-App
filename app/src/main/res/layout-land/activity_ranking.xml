@@ -3,21 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingLeft="10dp"
     tools:context="su.openwifi.openwlanmap.RankingActivity">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="20dp"
-        android:paddingTop="10dp">
+        android:paddingRight="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your/Your's position: "
+            android:text="@string/your_rank_header"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -31,6 +30,10 @@
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,5 +55,6 @@
         android:id="@+id/ranking_web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    </LinearLayout>
 
 </LinearLayout>
