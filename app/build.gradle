@@ -32,5 +32,6 @@ dependencies {
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
     // notification
     implementation "com.android.support:support-compat:27.1.1"
+    compile 'org.osmdroid:osmdroid-android:6.0.1'
 
 }
