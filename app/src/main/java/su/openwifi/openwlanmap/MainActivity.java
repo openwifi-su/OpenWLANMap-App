@@ -353,9 +353,6 @@ public class MainActivity extends AppCompatActivity
     switch (item.getItemId()) {
       case R.id.gps_map:
         //go to gps map
-        //startActivity(new Intent(MainActivity.this, MapActivity.class));
-        //test kill app
-        Config.setMode(Config.MODE.KILL_MODE);
         break;
       case R.id.sort_signal:
         Utils.addPreference(sharedPreferences, PREF_SORT_METHOD, SORT_BY_RSSID);
@@ -488,6 +485,9 @@ public class MainActivity extends AppCompatActivity
         break;
       case R.id.map:
         startActivity(new Intent(this, OpenWifiMapActivity.class));
+        break;
+      case R.id.usermap:
+        startActivity(new Intent(MainActivity.this, MapActivity.class));
         break;
       case R.id.news:
         //announcement page --> fetch from backend

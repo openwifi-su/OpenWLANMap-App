@@ -2,7 +2,7 @@
     <string name="app_name">OpenWLANMap</string>
     <string name="settings">Settings</string>
     <string name="user">User page</string>
-    <string name="map">Current map</string>
+    <string name="map">Current total map</string>
     <string name="news">News</string>
     <string name="ranking">Ranking</string>
     <string name="help">Help center</string>
@@ -108,4 +108,7 @@
     <string name="ok">OK</string>
     <string name="newRank">NEW RANK</string>
     <string name="your_rank_header">Your\'s rank:</string>
+    <string name="usermap">User\'s map</string>
+    <string name="map_loading_error">Something wrong happened while trying to load your map! :(</string>
+    <string name="no_connection">There is no internet connection :(</string>
 </resources>
