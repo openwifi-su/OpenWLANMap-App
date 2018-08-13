@@ -33,5 +33,5 @@ dependencies {
     // notification
     implementation "com.android.support:support-compat:27.1.1"
     compile 'org.osmdroid:osmdroid-android:6.0.1'
-
+    compile 'com.github.MKergall:osmbonuspack:6.5.1'
 }
