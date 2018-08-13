@@ -3,7 +3,7 @@ package su.openwifi.openwlanmap;
 import java.io.Serializable;
 import org.osmdroid.api.IGeoPoint;
 
-public class Coordinate implements IGeoPoint, Serializable {
+public class Coordinate implements IGeoPoint {
   private double lat;
   private double lon;
   public Coordinate(double lat, double lon){
