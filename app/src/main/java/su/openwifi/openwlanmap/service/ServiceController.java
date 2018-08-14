@@ -25,6 +25,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -273,16 +274,6 @@ public class ServiceController extends Service implements Runnable, Observer {
     final boolean pref_show_counter = sharedPreferences.getBoolean("pref_show_counter", false);
     final int pref_upload_entry = Integer.parseInt(
         sharedPreferences.getString("pref_upload_entry", "5000"));
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if (!Settings.canDrawOverlays(this)) {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_ASK_PERMISSION);
-        intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
-        broadcaster.sendBroadcast(intent);
-      }
-    } else {
-      iniOverlayView(totalApsCount);
-    }
     totalAps = new TotalApWrapper();
     totalAps.addObserver(this);
     showCounterWrapper = new ShowCounterWrapper(pref_show_counter);
@@ -300,6 +291,18 @@ public class ServiceController extends Service implements Runnable, Observer {
       numberOfApToUpload = -1;
     }
     broadcaster = LocalBroadcastManager.getInstance(this);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (!Settings.canDrawOverlays(this)) {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_ASK_PERMISSION);
+        intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
+        broadcaster.sendBroadcast(intent);
+      }else{
+        iniOverlayView(totalApsCount);
+      }
+    } else {
+      iniOverlayView(totalApsCount);
+    }
     running = true;
     controller.start();
     storer.start();
@@ -475,9 +478,13 @@ public class ServiceController extends Service implements Runnable, Observer {
       intent.putExtra(R_TOTAL_LIST, totalApsCount);
       broadcaster.sendBroadcast(intent);
     }
-    overlayView.setValue(totalApsCount);
-    overlayView.setMode(lastLocMethod);
-    overlayView.postInvalidate();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if(Settings.canDrawOverlays(getApplicationContext()) && overlayView !=null){
+        overlayView.setValue(totalApsCount);
+        overlayView.setMode(lastLocMethod);
+        overlayView.postInvalidate();
+      }
+    }
   }
 
   private boolean canTrigger() {
@@ -507,11 +514,15 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       float radius,
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
-      if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
-        //change color of overlay if loc method changes
-        lastLocMethod = simpleWifiLocator.getLastLocMethod();
-        overlayView.setMode(lastLocMethod);
-        overlayView.postInvalidate();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if(Settings.canDrawOverlays(getApplicationContext()) && overlayView !=null){
+          if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
+            //change color of overlay if loc method changes
+            lastLocMethod = simpleWifiLocator.getLastLocMethod();
+            overlayView.setMode(lastLocMethod);
+            overlayView.postInvalidate();
+          }
+        }
       }
       intent = new Intent();
       if (ret == WLOC_REPONSE_CODE.OK && qualityCheck(lat, lon, radius)) {
@@ -577,7 +588,11 @@ public class ServiceController extends Service implements Runnable, Observer {
       //set up next scan period
       if (!sharedPreferences.getBoolean("pref_adaptive_scanning", true)) {
         SCAN_PERIOD = 2000;
-      } else if (lastSpeed > 15) {
+      } else if((getApplicationContext().getResources().getConfiguration().uiMode &
+              Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){
+        //TODO tmp handle night mode
+        SCAN_PERIOD = 30*60*1000;
+      }else if (lastSpeed > 15) {
         //from  about 55km/h
         SCAN_PERIOD = 750;
       } else if (lastSpeed < 0) {
@@ -590,6 +605,8 @@ public class ServiceController extends Service implements Runnable, Observer {
         //user seems to stay
         SCAN_PERIOD = 5000;
       }
+
+
       //TODO detect not moving and extend scan period
       Log.e(LOG_TAG, "print out=" + numberOfApToUpload + "/" + totalApsCount);
       if (totalApsCount >= numberOfApToUpload && canTrigger() && Config.getMode() == SCAN_MODE) {

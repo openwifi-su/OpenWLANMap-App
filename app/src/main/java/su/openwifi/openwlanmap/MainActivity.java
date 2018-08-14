@@ -15,7 +15,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -33,6 +35,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -46,6 +49,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.service.Config;
+import su.openwifi.openwlanmap.service.HudView;
 import su.openwifi.openwlanmap.service.ServiceController;
 
 public class MainActivity extends AppCompatActivity
@@ -184,7 +188,9 @@ public class MainActivity extends AppCompatActivity
     super.onStart();
     Utils.checkLocationPermission(this);
     Utils.checkGpsSignal(this);
-    Utils.checkDrawOverlayPermission(this);
+    if(sharedPreferences.getBoolean("pref_show_counter", false)){
+      Utils.checkDrawOverlayPermission(this);
+    }
     final Set<String> summarySet = sharedPreferences.getStringSet("pref_show_summary", null);
     rankField.setVisibility(View.GONE);
     gpsField.setVisibility(View.GONE);
@@ -300,19 +306,6 @@ public class MainActivity extends AppCompatActivity
             doRegister();
             startService(intent);
             Toast.makeText(this, getString(R.string.gps_pop_up_ok), Toast.LENGTH_SHORT).show();
-            /*new Thread() {
-              @Override
-              public void run() {
-                try {
-                  Thread.sleep(1000);
-                  Utils.checkGpsSignal(MainActivity.this);
-                } catch (InterruptedException e) {
-                  Log.e(LOG_TAG, "Fail scaling toast time");
-                  Thread.currentThread().interrupt();
-                }
-              }
-            }.start();
-            */
           } else {
             Toast.makeText(this, getString(R.string.gps_pop_up), Toast.LENGTH_SHORT).show();
             new Thread() {
@@ -335,7 +328,21 @@ public class MainActivity extends AppCompatActivity
         break;
       case REQUEST_WRITE:
         break;
+      default:
+        break;
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    switch (requestCode){
       case REQUEST_OVERLAY:
+        /*
+        if(ServiceController.running){
+          stopService(intent);
+          startService(intent);
+        }
+        */
         break;
       default:
         break;
