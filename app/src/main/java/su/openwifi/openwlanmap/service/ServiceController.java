@@ -297,7 +297,7 @@ public class ServiceController extends Service implements Runnable, Observer {
         intent.setAction(ACTION_ASK_PERMISSION);
         intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
         broadcaster.sendBroadcast(intent);
-      }else{
+      } else {
         iniOverlayView(totalApsCount);
       }
     } else {
@@ -321,6 +321,10 @@ public class ServiceController extends Service implements Runnable, Observer {
     startForeground(1, notificationBuilder.build());
   }
 
+  /**
+   * Ini overlay view.
+   * @param value total count of aps
+   */
   public void iniOverlayView(long value) {
     WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     overlayView = new HudView(getApplicationContext(), sharedPreferences);
@@ -328,7 +332,7 @@ public class ServiceController extends Service implements Runnable, Observer {
     overlayView.invalidate();
 
     //TODO most of flags are deprecated --> find alternatives
-    int  overlayFlag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    int overlayFlag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
     WindowManager.LayoutParams params = new WindowManager
@@ -479,7 +483,7 @@ public class ServiceController extends Service implements Runnable, Observer {
       broadcaster.sendBroadcast(intent);
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if(Settings.canDrawOverlays(getApplicationContext()) && overlayView !=null){
+      if (Settings.canDrawOverlays(getApplicationContext()) && overlayView != null) {
         overlayView.setValue(totalApsCount);
         overlayView.setMode(lastLocMethod);
         overlayView.postInvalidate();
@@ -515,7 +519,7 @@ public class ServiceController extends Service implements Runnable, Observer {
                                       short ccode) {
       Log.i(LOG_TAG, "Getting back lat-lon = " + lat + "-" + lon);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if(Settings.canDrawOverlays(getApplicationContext()) && overlayView !=null){
+        if (Settings.canDrawOverlays(getApplicationContext()) && overlayView != null) {
           if (lastLocMethod != simpleWifiLocator.getLastLocMethod()) {
             //change color of overlay if loc method changes
             lastLocMethod = simpleWifiLocator.getLastLocMethod();
@@ -588,11 +592,11 @@ public class ServiceController extends Service implements Runnable, Observer {
       //set up next scan period
       if (!sharedPreferences.getBoolean("pref_adaptive_scanning", true)) {
         SCAN_PERIOD = 2000;
-      } else if((getApplicationContext().getResources().getConfiguration().uiMode &
-              Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){
+      } else if ((getApplicationContext().getResources().getConfiguration().uiMode
+          & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
         //TODO tmp handle night mode
-        SCAN_PERIOD = 30*60*1000;
-      }else if (lastSpeed > 15) {
+        SCAN_PERIOD = 30 * 60 * 1000;
+      } else if (lastSpeed > 15) {
         //from  about 55km/h
         SCAN_PERIOD = 750;
       } else if (lastSpeed < 0) {

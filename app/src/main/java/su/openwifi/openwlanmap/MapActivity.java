@@ -3,14 +3,11 @@ package su.openwifi.openwlanmap;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +22,8 @@ import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay;
 import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlayOptions;
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 
-public class MapActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<IGeoPoint>> {
+public class MapActivity extends AppCompatActivity
+    implements LoaderManager.LoaderCallbacks<List<IGeoPoint>> {
   private static final int LOADER_ID = 1;
   private MapView mapView;
   private ProgressBar progressView;
@@ -62,7 +60,7 @@ public class MapActivity extends AppCompatActivity implements LoaderManager.Load
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()){
+    switch (item.getItemId()) {
       case R.id.map_refresh:
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo infor = connectivityManager.getActiveNetworkInfo();
@@ -109,7 +107,7 @@ public class MapActivity extends AppCompatActivity implements LoaderManager.Load
       //check network infor
       mapView.getOverlays().add(sfpo);
       mapView.setVisibility(View.VISIBLE);
-    }else{
+    } else {
       Toast.makeText(this,
           getString(R.string.map_loading_error),
           Toast.LENGTH_SHORT).show();

@@ -15,9 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.PixelFormat;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -35,7 +33,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -49,7 +46,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import su.openwifi.openwlanmap.service.Config;
-import su.openwifi.openwlanmap.service.HudView;
 import su.openwifi.openwlanmap.service.ServiceController;
 
 public class MainActivity extends AppCompatActivity
@@ -188,7 +184,7 @@ public class MainActivity extends AppCompatActivity
     super.onStart();
     Utils.checkLocationPermission(this);
     Utils.checkGpsSignal(this);
-    if(sharedPreferences.getBoolean("pref_show_counter", false)){
+    if (sharedPreferences.getBoolean("pref_show_counter", false)) {
       Utils.checkDrawOverlayPermission(this);
     }
     final Set<String> summarySet = sharedPreferences.getStringSet("pref_show_summary", null);
@@ -335,7 +331,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    switch (requestCode){
+    switch (requestCode) {
       case REQUEST_OVERLAY:
         /*
         if(ServiceController.running){
