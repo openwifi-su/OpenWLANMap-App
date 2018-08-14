@@ -76,7 +76,6 @@ public class ServiceController extends Service implements Runnable, Observer {
   private WifiUploader uploader;
   private TotalApWrapper totalAps;
   private SharedPreferences sharedPreferences;
-  private HudView overlayView;
   private ConnectivityManager connectivityManager;
   private NotificationCompat.Builder notificationBuilder;
   private WifiLocator.LOC_METHOD lastLocMethod = WifiLocator.LOC_METHOD.NOT_DEFINE;
@@ -99,6 +98,7 @@ public class ServiceController extends Service implements Runnable, Observer {
   public static double lastLon = 190;
   public static float lastSpeed = -1f;
   public static int newest = 0;
+  public static HudView overlayView = null;
 
   @Override
   public void run() {
@@ -274,18 +274,12 @@ public class ServiceController extends Service implements Runnable, Observer {
     final int pref_upload_entry = Integer.parseInt(
         sharedPreferences.getString("pref_upload_entry", "5000"));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      while (!Settings.canDrawOverlays(this)) {
+      if (!Settings.canDrawOverlays(this)) {
         Intent intent = new Intent();
         intent.setAction(ACTION_ASK_PERMISSION);
         intent.putExtra(R_PERMISSION, Utils.REQUEST_OVERLAY);
         broadcaster.sendBroadcast(intent);
-        try {
-          Thread.sleep(3000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
       }
-      iniOverlayView(totalApsCount);
     } else {
       iniOverlayView(totalApsCount);
     }
@@ -324,17 +318,20 @@ public class ServiceController extends Service implements Runnable, Observer {
     startForeground(1, notificationBuilder.build());
   }
 
-  private void iniOverlayView(long value) {
+  public void iniOverlayView(long value) {
     WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-    overlayView = new HudView(this, sharedPreferences);
+    overlayView = new HudView(getApplicationContext(), sharedPreferences);
     overlayView.setValue(value);
     overlayView.invalidate();
 
     //TODO most of flags are deprecated --> find alternatives
+    int  overlayFlag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
     WindowManager.LayoutParams params = new WindowManager
         .LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
-        WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+        overlayFlag,
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
             | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
             | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
